@@ -2,6 +2,15 @@
 
   <goal name="build:snapshot">
     <attainGoal name="uberjar"/>
+    <attainGoal name="build:snapshot:dist"/>
+  </goal>
+  
+  <goal name="build:snapshot:dist">
+    <zip file="target/maven-proxy-standalone-SNAPSHOT.zip">
+      <fileset dir="target">
+        <include name="maven-proxy-standalone-*uber.jar"/>
+      </fileset>
+    </zip>
   </goal>
   
   <goal name="run" prereqs="jar:jar">
