@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.maven.proxy.RepositoryServlet;
 import org.apache.maven.proxy.config.*;
 import org.apache.maven.proxy.config.PropertyLoader;
@@ -44,6 +45,8 @@ public class Standalone
     {
         Standalone launcher;
 
+        PropertyConfigurator.configure(Standalone.class.getResource("/log4j.properties"));
+        
         try
         {
             launcher = new Standalone();

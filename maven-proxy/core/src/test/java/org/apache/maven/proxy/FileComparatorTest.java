@@ -1,4 +1,4 @@
-package org.apache.maven.proxy.config;
+package org.apache.maven.proxy;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -16,22 +16,35 @@ package org.apache.maven.proxy.config;
  * limitations under the License.
  */
 
+import java.io.File;
+
+import junit.framework.TestCase;
+
 /**
- * 
  * @author  Ben Walding
  * @version $Id$
  */
-public class FileRepoConfiguration extends RepoConfiguration
+public class FileComparatorTest extends TestCase
 {
-    /**
-     * @param key
-     * @param url
-     */
-    public FileRepoConfiguration(String key, String url, String description, boolean copy) {
-        super(key, url, description, copy);
+    private FileComparator fc;
+
+    protected void setUp()
+    {
+        fc = new FileComparator();
     }
 
-    
-    
+    protected void tearDown()
+    {
+        fc = null;
+    }
 
+    public void testBasic()
+    {
+        File fa = new File("a");
+        File fb = new File("b");
+        assertTrue("fa vs fb", fc.compare(fa, fb) < 0);
+        assertTrue("fb vs fa", fc.compare(fb, fa) > 0);
+        assertTrue("fa vs fa", fc.compare(fa, fa) == 0);
+        assertTrue("fb vs fb", fc.compare(fb, fb) == 0);
+    }
 }
