@@ -7,43 +7,44 @@ import java.io.InputStream;
 
 /**
  * @author Ben Walding
- *  
  */
-public class RetrievalDetails {
-	private InputStream is;
+public class RetrievalDetails
+{
+    private InputStream is;
+    private long lastModified;
+    private long length;
 
-	private long length;
+    public RetrievalDetails( InputStream is )
+    {
+        this( is, -1, -1 );
+    }
 
-	public RetrievalDetails(InputStream is) {
-		this(is, -1);
-	}
+    public RetrievalDetails( InputStream is, long length, long lastModified )
+    {
+        this.is = is;
+        this.length = length;
+        this.lastModified = lastModified;
+    }
 
-	public RetrievalDetails(InputStream is, long length) {
-		this.is = is;
-		this.length = length;
-	}
+    public RetrievalDetails( File path ) throws FileNotFoundException
+    {
 
-	/**
-	 * @param path
-	 * @throws FileNotFoundException
-	 */
-	public RetrievalDetails(File path) throws FileNotFoundException {
+        this( new FileInputStream( path ), path.length(), path.lastModified() );
+    }
 
-		this(new FileInputStream(path), path.length());
-	}
+    public InputStream getInputStream()
+    {
+        return is;
+    }
 
-	/**
-	 * @return
-	 */
-	public InputStream getInputStream() {
-		return is;
-	}
+    public long getLength()
+    {
+        return length;
+    }
 
-	/**
-	 * @return
-	 */
-	public long getLength() {
-		return length;
-	}
+    public long getLastModified()
+    {
+        return lastModified;
+    }
 
 }
