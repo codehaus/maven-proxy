@@ -1,5 +1,10 @@
 <project default="uberjar">
 
+  <preGoal name="test:test-resources">
+    <mkdir dir="target/repo"/>
+    <mkdir dir="target/repo-local"/>
+  </preGoal>
+  
   <goal name="build:snapshot">
     <attainGoal name="jar:install-snapshot"/>
   </goal> 
