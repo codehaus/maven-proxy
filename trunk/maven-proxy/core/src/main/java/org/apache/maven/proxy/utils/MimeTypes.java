@@ -31,8 +31,30 @@ public class MimeTypes
         mimeTypesByExtension.put( ".md5", new MimeType( "text/plain" ) );
     }
 
-    public static MimeType getMimeType( String extension )
+    public static MimeType getMimeTypeByExtension( String extension )
     {
         return (MimeType) mimeTypesByExtension.get( extension );
     }
+
+    public static MimeType getMimeTypeByPath( String path )
+    {
+        String extension = getExtension( path );
+        return (MimeType) mimeTypesByExtension.get( extension );
+    }
+
+    /**
+     * @param path
+     * @return
+     */
+    static String getExtension( String path )
+    {
+        int dotPos = path.lastIndexOf( '.' );
+        if ( dotPos < 0 )
+        {
+            return path;
+        }
+
+        return path.substring( dotPos );
+    }
+
 }
