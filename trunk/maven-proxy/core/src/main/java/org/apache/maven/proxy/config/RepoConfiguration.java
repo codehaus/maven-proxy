@@ -20,7 +20,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.maven.proxy.components.NotFoundProxyArtifact;
 import org.apache.maven.proxy.components.ProxyArtifact;
+import org.apache.maven.proxy.components.SnapshotCache;
+import org.apache.maven.proxy.components.impl.DefaultSnapshotCache;
+import org.apache.maven.proxy.components.impl.NoCacheSnapshotCache;
 import org.apache.maven.proxy.engine.RetrievalDetails;
 
 /**
@@ -37,19 +41,40 @@ import org.apache.maven.proxy.engine.RetrievalDetails;
  */
 public abstract class RepoConfiguration
 {
+    /** log4j logger */
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger( RepoConfiguration.class );
+
     private final String key;
     private final String description;
     private final String url;
     private final boolean copy;
     private final boolean hardFail;
+    private final boolean cacheFailures;
+    private final long cachePeriod;
+    private final SnapshotCache snapshotCache;
 
-    public RepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail )
+    public RepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail,
+                    boolean cacheFailures, long cachePeriod )
     {
         this.key = key;
         this.url = url;
         this.description = description;
         this.copy = copy;
         this.hardFail = hardFail;
+        this.cacheFailures = cacheFailures;
+        this.cachePeriod = cachePeriod;
+
+        if ( getCachePeriod() > 0 )
+        {
+            //Multiply by 1000 because the config file is in seconds, but the cache is in milliseconds
+            LOGGER.info( this + ": Enabling cache with period of " + getCachePeriod() + " seconds" );
+            snapshotCache = new DefaultSnapshotCache( getCachePeriod() * 1000 );
+        }
+        else
+        {
+            LOGGER.info( "Disabling snapshot cache" );
+            snapshotCache = new NoCacheSnapshotCache();
+        }
     }
 
     /**
@@ -87,6 +112,16 @@ public abstract class RepoConfiguration
         return hardFail;
     }
 
+    public boolean getCacheFailures()
+    {
+        return cacheFailures;
+    }
+
+    public long getCachePeriod()
+    {
+        return cachePeriod;
+    }
+
     public String toString()
     {
         return "Repo[" + getKey() + "]";
@@ -94,6 +129,49 @@ public abstract class RepoConfiguration
 
     public abstract RetrievalDetails retrieveArtifact( File out, String url ) throws IOException;
 
-    public abstract ProxyArtifact getMetaInformation( String url ) throws FileNotFoundException;
+    /**
+     * 
+     * @param url
+     * @return
+     * @throws FileNotFoundException
+     */
+    protected abstract ProxyArtifact getMetaInformationInternal( String url ) throws FileNotFoundException;
 
+    public final ProxyArtifact getMetaInformation( String url ) throws FileNotFoundException
+    {
+        ProxyArtifact pa = getSnapshotCache().getSnapshot( url );
+
+        if ( pa == null )
+        {
+            pa = getMetaInformationInternal( url );
+            if ( pa == null )
+            {
+                pa = new NotFoundProxyArtifact( this, url );
+            }
+        }
+
+        getSnapshotCache().setSnapshot( url, pa );
+
+        if ( pa instanceof NotFoundProxyArtifact )
+        {
+            return null;
+        }
+
+        return pa;
+    }
+
+    /**
+     * There is really no need for clients to know they are being cached
+     * @return
+     */
+    private SnapshotCache getSnapshotCache()
+    {
+        return this.snapshotCache;
+    }
+
+    public void clearSnapshotCache() throws Exception
+    {
+        this.snapshotCache.stop();
+        this.snapshotCache.start();
+    }
 }

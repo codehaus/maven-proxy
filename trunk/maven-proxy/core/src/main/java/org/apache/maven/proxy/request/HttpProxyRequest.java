@@ -51,4 +51,9 @@ public class HttpProxyRequest extends BaseProxyRequest
     {
         return httpRequest.getRemoteAddr();
     }
+
+    public long getIfModifiedSince()
+    {
+        return httpRequest.getDateHeader( "If-Modified-Since" );
+    }
 }

@@ -40,9 +40,10 @@ public class FileRepoConfiguration extends RepoConfiguration
 
     private final String basePath;
 
-    public FileRepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail )
+    public FileRepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail,
+                    boolean cacheFailures, long cachePeriod )
     {
-        super( key, url, description, copy, hardFail );
+        super( key, url, description, copy, hardFail, cacheFailures, cachePeriod );
         basePath = url.substring( 8 );
     }
 
@@ -82,10 +83,10 @@ public class FileRepoConfiguration extends RepoConfiguration
         }
     }
 
-    public ProxyArtifact getMetaInformation( String url )
+    public ProxyArtifact getMetaInformationInternal( String url )
     {
         final File file = getLocalFile( url );
-        LOGGER.info( this + ": Checking last modified time for " + file );
+        LOGGER.debug( this + ": Checking last modified time for " + file );
 
         if ( file.exists() )
         {
@@ -94,6 +95,7 @@ public class FileRepoConfiguration extends RepoConfiguration
             snapshot.setLastModified( file.lastModified() );
             return snapshot;
         }
+
         return null;
     }
 }

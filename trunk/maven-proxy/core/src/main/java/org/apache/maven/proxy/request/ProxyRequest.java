@@ -22,6 +22,8 @@ package org.apache.maven.proxy.request;
 public interface ProxyRequest
 {
     public long getLastModified();
+    public long getIfModifiedSince();
+    
     public String getPath();
     public String getSourceDescription();
     

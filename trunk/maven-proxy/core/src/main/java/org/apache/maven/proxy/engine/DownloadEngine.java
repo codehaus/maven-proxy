@@ -13,9 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.proxy.components.NotFoundProxyArtifact;
 import org.apache.maven.proxy.components.ProxyArtifact;
-import org.apache.maven.proxy.components.SnapshotCache;
-import org.apache.maven.proxy.components.impl.DefaultSnapshotCache;
-import org.apache.maven.proxy.components.impl.NoCacheSnapshotCache;
 import org.apache.maven.proxy.config.FileRepoConfiguration;
 import org.apache.maven.proxy.config.GlobalRepoConfiguration;
 import org.apache.maven.proxy.config.RepoConfiguration;
@@ -34,30 +31,17 @@ public class DownloadEngine
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger( DownloadEngine.class );
 
     private final RetrievalComponentConfiguration rcc;
-    private final SnapshotCache snapshotCache;
 
     public DownloadEngine( RetrievalComponentConfiguration rcc )
     {
         this.rcc = rcc;
-
-        if ( rcc.getSnapshotUpdate() )
-        {
-            //Multiply by 1000 because the config file is in seconds, but the cache is in milliseconds
-            LOGGER.info( "Enabling snapshot cache with update interval of " + rcc.getSnapshotUpdateInterval()
-                            + " seconds" );
-            snapshotCache = new DefaultSnapshotCache( rcc.getSnapshotUpdateInterval() * 1000 );
-        }
-        else
-        {
-            LOGGER.info( "Disabling snapshot cache" );
-            snapshotCache = new NoCacheSnapshotCache();
-        }
     }
 
     public void process( ProxyRequest request, ProxyResponse response ) throws IOException
     {
         LOGGER.debug( "Request: source=" + request.getSourceDescription() + ", path=" + request.getPath()
-                        + ", lastModified=" + request.getLastModified() + ", headOnly=" + request.isHeadOnly() );
+                        + ", lastModified=" + request.getLastModified() + ", headOnly=" + request.isHeadOnly()
+                        + ", ifModifiedSince=" + request.getIfModifiedSince() );
         try
         {
             //If we try to update snapshots, and this is a snapshot
@@ -165,12 +149,7 @@ public class DownloadEngine
      */
     private ProxyArtifact findBestSnapshotProxyArtifact( ProxyRequest request, ProxyResponse response )
     {
-        ProxyArtifact latestArtifact = snapshotCache.getSnapshot( request.getPath() );
-        if ( latestArtifact != null )
-        {
-            LOGGER.info( latestArtifact.getRepo() + ": [CACHED] Contains the latest snapshot." );
-            return latestArtifact;
-        }
+        ProxyArtifact latestArtifact = null;
 
         //Find latest snapshot
         for ( Iterator iter = rcc.getRepos().iterator(); iter.hasNext(); )
@@ -216,16 +195,6 @@ public class DownloadEngine
         if ( latestArtifact == null )
         {
             latestArtifact = new NotFoundProxyArtifact( rcc.getGlobalRepo(), request.getPath() );
-
-            if ( rcc.getSnapshotCacheFailures() )
-            {
-                LOGGER.info( "Caching fact that " + request.getPath() + " was not found." );
-                snapshotCache.setSnapshot( request.getPath(), latestArtifact );
-            }
-        }
-        else
-        {
-            snapshotCache.setSnapshot( request.getPath(), latestArtifact );
         }
 
         return latestArtifact;
@@ -234,6 +203,7 @@ public class DownloadEngine
     private void processSnapshot( ProxyRequest request, ProxyResponse response ) throws IOException
     {
         String mimeType = getMimeType( getExtension( request.getPath() ) );
+        long modificationTime = retrieveModificationTime( request );
 
         ProxyArtifact latestArtifact = findBestSnapshotProxyArtifact( request, response );
 
@@ -258,7 +228,7 @@ public class DownloadEngine
         /*
          * This will occur if the client has a newer version of the artifact than we can provide.
          */
-        if ( request.getLastModified() >= latestArtifact.getLastModified() )
+        if ( modificationTime >= latestArtifact.getLastModified() )
         {
             LOGGER.info( latestArtifact.getRepo() + ": Sending NOT-MODIFIED response" );
             response.setContentType( mimeType );
@@ -305,6 +275,28 @@ public class DownloadEngine
         }
 
         LOGGER.error( "Got to the end of processing without doing anything useful!" );
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private long retrieveModificationTime( ProxyRequest request )
+    {
+        if ( request.getLastModified() < 0 && request.getIfModifiedSince() < 0 )
+        {
+            LOGGER.warn( "Neither If-Modified-Since nor Last-Modified are set" );
+            return -1;
+        }
+
+        if ( request.getLastModified() >= 0 && request.getIfModifiedSince() >= 0
+                        && request.getLastModified() != request.getIfModifiedSince() )
+        {
+            LOGGER.warn( "If-Modified-Since (" + request.getIfModifiedSince() + ") AND Last-Modified ("
+                            + request.getLastModified() + ") both set and unequal" );
+        }
+
+        return Math.max( request.getLastModified(), request.getIfModifiedSince() );
     }
 
     private RetrievalDetails download( RepoConfiguration source, File target, ProxyRequest request ) throws IOException
@@ -371,8 +363,11 @@ public class DownloadEngine
 
     public void clearSnapshotCache() throws Exception
     {
-        snapshotCache.stop();
-        snapshotCache.start();
+        for ( Iterator iter = rcc.getRepos().iterator(); iter.hasNext(); )
+        {
+            RepoConfiguration repo = (RepoConfiguration) iter.next();
+            repo.clearSnapshotCache();
+        }
     }
 
     /**

@@ -83,23 +83,6 @@ public class PropertyLoader
         }
 
         rcc.setSnapshotUpdate( Boolean.valueOf( getMandatoryProperty( props, SNAPSHOT_UPDATE ) ).booleanValue() );
-        rcc.setSnapshotCacheFailures( Boolean.valueOf( getOptionalProperty( props, SNAPSHOT_CACHE_FAILURES, "false" ) )
-                        .booleanValue() );
-        if ( props.getProperty( SNAPSHOT_UPDATE_INTERVAL ) == null )
-        {
-            rcc.setSnapshotUpdateInterval( 0 );
-        }
-        else
-        {
-            try
-            {
-                rcc.setSnapshotUpdateInterval( Integer.parseInt( props.getProperty( SNAPSHOT_UPDATE_INTERVAL ) ) );
-            }
-            catch ( NumberFormatException ex )
-            {
-                throw new ValidationException( "Property " + SNAPSHOT_UPDATE_INTERVAL + " must be a integer" );
-            }
-        }
 
         rcc.setBrowsable( Boolean.valueOf( getMandatoryProperty( props, BROWSABLE ) ).booleanValue() );
         rcc.setSearchable( Boolean.valueOf( getOptionalProperty( props, SEARCHABLE, "true" ) ).booleanValue() );
@@ -150,7 +133,10 @@ public class PropertyLoader
                 String username = repoProps.getProperty( "username" );
                 String password = repoProps.getProperty( "password" );
                 String description = repoProps.getProperty( "description" );
-                String proxyKey = repoProps.getProperty( "proxy" );
+                String proxyKey = repoProps.getProperty( "cache.failures" );
+                
+                Boolean cacheFailures = Boolean.valueOf( repoProps.getProperty( "cache.failures", "false" ) );
+                Long cachePeriod = Long.valueOf( repoProps.getProperty( "cache.period", "0" ) );
                 Boolean hardFail = Boolean.valueOf( repoProps.getProperty( "hardfail", "true" ) );
 
                 ProxyConfiguration proxy = null;
@@ -169,13 +155,13 @@ public class PropertyLoader
                 if ( url.startsWith( "http://" ) )
                 {
                     rc = new HttpRepoConfiguration( key, url, description, username, password, hardFail.booleanValue(),
-                                    proxy );
+                                    proxy, cacheFailures.booleanValue(), cachePeriod.longValue() );
                 }
 
                 if ( url.startsWith( "file:///" ) )
                 {
                     boolean copy = "true".equalsIgnoreCase( repoProps.getProperty( "copy" ) );
-                    rc = new FileRepoConfiguration( key, url, description, copy, hardFail.booleanValue() );
+                    rc = new FileRepoConfiguration( key, url, description, copy, hardFail.booleanValue(), cacheFailures.booleanValue(), cachePeriod.longValue() );
                 }
 
                 if ( rc == null )
