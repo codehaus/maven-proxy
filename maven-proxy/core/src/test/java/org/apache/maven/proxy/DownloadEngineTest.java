@@ -45,7 +45,7 @@ public class DownloadEngineTest extends TestCase
         rcc.addRepo( new GlobalRepoConfiguration( "target/repo" ) );
         rcc.addRepo( new MockRepoConfiguration( "MockA", "target/mock-a", "MockA", true, true ) );
         rcc.setSnapshotUpdate( true );
-        rcc.setSnapshotUpdateInterval( 1000 );
+        rcc.setSnapshotUpdateInterval( 1000 );        
         return rcc;
     }
 
@@ -104,6 +104,7 @@ public class DownloadEngineTest extends TestCase
      */
     public void testHaveOlderSnapshot() throws IOException
     {
+        LOGGER.info("testHaveOldersnapshot: Client has older version of SNAPSHOT and will take the whole thing.");
         MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 1000L, false );
         MockProxyResponse pResponse = new MockProxyResponse();
         DownloadEngine engine = new DownloadEngine( createRCC_A() );
