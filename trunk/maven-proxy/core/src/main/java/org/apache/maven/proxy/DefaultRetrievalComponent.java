@@ -40,8 +40,11 @@ public class DefaultRetrievalComponent implements RetrievalComponent
         {
             fr.setProxyHost(proxyHost);
             fr.setProxyPort(proxyPort);
-            fr.setProxyUser(proxyUsername);
-            fr.setProxyPass(proxyPassword);
+            if (proxyUsername != null)
+            {
+                fr.setProxyUser(proxyUsername);
+                fr.setProxyPass(proxyPassword);
+            }
         }
         FetchTool bean = new FetchTool();
 
