@@ -69,12 +69,13 @@ public class RepositoryServlet extends HttpServlet
 
     protected long getLastModified( HttpServletRequest request )
     {
-        if (request.getPathInfo() == null) {
+        if ( request.getPathInfo() == null )
+        {
             return -1;
         }
-        
+
         LOGGER.debug( "Checking getLastModified(): " + request.getPathInfo() );
-        
+
         final File f = getFileForRequest( request );
 
         if ( f.exists() && f.isFile() )
@@ -86,6 +87,21 @@ public class RepositoryServlet extends HttpServlet
             return super.getLastModified( request );
         }
     }
+
+    private ThreadLocal dateFormatThreadLocal = new ThreadLocal()
+    {
+        protected synchronized Object initialValue()
+        {
+            if ( rcc.getLastModifiedDateFormat() == null || rcc.getLastModifiedDateFormat() == "" )
+            {
+                return new SimpleDateFormat();
+            }
+            else
+            {
+                return new SimpleDateFormat( rcc.getLastModifiedDateFormat() );
+            }
+        }
+    };
 
     public void init() throws ServletException
     {
@@ -110,12 +126,12 @@ public class RepositoryServlet extends HttpServlet
         LOGGER.info( "Received request: " + pathInfo );
 
         //We were called with something like http://localhost:9999/repository  (need a trailing slash)
-        if (pathInfo == null) {
-            response.sendRedirect("./" + rcc.getPrefix() + "/");
+        if ( pathInfo == null )
+        {
+            response.sendRedirect( "./" + rcc.getPrefix() + "/" );
             return;
         }
-        
-        
+
         if ( pathInfo.endsWith( "/" ) )
         {
             if ( rcc.isBrowsable() )
@@ -151,17 +167,17 @@ public class RepositoryServlet extends HttpServlet
                 System.out.println( "Ideally download a new snapshot of this file" );
             }
 
-            File f = getFileForRequest(request);
-            
+            File f = getFileForRequest( request );
+
             //Basically, we were asked for /repository/a but "a" is a directory, so we need to go to /repository/a/ 
-            if (f.isDirectory()) {
-                LOGGER.info("Redirecting /repository/a -> /repository/a/");
-                response.sendRedirect(request.getRequestURI() + "/");
+            if ( f.isDirectory() )
+            {
+                LOGGER.info( "Redirecting /repository/a -> /repository/a/" );
+                response.sendRedirect( request.getRequestURI() + "/" );
                 return;
             }
             f.getParentFile().mkdirs();
-            
-            
+
             for ( int i = 0; i < repos.size(); i++ )
             {
                 RepoConfiguration repoConfig = (RepoConfiguration) repos.get( i );
@@ -250,13 +266,14 @@ public class RepositoryServlet extends HttpServlet
 
         PrintWriter pw = response.getWriter();
 
+        
         pw.println( "<html>" );
         pw.println( "<head>" );
-        pw.println( "  <title>maven-proxy</title>" );
+        pw.println( "  <title>maven-proxy - " + pathInfo + "</title>" );
         pw.println( "  <link type='text/css' rel='stylesheet' href='" + retrace + "/styles/style.css'/>" );
         pw.println( "</head>" );
         pw.println( "<body>" );
-        pw.println( "<div>Browsing " + pathInfo + "</div>" );
+        pw.println( "<div class='browse'>Browsing " + pathInfo + "</div>" );
         File dir = new File( localStoreDir, pathInfo );
         File[] files = dir.listFiles();
         if ( files == null )
@@ -285,25 +302,20 @@ public class RepositoryServlet extends HttpServlet
         pw.println( "<colgroup>" );
         pw.println( "  <col width='20px'>" ); //Icon
         pw.println( "  <col width='50px'>" ); //Size
-        pw.println( "  <col width='50px'>" ); //Last Mod
+        pw.println( "  <col width='180px'>" ); //Last Modified
         pw.println( "  <col width='*'>" ); //URL / name
         pw.println( "  <col width='*'>" ); //Something else?
         pw.println( "  <col width='5*'>" ); //Something else?
         pw.println( "</colgroup>" );
 
-        pw.println( "<tr class='dir-a'><td></td><td>Size</td><td>Name</td><td>Repository</td><td></td></tr>" );
+        pw.println( createHeader() );
 
         char toggle = 'a';
 
         if ( !pathInfo.equals( "/" ) )
         {
             toggle = ( toggle == 'a' ? 'b' : 'a' );
-            pw
-                            .println( "<tr class='dir-"
-                                            + toggle
-                                            + "'><td><img src='"
-                                            + retrace
-                                            + "/images/parent.png' alt=''/></td><td></td><td></td><td><a href='..'>..</a></td><td></td><td></td></tr>" );
+            pw.println( createRow( "dir-" + toggle, retrace + "/images/parent.png", "", -1, "..", "" ) );
         }
         else
         {
@@ -312,7 +324,7 @@ public class RepositoryServlet extends HttpServlet
         }
 
         //Collections.sort(fileArray, new FileComparator());
-        DateFormat df = new SimpleDateFormat();
+
         for ( Iterator fileIter = fileList.iterator(); fileIter.hasNext(); )
         {
             FileElement fe = (FileElement) fileIter.next();
@@ -330,20 +342,17 @@ public class RepositoryServlet extends HttpServlet
                 repoDescription = "Global Repository";
             }
 
-            if ( fe.getFile().isDirectory() )
+            if ( theFile.isDirectory() )
             {
-                pw.println( "<tr class='dir-" + toggle + "'><td><img src='" + retrace
-                                + "/images/folder.png' alt=''/><td></td><td></td></td><td><a href='" + theFile.getName() + "/'>"
-                                + theFile.getName() + "</a></td><td>" + repoDescription + "</td><td></td></tr>" );
+                pw.println( createRow( "dir-" + toggle, retrace + "/images/folder.png", theFile, repoDescription ) );
             }
             else
             {
-                pw.println( "<tr class='file-" + toggle + "'><td><img src='" + retrace
-                                + "/images/jar.png' alt=''/></td><td>" + theFile.length() + "</td><td>" + df.format(new Date(theFile.lastModified())) + "</td><td><a href='"
-                                + theFile.getName() + "'>" + theFile.getName() + "</a></td><td>" + repoDescription
-                                + "</td><td></td></tr>" );
+                pw.println( createRow( "dir-" + toggle, retrace + "/images/jar.png", theFile, repoDescription ) );
             }
         }
+
+        DateFormat d = new SimpleDateFormat();
         pw.println( "</table>" );
         pw.println( "</body>" );
         pw.println( "</html>" );
@@ -351,6 +360,37 @@ public class RepositoryServlet extends HttpServlet
 
     }
 
+    protected String createHeader()
+    {
+        return "<tr class='dir-a'><th></th><th>Size (bytes)</th><th>Last Modified</th><th>Name</th><th>Repository</th><th></th></tr>";
+    }
+
+    protected String createRow( String cssClass, String imgSrc, String length, long lastModified, String link,
+                    String repoDescription )
+    {
+        DateFormat df = (DateFormat) dateFormatThreadLocal.get();
+        String lastModString = "";
+        if ( lastModified >= 0 )
+        {
+            lastModString = df.format( new Date( lastModified ) );
+        }
+        return "<tr class='" + cssClass + "'><td><a href='" + link + "'><img src='" + imgSrc + "' alt=''/></a></td><td style='text-align:right'>" + length + "</td><td>"
+                        + lastModString + "</td><td><a href='" + link + "/'>" + link + "</a></td><td>"
+                        + repoDescription + "</td><td></td></tr>";
+    }
+
+    protected String createRow( String cssClass, String imgSrc, File theFile, String repoDescription )
+    {
+        if ( theFile.isDirectory() )
+        {
+            return createRow( cssClass, imgSrc, "", -1, theFile.getName(), repoDescription );
+        }
+        else
+        {
+            return createRow( cssClass, imgSrc, "" + theFile.length(), theFile.lastModified(), theFile.getName(),
+                            repoDescription );
+        }
+    }
 }
 
 /* A bit of code that slows down the transfer so you can see what is going on
