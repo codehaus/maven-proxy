@@ -31,7 +31,7 @@
 	  </fileset>
     </ant:copy>
     
-    <zip destfile="target/invigilator-${pom.currentVersion}-distribution.zip"
+    <zip destfile="target/maven-proxy-standalone-${pom.currentVersion}.zip"
       basedir="target/dist"
       update="true"
     />
