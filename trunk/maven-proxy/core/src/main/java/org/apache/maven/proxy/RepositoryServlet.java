@@ -22,9 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -37,13 +35,15 @@ import org.apache.maven.fetch.exceptions.FetchException;
 import org.apache.maven.fetch.exceptions.NotModifiedFetchException;
 import org.apache.maven.fetch.exceptions.ResourceNotFoundFetchException;
 import org.apache.maven.fetch.util.IOUtility;
+import org.apache.maven.proxy.components.SnapshotCache;
+import org.apache.maven.proxy.components.impl.DefaultSnapshotCache;
+import org.apache.maven.proxy.components.impl.NoCacheSnapshotCache;
 import org.apache.maven.proxy.config.FileRepoConfiguration;
 import org.apache.maven.proxy.config.RepoConfiguration;
 import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.servlet.VelocityServlet;
 
 /**
  * @author  Ben Walding
@@ -56,6 +56,8 @@ public class RepositoryServlet extends MavenProxyServlet
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger( RepositoryServlet.class );
 
     private RetrievalComponentConfiguration rcc = null;
+
+    private SnapshotCache snapshotCache;
 
     private File localStoreDir;
 
@@ -103,6 +105,17 @@ public class RepositoryServlet extends MavenProxyServlet
         rcc = (RetrievalComponentConfiguration) getServletContext().getAttribute( "config" );
 
         localStoreDir = new File( rcc.getLocalStore() );
+
+        if ( rcc.getSnapshotUpdate() )
+        {
+            //Multiply by 1000 because the config file is in seconds, but the cache is in milliseconds
+            snapshotCache = new DefaultSnapshotCache( rcc.getSnapshotUpdateInterval() * 1000);
+        }
+        else
+        {
+            snapshotCache = new NoCacheSnapshotCache();
+        }
+
         if ( !localStoreDir.exists() )
         {
             LOGGER.info( "Local Repository (" + localStoreDir.getAbsolutePath() + ") does not exist" );
@@ -191,6 +204,23 @@ public class RepositoryServlet extends MavenProxyServlet
                     }
                     else
                     {
+                        //So they've asked for a snapshot... lets check their headers and 304 them if they don't really want it
+                        if ( isSnapshot )
+                        {
+                            long clientLastModified = request.getDateHeader( "Last-Modified" );
+                            long cacheLastModified = snapshotCache.getLastModified( pathInfo );
+
+                            if ( cacheLastModified > -1 && clientLastModified > cacheLastModified )
+                            {
+                                //Cache hit - no snapshot update required.
+                                LOGGER.info("Client already has latest version of snapshot. Sending SC_NOT_MODIFIED");
+                                response.setDateHeader( "Last-Modified", cacheLastModified );
+                                response.sendError( HttpServletResponse.SC_NOT_MODIFIED );
+                                return;
+                            }
+
+                        }
+
                         LOGGER.info( "Retrieving from upstream (" + repoConfig.getKey() + " " + f.getAbsolutePath() );
                         try
                         {
@@ -201,6 +231,7 @@ public class RepositoryServlet extends MavenProxyServlet
                         }
                         catch ( NotModifiedFetchException e )
                         {
+                            //XXX should this just send an SC_NOT_MODIFIED?
                             LOGGER.info( "Snapshot update not required : " + f.getAbsolutePath() );
                             is = new FileInputStream( f );
                             size = f.length();
@@ -213,6 +244,10 @@ public class RepositoryServlet extends MavenProxyServlet
                     if ( size != -1 )
                     {
                         response.setContentLength( (int) size );
+                    }
+                    
+                    if (isSnapshot) {
+                        snapshotCache.setLastModified(pathInfo, lastModified);
                     }
 
                     OutputStream os = response.getOutputStream();
