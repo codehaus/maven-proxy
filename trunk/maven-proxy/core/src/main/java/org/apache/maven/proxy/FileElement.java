@@ -15,6 +15,7 @@ public class FileElement
 
     public FileElement(File file, RepoConfiguration repo) {
         this.file = file;
+        //Could get away with passing the repo in - just need repo ordering key and description
         this.repo = repo;
     }
     
