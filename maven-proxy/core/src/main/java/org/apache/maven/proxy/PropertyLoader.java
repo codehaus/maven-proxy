@@ -11,12 +11,9 @@ import java.util.StringTokenizer;
  */
 public class PropertyLoader
 {
-    public RetrievalComponentConfiguration load(InputStream is) throws IOException
+    public RetrievalComponentConfiguration load(Properties props) throws IOException
     {
         RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
-
-        Properties props = new Properties();
-        props.load(is);
 
         {
             String propertyList = props.getProperty("proxy.list");
@@ -56,5 +53,12 @@ public class PropertyLoader
             }
         }
         return rcc;
+
+    }
+    public RetrievalComponentConfiguration load(InputStream is) throws IOException
+    {
+        Properties props = new Properties();
+        props.load(is);
+        return load(props);
     }
 }
