@@ -22,17 +22,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -43,12 +40,16 @@ import org.apache.maven.fetch.util.IOUtility;
 import org.apache.maven.proxy.config.FileRepoConfiguration;
 import org.apache.maven.proxy.config.RepoConfiguration;
 import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
+import org.apache.velocity.Template;
+import org.apache.velocity.context.Context;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.servlet.VelocityServlet;
 
 /**
  * @author  Ben Walding
  * @version $Id$
  */
-public class RepositoryServlet extends HttpServlet
+public class RepositoryServlet extends MavenProxyServlet
 {
 
     /** log4j logger */
@@ -58,9 +59,6 @@ public class RepositoryServlet extends HttpServlet
 
     private File localStoreDir;
 
-    /* (non-Javadoc)
-     * @see javax.servlet.Servlet#destroy()
-     */
     public void destroy()
     {
         rcc = null;
@@ -83,25 +81,20 @@ public class RepositoryServlet extends HttpServlet
         {
             return f.lastModified();
         }
-        else
-        {
-            return super.getLastModified( request );
-        }
+
+        return super.getLastModified( request );
     }
 
     private ThreadLocal dateFormatThreadLocal = new ThreadLocal()
     {
-
         protected synchronized Object initialValue()
         {
             if ( rcc.getLastModifiedDateFormat() == null || rcc.getLastModifiedDateFormat() == "" )
             {
                 return new SimpleDateFormat();
             }
-            else
-            {
-                return new SimpleDateFormat( rcc.getLastModifiedDateFormat() );
-            }
+
+            return new SimpleDateFormat( rcc.getLastModifiedDateFormat() );
         }
     };
 
@@ -122,7 +115,8 @@ public class RepositoryServlet extends HttpServlet
         return new File( localStoreDir, request.getPathInfo() );
     }
 
-    public void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
+    public Template handleRequestInternal( HttpServletRequest request, HttpServletResponse response, Context context )
+                    throws Exception
     {
         final String pathInfo = request.getPathInfo();
         LOGGER.info( "Received request: " + pathInfo );
@@ -131,30 +125,26 @@ public class RepositoryServlet extends HttpServlet
         if ( pathInfo == null )
         {
             response.sendRedirect( "./" + rcc.getPrefix() + "/" );
-            return;
+            return null;
         }
 
         if ( pathInfo.endsWith( "/" ) )
         {
             if ( rcc.isBrowsable() )
             {
-                handleBrowseRequest( request, response );
+                return handleBrowseRequest( request, response, context );
             }
-            else
-            {
-                response.sendError( HttpServletResponse.SC_FORBIDDEN );
-            }
-            return;
+
+            response.sendError( HttpServletResponse.SC_FORBIDDEN );
+            return null;
         }
-        else
-        {
-            handleDownloadRequest( request, response );
-            return;
-        }
+
+        handleDownloadRequest( request, response );
+        return null;
     }
 
     private void handleDownloadRequest( HttpServletRequest request, HttpServletResponse response )
-            throws FileNotFoundException, IOException
+                    throws FileNotFoundException, IOException
     {
         try
         {
@@ -178,6 +168,8 @@ public class RepositoryServlet extends HttpServlet
                 response.sendRedirect( request.getRequestURI() + "/" );
                 return;
             }
+
+            //XXX This should really delay directory creation until we have a verified file downloaded.
             f.getParentFile().mkdirs();
 
             for ( int i = 0; i < repos.size(); i++ )
@@ -251,8 +243,13 @@ public class RepositoryServlet extends HttpServlet
     /**
      * @param request
      * @param response
+     * @param context
+     * @throws Exception
+     * @throws ParseErrorException
+     * @throws Exception
      */
-    private void handleBrowseRequest( HttpServletRequest request, HttpServletResponse response ) throws IOException
+    private Template handleBrowseRequest( HttpServletRequest request, HttpServletResponse response, Context context )
+                    throws Exception
     {
         final String pathInfo = request.getPathInfo();
         final String retrace;
@@ -266,25 +263,21 @@ public class RepositoryServlet extends HttpServlet
             retrace = URLTool.getRetrace( "/" + rcc.getPrefix() + pathInfo );
         }
 
-        PrintWriter pw = response.getWriter();
+        context.put( "retrace", retrace );
+        context.put( "pathInfo", pathInfo );
 
-        pw.println( "<html>" );
-        pw.println( "<head>" );
-        pw.println( "  <title>maven-proxy - " + pathInfo + "</title>" );
-        pw.println( "  <link type='text/css' rel='stylesheet' href='" + retrace + "/styles/style.css'/>" );
-        pw.println( "</head>" );
-        pw.println( "<body>" );
-        pw.println( "<div class='browse'>Browsing " + pathInfo + "</div>" );
         File dir = new File( localStoreDir, pathInfo );
         File[] files = dir.listFiles();
         if ( files == null )
         {
-            files = new File[ 0 ];
+            files = new File[0];
         }
         List repos = rcc.getRepos();
-        Set fileList = new TreeSet( new FileElementComparator( repos ) );
+        Set fileElements = new TreeSet( new FileElementComparator( repos ) );
 
-        fileList.addAll( MergedFileList.filenames( files, null ) );
+        fileElements.addAll( MergedFileList.filenames( files, null ) );
+
+        //Now we merge in any local file repositories that might be configured
         for ( int i = 0; i < repos.size(); i++ )
         {
             RepoConfiguration repoConfig = (RepoConfiguration) repos.get( i );
@@ -295,104 +288,21 @@ public class RepositoryServlet extends HttpServlet
                 String path = repoConfig.getUrl().substring( 8 );
                 File fPath = new File( path, pathInfo );
                 File[] newfiles = fPath.listFiles();
-                fileList.addAll( MergedFileList.filenames( newfiles, repoConfig ) );
+                fileElements.addAll( MergedFileList.filenames( newfiles, repoConfig ) );
             }
         }
 
-        pw.println( "<table width='100%'>" );
-        pw.println( "<colgroup>" );
-        pw.println( "  <col width='20px'>" ); //Icon
-        pw.println( "  <col width='50px'>" ); //Size
-        pw.println( "  <col width='180px'>" ); //Last Modified
-        pw.println( "  <col width='*'>" ); //URL / name
-        pw.println( "  <col width='*'>" ); //Something else?
-        pw.println( "  <col width='5*'>" ); //Something else?
-        pw.println( "</colgroup>" );
-
-        pw.println( createHeader() );
-
-        char toggle = 'a';
-
-        if ( !pathInfo.equals( "/" ) )
-        {
-            toggle = (toggle == 'a' ? 'b' : 'a');
-            pw.println( createRow( "dir-" + toggle, retrace + "/images/parent.png", "", -1, "..", "" ) );
-        }
-        else
-        {
-            //            pw.println(
-            //                            "<tr class='dir-" + toggle + "'><td><img src='/parent.png' alt=''/></td><td></td><td>Already at root folder</td><td></td></tr>");
-        }
-
-        //Collections.sort(fileArray, new FileComparator());
-
-        for ( Iterator fileIter = fileList.iterator(); fileIter.hasNext(); )
-        {
-            FileElement fe = (FileElement) fileIter.next();
-
-            toggle = (toggle == 'a' ? 'b' : 'a');
-            File theFile = fe.getFile();
-            String repoDescription;
-
-            if ( fe.getRepo() != null )
-            {
-                repoDescription = fe.getRepo().getDescription();
-            }
-            else
-            {
-                repoDescription = "Global Repository";
-            }
-
-            if ( theFile.isDirectory() )
-            {
-                pw.println( createRow( "dir-" + toggle, retrace + "/images/folder.png", theFile, repoDescription ) );
-            }
-            else
-            {
-                pw.println( createRow( "dir-" + toggle, retrace + "/images/jar.png", theFile, repoDescription ) );
-            }
-        }
-
-        DateFormat d = new SimpleDateFormat();
-        pw.println( "</table>" );
-        pw.println( "</body>" );
-        pw.println( "</html>" );
-        return;
-
+        context.put( "fileElements", fileElements );
+        context.put( "ab", new ABToggler() );
+        context.put( "dateFormat", dateFormatThreadLocal.get() );
+        return getTemplate( "RepositoryServlet.vtl" );
     }
 
-    protected String createHeader()
+    public String getTopLevel()
     {
-        return "<tr class='dir-a'><th></th><th>Size (bytes)</th><th>Last Modified</th><th>Name</th><th>Repository</th><th></th></tr>";
+        return "REPOSITORY";
     }
 
-    protected String createRow( String cssClass, String imgSrc, String length, long lastModified, String link,
-            String repoDescription )
-    {
-        DateFormat df = (DateFormat) dateFormatThreadLocal.get();
-        String lastModString = "";
-        if ( lastModified >= 0 )
-        {
-            lastModString = df.format( new Date( lastModified ) );
-        }
-        return "<tr class='" + cssClass + "'><td><a href='" + link + "'><img src='" + imgSrc
-                + "' alt=''/></a></td><td style='text-align:right'>" + length + "</td><td>" + lastModString
-                + "</td><td><a href='" + link + "/'>" + link + "</a></td><td>" + repoDescription
-                + "</td><td></td></tr>";
-    }
-
-    protected String createRow( String cssClass, String imgSrc, File theFile, String repoDescription )
-    {
-        if ( theFile.isDirectory() )
-        {
-            return createRow( cssClass, imgSrc, "", -1, theFile.getName(), repoDescription );
-        }
-        else
-        {
-            return createRow( cssClass, imgSrc, "" + theFile.length(), theFile.lastModified(), theFile.getName(),
-                    repoDescription );
-        }
-    }
 }
 
 /* A bit of code that slows down the transfer so you can see what is going on

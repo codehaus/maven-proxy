@@ -30,6 +30,12 @@ public class ResourceServlet extends HttpServlet
             return;
         }
 
+        if ( pathInfo.equalsIgnoreCase( "/favicon.png" ) )
+        {
+            handleResourceRequest( "favicon.png", "image/png", response );
+            return;
+        }
+
         if ( pathInfo.equalsIgnoreCase( "/jar.png" ) )
         {
             handleResourceRequest( "jar.png", "image/png", response );
@@ -48,9 +54,15 @@ public class ResourceServlet extends HttpServlet
             return;
         }
 
-        if ( pathInfo.equalsIgnoreCase( "/style.css" ) )
+        if ( pathInfo.equalsIgnoreCase( "/print.gif" ) )
         {
-            handleResourceRequest( "style.css", "text/css", response );
+            handleResourceRequest( "print.gif", "image/gif", response );
+            return;
+        }
+        
+        if ( pathInfo.equalsIgnoreCase( "/question.gif" ) )
+        {
+            handleResourceRequest( "question.gif", "image/gif", response );
             return;
         }
 
