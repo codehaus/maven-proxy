@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import org.apache.maven.fetch.FetchRequest;
-import org.apache.maven.fetch.FetchResponse;
 import org.apache.maven.fetch.FetchTool;
 import org.apache.maven.fetch.exceptions.FetchException;
 
@@ -48,7 +47,8 @@ public class DefaultRetrievalComponent implements RetrievalComponent
 
         fr.setOutputFile(out);
 
-        FetchResponse dresp = bean.performDownload(fr);
+        //FetchResponse dresp = 
+        bean.performDownload(fr);
         //Don't really care about the response (No exception thrown == downloaded ok!)
         return new FileInputStream(out);
     }
