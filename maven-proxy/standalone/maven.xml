@@ -1,3 +1,14 @@
 <project default="jar:install">
- 
+  <goal name="run">
+  	<java
+      classname="org.apache.maven.proxy.standalone.Standalone"
+      fork="true">
+        <arg value="src/test/test-health.properties"/>
+        <classpath>
+          <path refid="maven-classpath"/>
+          <path refid="maven.dependency.classpath"/>
+          <pathelement path="target/classes"/>
+        </classpath>
+    </java>
+  </goal>
 </project>
