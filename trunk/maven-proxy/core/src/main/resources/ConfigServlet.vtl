@@ -1,7 +1,21 @@
 #set ($pageTitle = "maven-proxy")
 #parseHeader()
 
+<h1>Local Repository</h1>
+<div class="h1">
 <table>
+  <tr class="${ab.Next}">
+    <th">Local Store</th><td>$rcc.LocalStore</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Server Name</th><td>$rcc.ServerName</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Port</th><td>$rcc.Port</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Prefix</th><td>$rcc.Prefix</td>
+  </tr>
   <tr class="${ab.Next}">
     <th">Browsable</th><td>$rcc.Browsable</td>
   </tr>
@@ -9,23 +23,20 @@
     <th">Searchable</th><td>$rcc.Searchable</td>
   </tr>
   <tr class="${ab.Next}">
+    <th">Last Modified Date Format</th><td>$!rcc.LastModifiedDataFormat</td>
+  </tr>
+  <tr class="${ab.Next}">
     <th">Snapshot Update</th><td>$rcc.SnapshotUpdate</td>
   </tr>
   <tr class="${ab.Next}">
     <th">Snapshot Update Interval</th><td>$rcc.SnapshotUpdateInterval</td>
   </tr>
-  <tr class="${ab.Next}">
-    <th">Last Modified Date Format</th><td>$!rcc.LastModifiedDataFormat</td>
-  </tr>
-  <tr class="${ab.Next}">
-    <th">Prefix</th><td>$rcc.Prefix</td>
-  </tr>
-  <tr class="${ab.Next}">
-    <th">Port</th><td>$rcc.Port</td>
-  </tr>
 </table>
+</div>
 
 <h1>Repositories</h1>
+<div class="h1">
+
 #foreach ($repo in $rcc.Repos)
 <h2>$repo.Key</h2>
 <table>
@@ -51,8 +62,9 @@
     
 </table>
 #end
-
+</div>
 <h1>Proxies</h1>
+<div class="h1">
 
 <table>
   <thead>
@@ -66,5 +78,5 @@
   </tr>
 #end
 </table>
-
+</div>
 #parseFooter()
