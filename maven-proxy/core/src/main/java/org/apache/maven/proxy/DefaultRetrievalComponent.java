@@ -10,40 +10,25 @@ import org.apache.maven.fetch.FetchTool;
 import org.apache.maven.fetch.exceptions.FetchException;
 
 /**
+ * This component should be stateless and hence multithreadable.
  * @author  Ben Walding
  * @version $Id$
  */
 public class DefaultRetrievalComponent implements RetrievalComponent
 {
-    private String baseUrl;
+    
 
-    /**
-     * @return
-     */
-    public String getBaseUrl()
+    public InputStream retrieveArtifact(RepoConfiguration rc, File out, String url) throws FetchException, FileNotFoundException
     {
-        return baseUrl;
-    }
-
-    /**
-     * @param baseUrl
-     */
-    public void setBaseUrl(String baseUrl)
-    {
-        this.baseUrl = baseUrl;
-    }
-
-    public InputStream retrieveArtifact(File out, String url) throws FetchException, FileNotFoundException
-    {
-        FetchRequest fr = new FetchRequest(baseUrl + "/" + url);
-        if (proxyHost != null)
+        FetchRequest fr = new FetchRequest(rc.getUrl() + "/" + url);
+        if (rc.getProxy() != null)
         {
-            fr.setProxyHost(proxyHost);
-            fr.setProxyPort(proxyPort);
-            if (proxyUsername != null)
+            fr.setProxyHost(rc.getProxy().getHost());
+            fr.setProxyPort(rc.getProxy().getPort());
+            if (rc.getProxy().getUsername() != null)
             {
-                fr.setProxyUser(proxyUsername);
-                fr.setProxyPass(proxyPassword);
+                fr.setProxyUser(rc.getProxy().getUsername());
+                fr.setProxyPass(rc.getProxy().getPassword());
             }
         }
         FetchTool bean = new FetchTool();
@@ -55,41 +40,6 @@ public class DefaultRetrievalComponent implements RetrievalComponent
         //Don't really care about the response (No exception thrown == downloaded ok!)
         return new FileInputStream(out);
     }
-
-    /**
-     * @param string
-     */
-    private String proxyHost = null;
-    public void setProxyHost(String proxyHost)
-    {
-        this.proxyHost = proxyHost;
-    }
-
-    /**
-     * @param string
-     */
-    private int proxyPort = -1;
-    public void setProxyPort(int proxyPort)
-    {
-        this.proxyPort = proxyPort;
-    }
-
-    /**
-     * @param string
-     */
-    private String proxyUsername;
-    public void setProxyUsername(String proxyUsername)
-    {
-        this.proxyUsername = proxyUsername;
-    }
-
-    /**
-     * @param string
-     */
-    private String proxyPassword = null;
-    public void setProxyPassword(String proxyPassword)
-    {
-        this.proxyPassword = proxyPassword;
-    }
+    
 
 }
