@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project>
-  <extend>../core/base-project.xml</extend>
+  <extend>../common/base-project.xml</extend>
   <pomVersion>3</pomVersion>
   <id>maven-proxy-testrepo</id>
   <groupId>maven</groupId>
