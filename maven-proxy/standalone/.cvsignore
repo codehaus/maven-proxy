@@ -6,3 +6,4 @@ build.properties
 velocity.log
 .clover
 avalon-apps-phyre.tar.gz
+maven-proxy.velocity.log
