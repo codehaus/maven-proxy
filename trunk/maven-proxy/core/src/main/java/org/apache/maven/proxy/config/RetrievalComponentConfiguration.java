@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author  Ben Walding
@@ -33,6 +32,7 @@ public class RetrievalComponentConfiguration
     private final List repos = new ArrayList();
     private String localStore;
     private String serverName;
+    private boolean searchable;
     private boolean browsable;
     private int port;
     private String prefix;
@@ -108,9 +108,9 @@ public class RetrievalComponentConfiguration
      * There is no specific order to proxy configuration.
      * @return
      */
-    public Set getProxies()
+    public List getProxies()
     {
-        return Collections.unmodifiableSet( proxies.entrySet() );
+        return new ArrayList( proxies.values() );
     }
 
     public void addRepo( RepoConfiguration repo )
@@ -152,14 +152,28 @@ public class RetrievalComponentConfiguration
         this.snapshotUpdate = snapshotUpdate;
     }
 
+    public boolean getSnapshotUpdate()
+    {
+        return snapshotUpdate;
+    }
+
     public String getLastModifiedDateFormat()
     {
         return lastModifiedDateFormat;
     }
-    
+
     public void setLastModifiedDateFormat( String lastModifiedDateFormat )
     {
         this.lastModifiedDateFormat = lastModifiedDateFormat;
     }
 
+    public boolean isSearchable()
+    {
+        return searchable;
+    }
+
+    public void setSearchable( boolean searchable )
+    {
+        this.searchable = searchable;
+    }
 }
