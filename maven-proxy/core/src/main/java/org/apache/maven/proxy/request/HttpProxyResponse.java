@@ -58,4 +58,9 @@ public class HttpProxyResponse extends BaseProxyResponse
         //this is default in http
     }
 
+    public void setContentType( String contentType )
+    {
+        response.setContentType( contentType );
+    }
+
 }

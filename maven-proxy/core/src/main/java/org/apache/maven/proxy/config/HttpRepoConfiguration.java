@@ -32,9 +32,9 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateParser;
-import org.apache.maven.proxy.DownloadEngine;
-import org.apache.maven.proxy.RetrievalDetails;
 import org.apache.maven.proxy.components.ProxyArtifact;
+import org.apache.maven.proxy.engine.DownloadEngine;
+import org.apache.maven.proxy.engine.RetrievalDetails;
 
 /**
  * @author  Ben Walding
@@ -106,9 +106,9 @@ public class HttpRepoConfiguration extends RepoConfiguration
     {
         try
         {
-            HttpClient client = createHttpClient();
             String fullUrl = getUrl() + url;
             LOGGER.info( this + ": Checking last modified time for " + fullUrl );
+            HttpClient client = createHttpClient();
             HeadMethod method = new HeadMethod( fullUrl );
             client.executeMethod( method );
 

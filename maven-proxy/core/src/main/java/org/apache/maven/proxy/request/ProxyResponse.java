@@ -29,6 +29,8 @@ public interface ProxyResponse
 
     void setContentLength( int length );
 
+    void setContentType( String contentType );
+
     public OutputStream getOutputStream() throws IOException;
 
     //Yes, this is very http, but I don't care.

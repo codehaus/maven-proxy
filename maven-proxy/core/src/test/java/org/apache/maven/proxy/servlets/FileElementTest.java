@@ -1,4 +1,4 @@
-package org.apache.maven.proxy.components;
+package org.apache.maven.proxy.servlets;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -17,33 +17,24 @@ package org.apache.maven.proxy.components;
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
+import junit.framework.TestCase;
+
+import org.apache.maven.proxy.config.GlobalRepoConfiguration;
 import org.apache.maven.proxy.config.RepoConfiguration;
-import org.apache.maven.proxy.engine.RetrievalDetails;
+import org.apache.maven.proxy.servlets.FileElement;
 
 /**
  * @author Ben Walding
- * @version $Id$
  */
-public interface RetrievalComponent
+public class FileElementTest extends TestCase
 {
-    String ROLE = RetrievalComponent.ROLE;
+    public void testSimple()
+    {
+        RepoConfiguration repo = new GlobalRepoConfiguration( "./target" );
+        File f = new File( "target/clown.txt" );
 
-    /**
-     * 
-     * @param rc
-     * @param out
-     * @param url
-     * @param checkModified
-     * @param download if false, the file will NOT be downloaded
-     * @return
-     * @throws FetchException
-     * @throws FileNotFoundException
-     */
-    RetrievalDetails retrieveArtifact( RepoConfiguration rc, File out, String url ) throws IOException;
-
-    long getLastModified( RepoConfiguration rc, String url );
-
+        FileElement fe = new FileElement( f, "/", repo );
+        assertEquals( "/", fe.getRelativePath() );
+    }
 }

@@ -22,9 +22,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.maven.proxy.DownloadEngine;
-import org.apache.maven.proxy.RetrievalDetails;
 import org.apache.maven.proxy.components.ProxyArtifact;
+import org.apache.maven.proxy.engine.DownloadEngine;
+import org.apache.maven.proxy.engine.RetrievalDetails;
 
 /**
  * Strips file:/// off the front of the configured URL and uses that to find files locally.
@@ -34,6 +34,10 @@ import org.apache.maven.proxy.components.ProxyArtifact;
  */
 public class FileRepoConfiguration extends RepoConfiguration
 {
+    /** log4j logger */
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger
+                    .getLogger( FileRepoConfiguration.class );
+
     private final String basePath;
 
     public FileRepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail )
@@ -81,6 +85,7 @@ public class FileRepoConfiguration extends RepoConfiguration
     public ProxyArtifact getMetaInformation( String url )
     {
         final File file = getLocalFile( url );
+        LOGGER.info( this + ": Checking last modified time for " + file );
 
         if ( file.exists() )
         {

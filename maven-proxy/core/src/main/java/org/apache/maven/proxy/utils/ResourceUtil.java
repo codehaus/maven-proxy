@@ -1,4 +1,4 @@
-package org.apache.maven.proxy.request;
+package org.apache.maven.proxy.utils;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -16,39 +16,40 @@ package org.apache.maven.proxy.request;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.maven.proxy.utils.IOUtility;
+import java.net.Socket;
 
 /**
- * @author Ben Walding
+ * @author  Ben Walding
+ * @version $Id$
  */
-public abstract class BaseProxyResponse implements ProxyResponse
+public class ResourceUtil
 {
-    //Nothing to do here yet
-    public void sendFile( File file ) throws IOException
+    public static final void close(Socket s)
     {
-        InputStream is = new FileInputStream( file );        
-        OutputStream os = getOutputStream();
         try
         {
-            IOUtility.transferStream( is, os );
-            sendOK();
+            s.close();
         }
-        catch ( Exception e )
+        catch (IOException e)
         {
-            sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+            //Don't care.
         }
-        finally
+    }
+
+    /**
+     * @param is
+     */
+    public static void close(InputStream is)
+    {
+        try
         {
-            IOUtility.close( os );
-            IOUtility.close( is );
+            is.close();
+        }
+        catch (IOException e)
+        {
+            //Don't care.
         }
     }
 }
