@@ -1,4 +1,4 @@
-package org.apache.maven.proxy;
+package org.apache.maven.proxy.config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +18,10 @@ public class PropertyLoaderTest extends TestCase
         PropertyLoader loader = new PropertyLoader();
 
         RetrievalComponentConfiguration rcc = loader.load(is);
-
+        
+        /////////////////////// Check Globals ////////////////////////
+        assertEquals("rcc.getLocalStore()", "/var/tmp/maven-proxy", rcc.getLocalStore());
+        
         /////////////////////// Check Proxies ////////////////////////
         assertEquals("rcc.getProxies().size()", 3, rcc.getProxies().size());
         ProxyConfiguration pcOne = rcc.getProxy("one");
