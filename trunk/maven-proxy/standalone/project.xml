@@ -15,6 +15,9 @@
       <groupId>maven</groupId>
       <artifactId>maven-proxy-core</artifactId>
       <version>SNAPSHOT</version>
+      <properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     
     <dependency>
