@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -282,6 +285,7 @@ public class RepositoryServlet extends HttpServlet
         pw.println( "<colgroup>" );
         pw.println( "  <col width='20px'>" ); //Icon
         pw.println( "  <col width='50px'>" ); //Size
+        pw.println( "  <col width='50px'>" ); //Last Mod
         pw.println( "  <col width='*'>" ); //URL / name
         pw.println( "  <col width='*'>" ); //Something else?
         pw.println( "  <col width='5*'>" ); //Something else?
@@ -299,7 +303,7 @@ public class RepositoryServlet extends HttpServlet
                                             + toggle
                                             + "'><td><img src='"
                                             + retrace
-                                            + "/images/parent.png' alt=''/></td><td></td><td><a href='..'>..</a></td><td></td><td></td></tr>" );
+                                            + "/images/parent.png' alt=''/></td><td></td><td></td><td><a href='..'>..</a></td><td></td><td></td></tr>" );
         }
         else
         {
@@ -308,7 +312,7 @@ public class RepositoryServlet extends HttpServlet
         }
 
         //Collections.sort(fileArray, new FileComparator());
-
+        DateFormat df = new SimpleDateFormat();
         for ( Iterator fileIter = fileList.iterator(); fileIter.hasNext(); )
         {
             FileElement fe = (FileElement) fileIter.next();
@@ -329,13 +333,13 @@ public class RepositoryServlet extends HttpServlet
             if ( fe.getFile().isDirectory() )
             {
                 pw.println( "<tr class='dir-" + toggle + "'><td><img src='" + retrace
-                                + "/images/folder.png' alt=''/><td></td></td><td><a href='" + theFile.getName() + "/'>"
+                                + "/images/folder.png' alt=''/><td></td><td></td></td><td><a href='" + theFile.getName() + "/'>"
                                 + theFile.getName() + "</a></td><td>" + repoDescription + "</td><td></td></tr>" );
             }
             else
             {
                 pw.println( "<tr class='file-" + toggle + "'><td><img src='" + retrace
-                                + "/images/jar.png' alt=''/></td><td>" + theFile.length() + "</td><td><a href='"
+                                + "/images/jar.png' alt=''/></td><td>" + theFile.length() + "</td><td>" + df.format(new Date(theFile.lastModified())) + "</td><td><a href='"
                                 + theFile.getName() + "'>" + theFile.getName() + "</a></td><td>" + repoDescription
                                 + "</td><td></td></tr>" );
             }
