@@ -1,5 +1,7 @@
 package org.apache.maven.proxy;
 
+import java.io.File;
+
 /**
  * This is where all configuration elements for a single
  * retrieval is to go.
@@ -8,5 +10,6 @@ package org.apache.maven.proxy;
  */
 public class RetrievalConfiguration
 {
-
+    
+    
 }

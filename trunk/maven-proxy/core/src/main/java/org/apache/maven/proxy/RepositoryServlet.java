@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -86,7 +87,29 @@ public class RepositoryServlet extends HttpServlet
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        LOGGER.info("Received request: " + request.getPathInfo());
+        String pathInfo = request.getPathInfo();
+        LOGGER.info("Received request: " + pathInfo);
+
+        if (pathInfo.endsWith("/"))
+        {
+            PrintWriter pw = response.getWriter();
+
+            pw.println("<html>");
+            pw.println("<body>");
+            File dir = new File(baseDir, pathInfo);
+            File[] files = dir.listFiles();
+            if (files == null) {
+                files = new File[0];
+            }
+            for (int i = 0; i < files.length; i++)
+            {
+                pw.println("<br/>");
+                pw.println("<a href='" + pathInfo + files[i].getName() + "/'>" + files[i].getName() + "</a>");
+            }
+            pw.println("</body>");
+            pw.println("</html>");
+            return;
+        }
         try
         {
             boolean done = false;
@@ -96,7 +119,7 @@ public class RepositoryServlet extends HttpServlet
 
                 try
                 {
-                    File f = new File(baseDir + request.getPathInfo());
+                    File f = new File(baseDir, request.getPathInfo());
                     f.getParentFile().mkdirs();
                     if (f.exists())
                     {
