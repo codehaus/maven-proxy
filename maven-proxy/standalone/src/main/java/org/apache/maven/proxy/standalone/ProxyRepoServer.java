@@ -2,7 +2,10 @@ package org.apache.maven.proxy.standalone;
 
 import java.io.IOException;
 
-import org.apache.maven.proxy.standalone.http.*;
+import org.apache.maven.proxy.standalone.http.AbstractHttpServer;
+import org.apache.maven.proxy.standalone.http.Request;
+import org.apache.maven.proxy.standalone.http.Response;
+
 
 /**
  * The ProxyRepoServer implements an HttpServer that serves files from a
@@ -10,13 +13,16 @@ import org.apache.maven.proxy.standalone.http.*;
  */
 public class ProxyRepoServer extends AbstractHttpServer
 {
-	/**
-	 * @return the bytecodes for the class
+
+	/* (non-Javadoc)
+	 * @see org.apache.maven.proxy.standalone.http.AbstractHttpServer#getResponse(org.apache.maven.proxy.standalone.http.Request)
 	 */
-	public Response getResponse(Request request) throws IOException
+	public Response getResponse( Request request ) throws IOException
 	{
-		Response response = new Response();
-		return response;
-	}
+        Response response = new Response();
+        return response;
+    }
+
+	
 
 }
