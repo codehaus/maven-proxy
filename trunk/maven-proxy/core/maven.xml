@@ -1,6 +1,6 @@
 <project default="uberjar">
 
-  <goal name="build:nightly">
+  <goal name="build:snapshot">
     <attainGoal name="jar:install-snapshot"/>
   </goal> 
   
