@@ -66,7 +66,12 @@ public class RepositoryServlet extends HttpServlet
 
     protected long getLastModified( HttpServletRequest request )
     {
+        if (request.getPathInfo() == null) {
+            return -1;
+        }
+        
         LOGGER.debug( "Checking getLastModified(): " + request.getPathInfo() );
+        
         final File f = getFileForRequest( request );
 
         if ( f.exists() && f.isFile() )
@@ -101,6 +106,13 @@ public class RepositoryServlet extends HttpServlet
         final String pathInfo = request.getPathInfo();
         LOGGER.info( "Received request: " + pathInfo );
 
+        //We were called with something like http://localhost:9999/repository  (need a trailing slash)
+        if (pathInfo == null) {
+            response.sendRedirect("./" + rcc.getPrefix() + "/");
+            return;
+        }
+        
+        
         if ( pathInfo.endsWith( "/" ) )
         {
             if ( rcc.isBrowsable() )
@@ -142,7 +154,15 @@ public class RepositoryServlet extends HttpServlet
 
                 try
                 {
-                    File f = new File( localStoreDir, pathInfo );
+                    File f = getFileForRequest(request);
+                    
+                    //Basically, we were asked for /repository/a but "a" is a directory, so we need to go to /repository/a/ 
+                    if (f.isDirectory()) {
+                        LOGGER.info("Stupid user... /repository/a -> /repository/a/");
+                        response.sendRedirect(request.getRequestURI() + "/");
+                        return;
+                    }
+                    
                     f.getParentFile().mkdirs();
                     long size = -1;
                     long lastModified = -1;
@@ -213,20 +233,23 @@ public class RepositoryServlet extends HttpServlet
     private void handleBrowseRequest( HttpServletRequest request, HttpServletResponse response ) throws IOException
     {
         final String pathInfo = request.getPathInfo();
+        final String retrace;
+
+        if ( rcc.getPrefix().length() == 0 )
+        {
+            retrace = URLTool.getRetrace( pathInfo );
+        }
+        else
+        {
+            retrace = URLTool.getRetrace( "/" + rcc.getPrefix() + pathInfo );
+        }
 
         PrintWriter pw = response.getWriter();
 
         pw.println( "<html>" );
         pw.println( "<head>" );
         pw.println( "  <title>maven-proxy</title>" );
-        pw.println( "  <style type='text/css'>" );
-        pw.println( "    * { font-family: tahoma,verdana,arial; }" );
-        pw.println( "    table { border: 1px solid black; border-collapse: collapse; }" );
-        pw.println( "    tr.dir-a { left-margin: 1cm; background-color: #ddd; border: 1px solid black; }" );
-        pw.println( "    tr.dir-b { left-margin: 1cm; background-color: #eee; border: 1px solid black; }" );
-        pw.println( "    tr.file-a { left-margin: 1cm; background-color: #ddd; border: 1px solid black; }" );
-        pw.println( "    tr.file-b { left-margin: 1cm; background-color: #eee; border: 1px solid black; }" );
-        pw.println( "  </style>" );
+        pw.println( "  <link type='text/css' rel='stylesheet' href='" + retrace + "/styles/style.css'/>" );
         pw.println( "</head>" );
         pw.println( "<body>" );
         pw.println( "<div>Browsing " + pathInfo + "</div>" );
@@ -266,16 +289,6 @@ public class RepositoryServlet extends HttpServlet
         pw.println( "<tr class='dir-a'><td></td><td>Size</td><td>Name</td><td>Repository</td><td></td></tr>" );
 
         char toggle = 'a';
-        String retrace;
-
-        if ( rcc.getPrefix().length() == 0 )
-        {
-            retrace = URLTool.getRetrace( pathInfo );
-        }
-        else
-        {
-            retrace = URLTool.getRetrace( "/" + rcc.getPrefix() + pathInfo );
-        }
 
         if ( !pathInfo.equals( "/" ) )
         {

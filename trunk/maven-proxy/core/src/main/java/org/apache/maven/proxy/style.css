@@ -1,0 +1,38 @@
+* 
+{ 
+  font-family: tahoma,verdana,arial; 
+}
+  
+table 
+{ 
+  border: 1px solid black; 
+  border-collapse: collapse; 
+}
+
+tr.dir-a 
+{ 
+  left-margin: 1cm; 
+  background-color: #ddd; 
+  border: 1px solid black; 
+}
+ 
+tr.dir-b 
+{ 
+  left-margin: 1cm; 
+  background-color: #eee; 
+  border: 1px solid black;
+}
+
+tr.file-a 
+{ 
+  left-margin: 1cm; 
+  background-color: #ddd; 
+  border: 1px solid black; 
+}
+
+tr.file-b 
+{ 
+  left-margin: 1cm; 
+  background-color: #eee; 
+  border: 1px solid black; 
+}
