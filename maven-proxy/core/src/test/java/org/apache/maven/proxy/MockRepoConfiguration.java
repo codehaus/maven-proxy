@@ -58,11 +58,13 @@ public class MockRepoConfiguration extends RepoConfiguration
         if ( url.equals( "/a/a-SNAPSHOT.jar" ) || url.equals( "/b/b-1.1.jar" ) )
         {
             DownloadEngine.download( out, new StringInputStream( MOCK_DATA_100 ) );
+            LOGGER.info( "lastmodbefore:" + out.lastModified() );
             if ( !out.setLastModified( 1010L ) )
             {
                 //If we can't set the last modified time, then none of our not modified checking will work.
                 LOGGER.error( "Failure setting the last modified time on " + out );
             }
+            LOGGER.info( "lastmodafter:" + out.lastModified() );
             return new RetrievalDetails( out );
         }
 
