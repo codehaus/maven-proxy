@@ -48,36 +48,26 @@ public class RepositoryServlet extends HttpServlet
         }
     }
 
+    private RetrievalComponentConfiguration rcc = null;
     public void init() throws ServletException
     {
         Properties props = (Properties) getServletContext().getAttribute("properties");
-        String remote;
-        int i = 1;
-        boolean done = false;
+
+        try
+        {
+            rcc = (new PropertyLoader()).load(props);
+        }
+        catch (IOException e)
+        {
+            throw new ServletException(e);
+        }
 
         baseDir = new File(props.getProperty(ProxyProperties.REPOSITORY_LOCAL));
-
         if (!baseDir.exists())
         {
             LOGGER.info("Local Repository (" + baseDir.getAbsolutePath() + ") does not exist");
         }
 
-        while(!done)
-        {
-            DefaultRetrievalComponent rc = new DefaultRetrievalComponent();
-
-            remote = props.getProperty(ProxyProperties.REPOSITORY_REMOTE + "." + i);
-            if(remote == null) {
-                done = true;
-                break;
-            }
-
-            LOGGER.info("Adding " + remote);
-            rc.setBaseUrl(remote);
-            configureProxy(rc, props);
-            retrievers.add(rc);
-            i++;
-        }
     }
 
     public File getFileForRequest(HttpServletRequest request)
@@ -98,7 +88,8 @@ public class RepositoryServlet extends HttpServlet
             pw.println("<body>");
             File dir = new File(baseDir, pathInfo);
             File[] files = dir.listFiles();
-            if (files == null) {
+            if (files == null)
+            {
                 files = new File[0];
             }
             for (int i = 0; i < files.length; i++)
@@ -113,9 +104,11 @@ public class RepositoryServlet extends HttpServlet
         try
         {
             boolean done = false;
-            for (int i = 0; i < retrievers.size(); i++)
+            List repos = rcc.getRepos();
+            RetrievalComponent rc = new DefaultRetrievalComponent();
+            for (int i = 0; i < repos.size(); i++)
             {
-                DefaultRetrievalComponent rc = (DefaultRetrievalComponent) retrievers.get(i);
+                RepoConfiguration repoConfig = (RepoConfiguration) retrievers.get(i);
 
                 try
                 {
@@ -127,7 +120,7 @@ public class RepositoryServlet extends HttpServlet
                     }
                     else
                     {
-                        rc.retrieveArtifact(f, request.getPathInfo());
+                        rc.retrieveArtifact(repoConfig, f, request.getPathInfo());
                     }
 
                     InputStream is = new FileInputStream(f);
@@ -153,7 +146,7 @@ public class RepositoryServlet extends HttpServlet
         }
         catch (ResourceNotFoundFetchException e)
         {
-            //This is not a huge error
+            //This is not a huge error. Can this even occur as Tryvgis put the catch inside?
             LOGGER.info("Couldn't find upstream resource : " + e.getMessage());
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
@@ -164,15 +157,4 @@ public class RepositoryServlet extends HttpServlet
         }
     }
 
-    private void configureProxy(DefaultRetrievalComponent rc, Properties props)
-    {
-        String host = props.getProperty(ProxyProperties.PARENT_PROXY_HOST);
-        if (host != null)
-        {
-            rc.setProxyHost(props.getProperty(ProxyProperties.PARENT_PROXY_HOST));
-            rc.setProxyPort(Integer.parseInt(props.getProperty(ProxyProperties.PARENT_PROXY_PORT)));
-            rc.setProxyUsername(props.getProperty(ProxyProperties.PARENT_PROXY_USERNAME));
-            rc.setProxyPassword(props.getProperty(ProxyProperties.PARENT_PROXY_PASSWORD));
-        }
-    }
 }
