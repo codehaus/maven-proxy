@@ -349,7 +349,7 @@ public class DownloadEngine
             LOGGER.info( "Rounding a last modified value..." );
             BigDecimal bd = new BigDecimal( input );
             BigDecimal rounded = bd.divide( DIVISOR, BigDecimal.ROUND_HALF_EVEN );
-            return rounded.multiply( DIVISOR ).longValueExact();
+            return rounded.multiply( DIVISOR ).longValue();
         }
 
         return input;
