@@ -1,0 +1,70 @@
+#set ($pageTitle = "maven-proxy")
+#parseHeader()
+
+<table>
+  <tr class="${ab.Next}">
+    <th">Browsable</th><td>$rcc.Browsable</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Searchable</th><td>$rcc.Searchable</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Snapshot Update</th><td>$rcc.SnapshotUpdate</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Snapshot Update Interval</th><td>$rcc.SnapshotUpdateInterval</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Last Modified Date Format</th><td>$!rcc.LastModifiedDataFormat</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Prefix</th><td>$rcc.Prefix</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th">Port</th><td>$rcc.Port</td>
+  </tr>
+</table>
+
+<h1>Repositories</h1>
+#foreach ($repo in $rcc.Repos)
+<h2>$repo.Key</h2>
+<table>
+  <tr class="${ab.Next}">
+    <th>Description</th><td>$repo.Description</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>URL</th><td>$repo.Url</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Copy</th><td>$repo.Copy</td>
+  </tr>
+  #if ($repo.Proxy)
+  <tr class="${ab.Next}">
+    <th>Proxy</th><td>$repo.Proxy.Key</td>
+  </tr>
+  #end
+  #if ($repo.BasePath)
+  <tr class="${ab.Next}">
+    <th>Base Path</th><td>$repo.BasePath</td>
+  </tr>
+  #end
+    
+</table>
+#end
+
+<h1>Proxies</h1>
+
+<table>
+  <thead>
+  <tr class="${ab.Next}">
+    <th>Key</th><th>Location</th>
+  </tr>
+  </thead>
+#foreach ($proxy in $rcc.Proxies)
+  <tr class="${ab.Next}">
+    <td>$proxy.Key</td><td>#if ($proxy.Username)$proxy.Username@#end$proxy.Host:$proxy.Port</td>
+  </tr>
+#end
+</table>
+
+#parseFooter()

@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>$pageTitle</title>
+    <link type="text/css" rel="stylesheet" href="$retrace/servlets/Style"/>       
+    <link rel="shortcut icon" href="$retrace/images/favicon.png"/>    
+  </head>
+  <body>
+  <table class="page-header">
+  <tr>
+    <th class="page-header-left">
+      ##<img src="$retrace/images/invigilator-small.png"/>
+      maven-proxy
+    </th>
+    <th class="page-header-middle"></th>
+    <th class="page-header-right">
+      #*
+      <img src="$retrace/images/print.gif" title="View a printable version of the current page" onClick="javascript:alert('Not implemented yet.');"/>
+      #if (!$help-wiki)
+        #set ($help-wiki = "index")
+      #end
+      <a href="Wiki?page=$help-wiki"><img style="border: 0" src="$retrace/images/question.gif" title="Get online help about configuring and using Invigilator" /></a>
+      *#
+      $version
+    </th>
+  </tr>
+</table>
+
+<div class="top-level-menu">
+	<a href="$retrace/servlets/Config" #if ($topLevel == "CONFIG")class="selected"#end accessKey="c"><u>C</u>ONFIG</a>
+	<a href="$retrace/servlets/Search" #if ($topLevel == "SEARCH")class="selected"#end accessKey="s"><u>S</u>EARCH</a>
+	<a href="$retrace/repository" #if ($topLevel == "REPOSITORY")class="selected"#end accessKey="d"><u>R</u>EPOSITORY</a>
+</div>

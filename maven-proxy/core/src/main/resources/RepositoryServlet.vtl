@@ -1,0 +1,77 @@
+#set ($pageTitle = "maven-proxy - $pathInfo" )
+#parseHeader()
+
+
+#macro (createRow $imgSrc $length $lastModifiedDate $link $repoDescription)
+  #set ($lastModifiedString = "")
+  #if ( $lastModifiedDate != "" )
+    #set ($lastModifiedString = $dateFormat.format( $lastModifiedDate ))
+  #end
+  
+  #set ($lengthString = "")
+  #if ($length.toString() != "-1")
+    #set ($lengthString = $length)
+  #end
+  
+        <tr class="${ab.Next}">
+          <td>
+            <a href="$link"><img src="$imgSrc" alt=""/></a>
+          </td>
+          <td style='text-align:right'>$lengthString</td>
+          <td>$lastModifiedString</td>
+          <td><a href="$link">$link</a></td>
+          <td>$repoDescription</td>
+          <td></td>
+        </tr>
+#end
+
+#macro (createRow2 $imgSrc $fileElement $repoDescription)
+  #if ($fileElement.isDirectory())
+    #createRow( $imgSrc $fileElement.length() $fileElement.lastModifiedDate() "${fileElement.Name}/" $repoDescription )
+  #else
+    #createRow( $imgSrc $fileElement.length() $fileElement.lastModifiedDate() "${fileElement.Name}" $repoDescription )
+  #end
+#end
+        <div class='browse'>Browsing $pathInfo</div>
+
+
+<table width="100%">
+        <colgroup>
+          <col width='20px'>
+          <col width='50px'>
+          <col width='180px'>
+          <col width='*'>
+          <col width='*'>
+          <col width='5*'>
+        </colgroup>
+        
+        
+        <tr class="$ab.Next">
+          <th></th>
+          <th>Size (bytes)</th>
+          <th>Last Modified</th>
+          <th>Name</th>
+          <th>Repository</th>
+          <th></th>
+        </tr>
+   
+    
+    
+    #if ($pathInfo != "/")
+            #createRow( "$retrace/images/parent.png" "" "" ".." "" )        
+    #end
+    
+    #foreach ($fileElement in $fileElements)
+      #if ( $fileElement.Repo )
+        #set ($repoDescription = $fileElement.getRepo().getDescription())
+      #else
+		#set ($repoDescription = "Global Repository")
+	  #end
+	  
+	  #if ( $fileElement.isDirectory() )
+        #createRow2( "$retrace/images/folder.png" $fileElement $repoDescription )
+      #else
+        #createRow2( "$retrace/images/jar.png" $fileElement $repoDescription )
+      #end
+    #end
+#parseFooter()
