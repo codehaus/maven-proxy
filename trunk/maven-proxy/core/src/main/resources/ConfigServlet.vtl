@@ -29,9 +29,6 @@
     <th>Snapshot Update</th><td>$rcc.SnapshotUpdate</td>
   </tr>
   <tr class="${ab.Next}">
-    <th>Snapshot Update Interval</th><td>$rcc.SnapshotUpdateInterval</td>
-  </tr>
-  <tr class="${ab.Next}">
     <th>Stylesheet</th><td>$!rcc.Stylesheet</td>
   </tr>
   <tr class="${ab.Next}">
@@ -66,6 +63,12 @@
   </tr>
   <tr class="${ab.Next}">
     <th>Hard Fail</th><td>$repo.HardFail</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Cache Period</th><td>#if ($repo.CachePeriod.toString() == "0")0 (disabled)#else $repo.CachePeriod seconds#end</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Cache Failures</th><td>$repo.CacheFailures</td>
   </tr>
   #if ($repo.Proxy)
   <tr class="${ab.Next}">
