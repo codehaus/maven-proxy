@@ -117,8 +117,10 @@ public class RepositoryServlet extends HttpServlet
                     response.setContentType("application/octet-stream");
                     OutputStream os = response.getOutputStream();
                     IOUtility.transferStream(is, os);
-                    IOUtility.close(os);
+                    //IOUtility.close(os);
                     IOUtility.close(is);
+                    done = true;
+                    break;
                 }
                 catch (ResourceNotFoundFetchException ex)
                 {
