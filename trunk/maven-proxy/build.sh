@@ -7,3 +7,4 @@ do
   maven 
   cd ..
 done
+
