@@ -1,6 +1,5 @@
 package org.apache.maven.proxy.standalone;
 
-import java.io.IOException;
 
 /**
  * @author  Ben Walding
