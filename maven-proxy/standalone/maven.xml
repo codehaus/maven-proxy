@@ -12,30 +12,12 @@
   </pregoal>
   
   <goal name="build:snapshot:dist">
-    <j:set var="distBase">target/dist/maven-proxy-${pom.currentVersion}</j:set>
-
-    <mkdir dir="${distBase}"/>
-    <mkdir dir="${distBase}/lib"/>
-  	<copy file="target/maven-proxy-standalone-${pom.currentVersion}.jar" todir="${distBase}/lib"/>
-   	<j:forEach var="lib" items="${pom.artifacts}">
-      <j:set var="dep" value="${lib.dependency}"/>
-      <j:if test="${dep.getProperty('dist')=='true'}">
-        <ant:copy todir="${distBase}/lib" file="${lib.path}"/>  
-      </j:if>  
-    </j:forEach>
-  
-    <mkdir dir="${distBase}/bin"/>
-  	<ant:copy todir="${distBase}/bin">
-	  <fileset dir="src/bin">
-        <include name="*"/>
-	  </fileset>
-    </ant:copy>
+    <zip file="target/maven-proxy-standalone-SNAPSHOT.zip">
+      <fileset dir="target">
+        <include name="maven-proxy-standalone-*uber.jar"/>
+      </fileset>
+    </zip>
     
-    <zip destfile="target/maven-proxy-standalone-${pom.currentVersion}.zip"
-      basedir="target/dist"
-      update="true"
-    />
-  
     <copy file="target/maven-proxy-standalone-SNAPSHOT.zip"
           todir="/dist/maven-proxy/distributions/"/>
   </goal>
