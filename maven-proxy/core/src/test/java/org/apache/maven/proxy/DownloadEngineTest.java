@@ -45,8 +45,22 @@ public class DownloadEngineTest extends TestCase
         rcc.addRepo( new GlobalRepoConfiguration( "target/repo" ) );
         rcc.addRepo( new MockRepoConfiguration( "MockA", "target/mock-a", "MockA", true, true ) );
         rcc.setSnapshotUpdate( true );
-        rcc.setSnapshotUpdateInterval( 1000 );        
+        rcc.setSnapshotUpdateInterval( 1000 );
         return rcc;
+    }
+
+    public void testRoundTime()
+    {
+        //-1 is special
+        assertEquals( -1, DownloadEngine.round( -1) );
+        
+        assertEquals( 3000, DownloadEngine.round( 3010 ) );
+        assertEquals( 3000, DownloadEngine.round( 3000 ) );
+        assertEquals( 3000, DownloadEngine.round( 2999 ) );
+        assertEquals( 2000, DownloadEngine.round( 2500 ) );
+        assertEquals( 3000, DownloadEngine.round( 2501 ) );
+        assertEquals( 4000, DownloadEngine.round( 3500 ) );
+        assertEquals( 4000, DownloadEngine.round( 3501 ) );
     }
 
     private RetrievalComponentConfiguration createRCC_Flaky_A()
@@ -104,13 +118,13 @@ public class DownloadEngineTest extends TestCase
      */
     public void testHaveOlderSnapshot() throws IOException
     {
-        LOGGER.info("testHaveOldersnapshot: Client has older version of SNAPSHOT and will take the whole thing.");
+        LOGGER.info( "testHaveOldersnapshot: Client has older version of SNAPSHOT and will take the whole thing." );
         MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 1000L, false );
         MockProxyResponse pResponse = new MockProxyResponse();
         DownloadEngine engine = new DownloadEngine( createRCC_A() );
         engine.process( pRequest, pResponse );
 
-        assertEquals( 1010L, pResponse.getLastModified() );
+        assertEquals( 1005000L, pResponse.getLastModified() );
         assertEquals( 100, pResponse.getContentLength() );
         assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
 
@@ -120,17 +134,17 @@ public class DownloadEngineTest extends TestCase
     }
 
     /**
-     * The client has requested a SNAPSHOT download and has provided an older Last-Modified entry.
+     * The client has requested a SNAPSHOT download and has provided a newer Last-Modified entry.
      * If there is an update, they want the whole lot.
      */
     public void testHaveNewerSnapshot() throws IOException
     {
-        MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 2000L, false );
+        MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 10020000L, false );
         MockProxyResponse pResponse = new MockProxyResponse();
         DownloadEngine engine = new DownloadEngine( createRCC_A() );
         engine.process( pRequest, pResponse );
 
-        assertEquals( 1010L, pResponse.getLastModified() );
+        assertEquals( 1005000L, pResponse.getLastModified() );
         assertEquals( 100, pResponse.getContentLength() );
         assertEquals( HttpServletResponse.SC_NOT_MODIFIED, pResponse.getStatusCode() );
         assertNull( pResponse.getContent() );
@@ -142,12 +156,12 @@ public class DownloadEngineTest extends TestCase
      */
     public void testOlderSnapshotHeadOnly() throws IOException
     {
-        MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 1010L, true );
+        MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 1006000L, true );
         MockProxyResponse pResponse = new MockProxyResponse();
         DownloadEngine engine = new DownloadEngine( createRCC_A() );
         engine.process( pRequest, pResponse );
 
-        assertEquals( 1010L, pResponse.getLastModified() );
+        assertEquals( 1005000L, pResponse.getLastModified() );
         assertEquals( 100, pResponse.getContentLength() );
         assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
         assertNull( pResponse.getContent() );
@@ -159,12 +173,12 @@ public class DownloadEngineTest extends TestCase
      */
     public void testNewerSnapshotHeadOnly() throws IOException
     {
-        MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 2000L, true );
+        MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 3005000L, true );
         MockProxyResponse pResponse = new MockProxyResponse();
         DownloadEngine engine = new DownloadEngine( createRCC_A() );
         engine.process( pRequest, pResponse );
 
-        assertEquals( 1010L, pResponse.getLastModified() );
+        assertEquals( 1005000L, pResponse.getLastModified() );
         assertEquals( 100, pResponse.getContentLength() );
         assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
         assertNull( pResponse.getContent() );
@@ -178,13 +192,13 @@ public class DownloadEngineTest extends TestCase
      */
     public void testArtifactGet() throws IOException
     {
-        MockProxyRequest pRequest = new MockProxyRequest( "/b/b-1.1.jar", 1000L, false );
+        MockProxyRequest pRequest = new MockProxyRequest( "/b/b-1.1.jar", 1005000L, false );
         MockProxyResponse pResponse = new MockProxyResponse();
         DownloadEngine engine = new DownloadEngine( createRCC_A() );
         engine.process( pRequest, pResponse );
 
         assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
-        assertEquals( 1010L, pResponse.getLastModified() );
+        assertEquals( 1005000L, pResponse.getLastModified() );
         assertEquals( 100, pResponse.getContentLength() );
         assertEquals( MockRepoConfiguration.MOCK_DATA_100, pResponse.getContent() );
     }
@@ -197,13 +211,13 @@ public class DownloadEngineTest extends TestCase
      */
     public void testArtifactGetAlreadyHaveLatest() throws IOException
     {
-        MockProxyRequest pRequest = new MockProxyRequest( "/b/b-1.1.jar", 3000L, false );
+        MockProxyRequest pRequest = new MockProxyRequest( "/b/b-1.1.jar", 3005000L, false );
         MockProxyResponse pResponse = new MockProxyResponse();
         DownloadEngine engine = new DownloadEngine( createRCC_A() );
         engine.process( pRequest, pResponse );
 
         assertEquals( HttpServletResponse.SC_NOT_MODIFIED, pResponse.getStatusCode() );
-        assertEquals( 1010L, pResponse.getLastModified() );
+        assertEquals( 1005000L, pResponse.getLastModified() );
         assertEquals( 100, pResponse.getContentLength() );
         assertNull( pResponse.getContent() );
     }
@@ -222,7 +236,7 @@ public class DownloadEngineTest extends TestCase
         engine.process( pRequest, pResponse );
 
         assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
-        assertEquals( 1010L, pResponse.getLastModified() );
+        assertEquals( 1005000L, pResponse.getLastModified() );
         assertEquals( 100, pResponse.getContentLength() );
         assertNull( pResponse.getContent() );
     }
@@ -240,11 +254,11 @@ public class DownloadEngineTest extends TestCase
         DownloadEngine engine = new DownloadEngine( rcc );
 
         {
-            MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 1000L, false );
+            MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 1001000L, false );
             MockProxyResponse pResponse = new MockProxyResponse();
             engine.process( pRequest, pResponse );
 
-            assertEquals( 1010L, pResponse.getLastModified() );
+            assertEquals( 1005000L, pResponse.getLastModified() );
             assertEquals( 100, pResponse.getContentLength() );
             assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
 
@@ -257,11 +271,11 @@ public class DownloadEngineTest extends TestCase
         assertEquals( 2, mockRepo.getHits() );
 
         {
-            MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 1010L, false );
+            MockProxyRequest pRequest = new MockProxyRequest( "/a/a-SNAPSHOT.jar", 1005000L, false );
             MockProxyResponse pResponse = new MockProxyResponse();
             engine.process( pRequest, pResponse );
 
-            assertEquals( 1010L, pResponse.getLastModified() );
+            assertEquals( 1005000L, pResponse.getLastModified() );
             assertEquals( 100, pResponse.getContentLength() );
             assertEquals( HttpServletResponse.SC_NOT_MODIFIED, pResponse.getStatusCode() );
 
@@ -309,7 +323,7 @@ public class DownloadEngineTest extends TestCase
             MockProxyResponse pResponse = new MockProxyResponse();
             engine.process( pRequest, pResponse );
 
-            assertEquals( 1010L, pResponse.getLastModified() );
+            assertEquals( 1005000L, pResponse.getLastModified() );
             assertEquals( 100, pResponse.getContentLength() );
             assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
 
@@ -326,7 +340,7 @@ public class DownloadEngineTest extends TestCase
             MockProxyResponse pResponse = new MockProxyResponse();
             engine.process( pRequest, pResponse );
 
-            assertEquals( 1010L, pResponse.getLastModified() );
+            assertEquals( 1005000L, pResponse.getLastModified() );
             assertEquals( 100, pResponse.getContentLength() );
             assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
             assertNull( pResponse.getContent() );
@@ -368,7 +382,7 @@ public class DownloadEngineTest extends TestCase
         engine.process( pRequest, pResponse );
         assertEquals( HttpServletResponse.SC_NOT_FOUND, pResponse.getStatusCode() );
         assertEquals( 1, mockRepo.getHits() );
-        
+
         pResponse = new MockProxyResponse();
         engine.process( pRequest, pResponse );
         assertEquals( 1, mockRepo.getHits() );
