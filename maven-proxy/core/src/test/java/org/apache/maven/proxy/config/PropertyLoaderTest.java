@@ -1,5 +1,61 @@
 package org.apache.maven.proxy.config;
 
+/* ====================================================================
+ * The Apache Software License, Version 1.1
+ *
+ * Copyright (c) 2003 The Apache Software Foundation.  All rights
+ * reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. The end-user documentation included with the redistribution,
+ *    if any, must include the following acknowledgment:
+ *       "This product includes software developed by the
+ *        Apache Software Foundation (http://www.apache.org/)."
+ *    Alternately, this acknowledgment may appear in the software itself,
+ *    if and wherever such third-party acknowledgments normally appear.
+ *
+ * 4. The names "Apache" and "Apache Software Foundation" and
+ *    "Apache Maven" must not be used to endorse or promote products
+ *    derived from this software without prior written permission. For
+ *    written permission, please contact apache@apache.org.
+ *
+ * 5. Products derived from this software may not be called "Apache",
+ *    "Apache Maven", nor may "Apache" appear in their name, without
+ *    prior written permission of the Apache Software Foundation.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ *
+ * ====================================================================
+ */
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -18,48 +74,51 @@ public class PropertyLoaderTest extends TestCase
         PropertyLoader loader = new PropertyLoader();
 
         RetrievalComponentConfiguration rcc = loader.load(is);
-        
+
         /////////////////////// Check Globals ////////////////////////
         assertEquals("rcc.getLocalStore()", "/var/tmp/maven-proxy", rcc.getLocalStore());
         assertEquals("rcc.getPort()", 9999, rcc.getPort());
         assertTrue("rcc.isBrowsable()", rcc.isBrowsable());
-        
+
         /////////////////////// Check Proxies ////////////////////////
         assertEquals("rcc.getProxies().size()", 3, rcc.getProxies().size());
-        ProxyConfiguration pcOne = rcc.getProxy("one");
-        ProxyConfiguration pcTwo = rcc.getProxy("two");
-        ProxyConfiguration pcThree = rcc.getProxy("three");
-
-        assertNotNull("pcOne", pcOne);
-        assertEquals("pcOne.host", "proxy1.example.com", pcOne.getHost());
-        assertEquals("pcOne.port", 3128, pcOne.getPort());
-
-        assertNotNull("pcTwo", pcTwo);
-        assertEquals("pcTwo.host", "proxy2.example.org", pcTwo.getHost());
-        assertEquals("pcTwo.port", 80, pcTwo.getPort());
-        assertEquals("pcTwo.username", "username2", pcTwo.getUsername());
-        assertEquals("pcTwo.password", "password2", pcTwo.getPassword());
-
-        assertNotNull("pcThree", pcThree);
-        assertEquals("pcThree.host", "proxy3.example.net", pcThree.getHost());
-        assertEquals("pcThree.port", 3129, pcThree.getPort());
-        assertEquals("pcThree.username", "username3", pcThree.getUsername());
-        assertEquals("pcThree.password", "password3", pcThree.getPassword());
+        verifyProxyOne(rcc.getProxy("one"));
+        verifyProxyTwo(rcc.getProxy("two"));
+        verifyProxyThree(rcc.getProxy("three"));
 
         assertNull("rcc.getProxy(snuffleuffigus)", rcc.getProxy("snuffleuffigus"));
 
         /////////////////////// Check Repos ////////////////////////
         List repos = rcc.getRepos();
         assertEquals("repos.size()", 3, repos.size());
+        verifyRepoIbiblio((RepoConfiguration) repos.get(0));
+        verifyRepoDist((RepoConfiguration) repos.get(1));
+        verifyRepoPrivate((RepoConfiguration) repos.get(2));
+    }
 
-        RepoConfiguration rcIbiblio = (RepoConfiguration) repos.get(0);
-        verifyRepoIbiblio(rcIbiblio);
+    private void verifyProxyOne(ProxyConfiguration pcOne)
+    {
+        assertNotNull("pcOne", pcOne);
+        assertEquals("pcOne.host", "proxy1.example.com", pcOne.getHost());
+        assertEquals("pcOne.port", 3128, pcOne.getPort());
+    }
 
-        RepoConfiguration rcDist = (RepoConfiguration) repos.get(1);
-        verifyRepoDist(rcDist);
+    private void verifyProxyTwo(ProxyConfiguration pcTwo)
+    {
+        assertNotNull("pcTwo", pcTwo);
+        assertEquals("pcTwo.host", "proxy2.example.org", pcTwo.getHost());
+        assertEquals("pcTwo.port", 80, pcTwo.getPort());
+        assertEquals("pcTwo.username", "username2", pcTwo.getUsername());
+        assertEquals("pcTwo.password", "password2", pcTwo.getPassword());
+    }
 
-        RepoConfiguration rcPrivate = (RepoConfiguration) repos.get(2);
-        verifyRepoPrivate(rcPrivate);
+    private void verifyProxyThree(ProxyConfiguration pcThree)
+    {
+        assertNotNull("pcThree", pcThree);
+        assertEquals("pcThree.host", "proxy3.example.net", pcThree.getHost());
+        assertEquals("pcThree.port", 3129, pcThree.getPort());
+        assertEquals("pcThree.username", "username3", pcThree.getUsername());
+        assertEquals("pcThree.password", "password3", pcThree.getPassword());
     }
 
     private void verifyRepoIbiblio(RepoConfiguration rcIbiblio)
