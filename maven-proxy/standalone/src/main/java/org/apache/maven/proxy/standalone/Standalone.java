@@ -4,14 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Properties;
-
-import javax.servlet.ServletException;
+import java.util.Iterator;
 
 import org.apache.maven.proxy.RepositoryServlet;
 import org.apache.maven.proxy.config.*;
 import org.apache.maven.proxy.config.PropertyLoader;
-import org.apache.maven.proxy.config.ProxyProperties;
 import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpServer;
@@ -25,9 +22,8 @@ import org.mortbay.util.MultiException;
  */
 public class Standalone
 {
-    private Properties props;
-    private int port;
-
+    private static final String VERSION = "SNAPSHOT";
+    
     public static void main(String args[])
     {
         Standalone launcher;
@@ -47,6 +43,8 @@ public class Standalone
 
     public void doMain(String args[]) throws MultiException, IOException, ValidationException
     {
+        System.err.println("maven-proxy " + Standalone.VERSION);
+        
         if (args.length != 1)
         {
             System.err.println("Usage:");
@@ -54,9 +52,10 @@ public class Standalone
             return;
         }
 
+        RetrievalComponentConfiguration rcc = null;
         try
         {
-            props = loadAndValidateProperties(args[0]);
+            rcc = loadAndValidateConfiguration(args[0]);
         }
         catch (ValidationException e)
         {
@@ -70,30 +69,38 @@ public class Standalone
                 t = t.getCause();
             }
         }
-        // a error message should have been displayed
-        if (props == null)
-            return;
+        
 
-        RetrievalComponentConfiguration rcc = (new PropertyLoader()).load(props);
-
-        System.out.println("Saving repository at " + props.getProperty(rcc.getLocalStore()));
+        System.out.println("Saving repository at " + rcc.getLocalStore());
+        for (Iterator iter = rcc.getRepos().iterator(); iter.hasNext();) {
+            RepoConfiguration repo = (RepoConfiguration) iter.next();
+            System.out.println("Scanning repository: " + repo.getUrl());
+        } 
         System.out.println("Starting...");
-
+        
         HttpServer server = new HttpServer();
         SocketListener listener = new SocketListener();
-        listener.setPort(port);
+        listener.setPort(rcc.getPort());
         server.addListener(listener);
 
         HttpContext context = new HttpContext();
         context.setContextPath("/");
         ServletHandler sh = new ServletHandler();
         sh.addServlet("Repository", "/*", RepositoryServlet.class.getName());
-        context.setAttribute("properties", props);
+        context.setAttribute("config", rcc);
         context.addHandler(sh);
         server.addContext(context);
 
         server.start();
         System.out.println("Started.");
+        System.out.println("Add the following to your ~/build.properties file:");
+        System.out.println("   maven.repo.remote=http://<external ip>:" + rcc.getPort());
+        if (rcc.isBrowsable())  {
+            System.out.println("The repository can be browsed at http://<external ip>:" + rcc.getPort() + "/");
+        } else  {
+            System.out.println("Repository browsing is not enabled.");
+        }
+
     }
 
     /**
@@ -104,18 +111,14 @@ public class Standalone
      * @return Returns a <code>Properties</code> object if the load and validation was successfull.
      * @throws ValidationException If there was any problem validating the properties
      */
-    private Properties loadAndValidateProperties(String filename) throws ValidationException
+    private RetrievalComponentConfiguration loadAndValidateConfiguration(String filename) throws ValidationException
     {
-        File file;
-        Properties p;
+        RetrievalComponentConfiguration rcc;
+        File file = new File(filename);
 
-        file = new File(filename);
-
-        // load
         try
         {
-            p = new Properties();
-            p.load(new FileInputStream(file));
+            rcc = (new PropertyLoader()).load(new FileInputStream(file));
         }
         catch (FileNotFoundException ex)
         {
@@ -124,13 +127,12 @@ public class Standalone
         }
         catch (IOException ex)
         {
-
             throw new ValidationException(ex);
         }
 
         {
             //Verify local repository set
-            String tmp = checkPropertySet(p, ProxyProperties.REPOSITORY_LOCAL);
+            String tmp = checkSet(rcc.getLocalStore(), PropertyLoader.REPO_LOCAL_STORE);
 
             file = new File(tmp);
             if (!file.exists())
@@ -147,22 +149,23 @@ public class Standalone
         {
             //Verify remote repository set
             //only warn if missing
-            if (!p.containsKey(ProxyProperties.REPOSITORY_REMOTE + ".1"))
-                System.err.println("At least one remote should be configured.");
+            if (rcc.getRepos().size() < 1)
+            {
+                throw new ValidationException("At least one remote repository must be configured.");
+            }
         }
 
         // all ok
-        return p;
+        return rcc;
     }
 
-    private String checkPropertySet(Properties p, String value) throws ValidationException
+    private String checkSet(String value, String propertyName) throws ValidationException
     {
-        String prop = p.getProperty(value);
-        if (prop == null)
+        if (value == null)
         {
-            throw new ValidationException("Missing property '" + value + "'");
+            throw new ValidationException("Missing property '" + propertyName + "'");
         }
 
-        return prop;
+        return value;
     }
 }
