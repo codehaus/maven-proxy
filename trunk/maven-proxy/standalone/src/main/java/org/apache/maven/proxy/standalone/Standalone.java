@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.maven.proxy.ProxyProperties;
 import org.apache.maven.proxy.RepositoryServlet;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpServer;
@@ -28,7 +29,7 @@ public class Standalone
     {
         Standalone launcher;
 
-        try 
+        try
         {
             launcher = new Standalone();
             launcher.doMain(args);
@@ -42,7 +43,7 @@ public class Standalone
 
     public void doMain(String args[]) throws MultiException
     {
-        if (args.length != 1) 
+        if (args.length != 1)
         {
             System.err.println("Usage:");
             System.err.println("  java -jar maven-proxy-SNAPSHOT-uber.jar maven-proxy.properties");
@@ -60,11 +61,12 @@ public class Standalone
         }
         else
         {
-            try 
+            try
             {
                 port = Integer.parseInt(props.getProperty("port"));
             }
-            catch (NumberFormatException ex) {
+            catch (NumberFormatException ex)
+            {
                 System.err.println("Error in properyfile: port must be a integer");
                 return;
             }
@@ -96,11 +98,13 @@ public class Standalone
 
     /**
      * This method will load and validate the properties.
-     *
+     * @todo make it throw a validation exception and defer
+     *       logging to the handler of the exception.
      * @param filename The name of the properties file.
      * @return Returns a <code>Properties</code> object if the load and validation was successfull.
      */
-    private Properties loadAndValidateProperties(String filename) {
+    private Properties loadAndValidateProperties(String filename)
+    {
         File file;
         Properties p;
         String tmp;
@@ -113,45 +117,50 @@ public class Standalone
             p = new Properties();
             p.load(new FileInputStream(file));
         }
-        catch (FileNotFoundException ex) 
+        catch (FileNotFoundException ex)
         {
             System.err.println("No such file: " + file.getAbsolutePath());
             return null;
         }
-        catch (IOException ex) 
+        catch (IOException ex)
         {
             Throwable t = ex;
 
             System.err.println("Error while loading properties:");
 
-            while(t != null) {
-                System.err.println("  " + ex.getLocalizedMessage());
+            while (t != null)
+            {
+                System.err.println("  " + t.getLocalizedMessage());
+                t = t.getCause();
             }
 
             return null;
         }
 
         // validate
-        tmp = p.getProperty("repository.local");
-        if(tmp == null) {
-            System.err.println("Missing property 'repository.local'");
+        tmp = p.getProperty(ProxyProperties.REPOSITORY_LOCAL);
+        if (tmp == null)
+        {
+            System.err.println("Missing property '" + ProxyProperties.REPOSITORY_LOCAL + "'");
             return null;
         }
 
         file = new File(tmp);
-        if(!file.exists()) {
+        if (!file.exists())
+        {
             System.err.println("The local repository doesn't exist: " + file.getAbsolutePath());
             return null;
         }
 
-        if(!file.isDirectory()) {
-            System.err.println("The local repository must be a directory: " + 
-                    file.getAbsolutePath());
+        if (!file.isDirectory())
+        {
+            System.err.println("The local repository must be a directory: " + file.getAbsolutePath());
             return null;
         }
 
         tmp = p.getProperty("repository.remote");
-        if(tmp == null) {
+        if (tmp == null)
+        {
             System.err.println("Missing property 'repository.remote'");
             return null;
         }
