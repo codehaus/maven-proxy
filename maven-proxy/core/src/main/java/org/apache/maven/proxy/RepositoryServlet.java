@@ -23,30 +23,42 @@ public class RepositoryServlet extends HttpServlet
 {
     /** log4j logger */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(RepositoryServlet.class);
-    
+
     private final DefaultRetrievalComponent rc = new DefaultRetrievalComponent();
     File baseDir;
     public void init() throws ServletException
     {
         Properties props = (Properties) getServletContext().getAttribute("properties");
-        baseDir = new File(props.getProperty("repository.local"));
+        baseDir = new File(props.getProperty(ProxyProperties.REPOSITORY_LOCAL));
+
+        if (!baseDir.exists())
+        {
+            LOGGER.info("Local Repository (" + baseDir.getAbsolutePath() + ") does not exist");
+        }
+
         rc.setBaseUrl(props.getProperty("repository.remote"));
-        rc.setBaseDir(baseDir);
+        //rc.setBaseDir(baseDir);
+        rc.setProxyHost(props.getProperty(ProxyProperties.PARENT_PROXY_HOST));
+        rc.setProxyPort(Integer.parseInt(props.getProperty(ProxyProperties.PARENT_PROXY_PORT)));
+        rc.setProxyUsername(props.getProperty(ProxyProperties.PARENT_PROXY_USERNAME));
+        rc.setProxyPassword(props.getProperty(ProxyProperties.PARENT_PROXY_PASSWORD));
     }
 
-    public void doGet(HttpServletRequest req, HttpServletResponse arg1) throws ServletException, IOException
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        LOGGER.info("Received request for " + req.getPathInfo());
+        LOGGER.info("Received request: " + request.getPathInfo());
         try
         {
-            
-            File f = new File(baseDir + req.getPathInfo());
+
+            File f = new File(baseDir + request.getPathInfo());
             f.getParentFile().mkdirs();
-            
-            rc.retrieveArtifact(f, req.getPathInfo());
+
+            rc.retrieveArtifact(f, request.getPathInfo());
             InputStream is = new FileInputStream(f);
-            arg1.setContentType("x-binary");
-            OutputStream os = arg1.getOutputStream();
+
+            //TODO could tailor the mime type
+            response.setContentType("application/octet-stream");
+            OutputStream os = response.getOutputStream();
             IOUtility.transferStream(is, os);
             IOUtility.close(os);
             IOUtility.close(is);
@@ -54,7 +66,7 @@ public class RepositoryServlet extends HttpServlet
         catch (FetchException e)
         {
             e.printStackTrace();
-            arg1.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
