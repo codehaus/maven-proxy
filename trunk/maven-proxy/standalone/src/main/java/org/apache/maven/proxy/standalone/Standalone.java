@@ -69,7 +69,7 @@ public class Standalone
         if (props == null)
             return;
 
-        if (props.getProperty("port") == null)
+        if (props.getProperty(ProxyProperties.PORT) == null)
         {
             port = 8080;
         }
@@ -77,11 +77,11 @@ public class Standalone
         {
             try
             {
-                port = Integer.parseInt(props.getProperty("port"));
+                port = Integer.parseInt(props.getProperty(ProxyProperties.PORT));
             }
             catch (NumberFormatException ex)
             {
-                System.err.println("Error in properyfile: port must be a integer");
+                System.err.println("Error in properyfile: " + ProxyProperties.PORT + " must be a integer");
                 return;
             }
         }
@@ -158,7 +158,9 @@ public class Standalone
 
         {
             //Verify remote repository set
-            checkPropertySet(p, ProxyProperties.REPOSITORY_REMOTE);
+            //only warn if missing
+            if(!p.containsKey(ProxyProperties.REPOSITORY_REMOTE + ".1"))
+                System.err.println("At least one remote should be configured.");
         }
 
         // all ok
