@@ -16,7 +16,6 @@ package org.apache.maven.proxy.engine;
  * limitations under the License.
  */
 
-import org.apache.maven.proxy.engine.DownloadEngine;
 import org.apache.maven.proxy.request.BaseProxyRequest;
 
 /**
@@ -26,18 +25,20 @@ public class MockProxyRequest extends BaseProxyRequest
 {
     private final String path;
     private final long lastModified;
+    private final long ifModifiedSince;
     private final boolean headOnly;
 
-    public MockProxyRequest( String path, long lastModified, boolean headOnly )
+    public MockProxyRequest( String path, long lastModified, boolean headOnly, long ifModifiedSince )
     {
         this.path = path;
         this.lastModified = lastModified;
         this.headOnly = headOnly;
+        this.ifModifiedSince = ifModifiedSince;
     }
 
     public long getLastModified()
     {
-        return DownloadEngine.round(lastModified);
+        return DownloadEngine.round( lastModified );
     }
 
     public String getPath()
@@ -53,6 +54,11 @@ public class MockProxyRequest extends BaseProxyRequest
     public String getSourceDescription()
     {
         return "Mock";
+    }
+
+    public long getIfModifiedSince()
+    {
+        return ifModifiedSince;
     }
 
 }

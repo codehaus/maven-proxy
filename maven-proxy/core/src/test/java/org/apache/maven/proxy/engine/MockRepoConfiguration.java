@@ -46,9 +46,9 @@ public class MockRepoConfiguration extends RepoConfiguration
         hits++;
     }
 
-    public MockRepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail )
+    public MockRepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail, boolean cacheFailures, long cachePeriod )
     {
-        super( key, url, description, copy, hardFail );
+        super( key, url, description, copy, hardFail, cacheFailures, cachePeriod );
     }
 
     public RetrievalDetails retrieveArtifact( File out, String url ) throws IOException
@@ -70,7 +70,7 @@ public class MockRepoConfiguration extends RepoConfiguration
         throw new FileNotFoundException( "Can't find " + url );
     }
 
-    public ProxyArtifact getMetaInformation( String url ) throws FileNotFoundException
+    public ProxyArtifact getMetaInformationInternal( String url ) throws FileNotFoundException
     {
         incrementHits();
 

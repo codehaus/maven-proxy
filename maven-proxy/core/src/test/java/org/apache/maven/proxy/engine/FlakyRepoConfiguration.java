@@ -35,13 +35,13 @@ public class FlakyRepoConfiguration extends RepoConfiguration
     /**
      * The retrieval is always flaky, the snapshot is only flaky if you want it to be.
      */
-    public FlakyRepoConfiguration( boolean flakyStatus, boolean copy, boolean hardFail )
+    public FlakyRepoConfiguration( boolean flakyStatus, boolean copy, boolean hardFail, boolean cacheFailures, long cachePeriod )
     {
-        super( "flaky", "file://///", "Flaky Repository", copy, hardFail );
+        super( "flaky", "file://///", "Flaky Repository", copy, hardFail, cacheFailures, cachePeriod );
         this.flakyStatus = flakyStatus;
     }
 
-    public ProxyArtifact getMetaInformation( String url ) throws FileNotFoundException
+    public ProxyArtifact getMetaInformationInternal( String url ) throws FileNotFoundException
     {
         if ( flakyStatus )
         {

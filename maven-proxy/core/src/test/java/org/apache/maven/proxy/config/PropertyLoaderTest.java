@@ -47,7 +47,6 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "rcc.getPrefix()", "repository", rcc.getPrefix() );
         assertEquals( "rcc.getServerName()", "http://localhost:9999", rcc.getServerName() );
         assertEquals( "rcc.getSnapshotUpdate()", true, rcc.getSnapshotUpdate() );
-        assertEquals( "rcc.getSnapshotUpdateInterval()", 60, rcc.getSnapshotUpdateInterval() );
         assertEquals( "rcc.getLastModifiedDateFormat()", "yyyy/MM/dd HH:mm:ss", rcc.getLastModifiedDateFormat() );
         assertTrue( "rcc.isBrowsable()", rcc.isBrowsable() );
         assertTrue( "rcc.isSearchable()", rcc.isSearchable() );
@@ -56,7 +55,6 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "rcc.rowColor", rcc.getRowColor(), "#CCF" );
         assertEquals( "rcc.rowColorHighlight", rcc.getRowColorHighlight(), "#DDF" );
         assertEquals( "rcc.styleSheet", rcc.getStylesheet(), "/maven-proxy/style.css" );
-        assertTrue( "rcc.getSnapshotCacheFailures()", rcc.getSnapshotCacheFailures());
 
         /////////////////////// Check Proxies ////////////////////////
         assertEquals( "rcc.getProxies().size()", 3, rcc.getProxies().size() );
@@ -84,7 +82,9 @@ public class PropertyLoaderTest extends TestCase
         assertNotNull( "configuration", configuration );
         assertEquals( "configuration.getUrl()", "file:///./target/repo", configuration.getUrl() );
         assertEquals( "configuration.getDescription()", "Global Repository", configuration.getDescription() );
-        assertEquals( "configuration.getDescription()", true, configuration.getHardFail() );
+        assertEquals( "configuration.getHardFail()", true, configuration.getHardFail() );
+        assertEquals( "configuration.getCacheFailures()", true, configuration.getCacheFailures() );
+        assertEquals( "configuration.getCachePeriod()", 3600, configuration.getCachePeriod() );
     }
 
     private void verifyRepoLocal( FileRepoConfiguration configuration )

@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateParser;
+import org.apache.maven.proxy.components.NotFoundProxyArtifact;
 import org.apache.maven.proxy.components.ProxyArtifact;
 import org.apache.maven.proxy.engine.DownloadEngine;
 import org.apache.maven.proxy.engine.RetrievalDetails;
@@ -51,9 +52,9 @@ public class HttpRepoConfiguration extends RepoConfiguration
     private final ProxyConfiguration proxy;
 
     public HttpRepoConfiguration( String key, String url, String description, String username, String password,
-                    boolean hardFail, ProxyConfiguration proxy )
+                    boolean hardFail, ProxyConfiguration proxy, boolean cacheFailures, long cachePeriod )
     {
-        super( key, url, description, true, hardFail );
+        super( key, url, description, true, hardFail, cacheFailures, cachePeriod );
         this.username = username;
         this.password = password;
         this.proxy = proxy;
@@ -102,7 +103,7 @@ public class HttpRepoConfiguration extends RepoConfiguration
         return client;
     }
 
-    public ProxyArtifact getMetaInformation( String url )
+    protected ProxyArtifact getMetaInformationInternal( String url )
     {
         try
         {

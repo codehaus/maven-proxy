@@ -43,8 +43,8 @@ public class FileElementComparatorTest extends TestCase
     protected void setUp()
     {
         repos = new ArrayList();
-        repoA = new HttpRepoConfiguration( "A", "http://example.com", "Repo A", null, null, true, null );
-        repoB = new FileRepoConfiguration( "B", "file:///target", "Repo B", false, true );
+        repoA = new HttpRepoConfiguration( "A", "http://example.com", "Repo A", null, null, true, null, false, 0 );
+        repoB = new FileRepoConfiguration( "B", "file:///target", "Repo B", false, true, false, 0 );
         repos.add( repoA );
         repos.add( repoB );
         fec = new FileElementComparator( repos );
