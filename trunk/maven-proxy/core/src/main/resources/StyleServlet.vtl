@@ -1,0 +1,156 @@
+#set ($bgColor = "#14B")
+#set ($bgColorHighlight = "#9BF")
+
+* 
+{ 
+  font-family: tahoma,verdana,arial;
+  font-size: 0.95em;
+#  background-color: #DDF;
+}
+  
+table 
+{ 
+  border: 1px solid black; 
+  border-collapse: collapse; 
+}
+
+tr.dir 
+{ 
+  left-margin: 1cm; 
+  border: 1px solid black; 
+}
+ 
+tr.file 
+{ 
+  left-margin: 1cm; 
+  border: 1px solid black; 
+}
+
+td, th
+{
+	border-left: 1px solid #999;
+	border-right: 1px solid #999;
+	padding-left: 2px; 
+	padding-right: 2px;
+}
+
+tr {
+  padding: 2px;
+}
+
+tr.a {
+	background-color: #DDF;
+}
+
+tr.b {
+	background-color: #CCF;
+}
+
+th
+{
+	font-weight: bolder;
+	text-align: left;
+}
+
+img
+{
+  border: 0;
+}
+
+div.browse 
+{
+  border: 1px solid black;
+  background-color: #ddd;
+  padding: 2px;
+  margin-bottom: 3px;
+  font-weight: bolder;
+}
+
+h1 {
+  font-weight: bolder;
+  font-size: 1.3em;
+}
+
+h2 {
+  font-size: 1.1em;
+  font-weight: normal;
+}
+
+table {
+ -moz-border-radius: 10px;
+}
+
+
+div.top-level-menu {
+	font-size: 0.7em;
+	font-weight: bolder;
+	background-color: $bgColor;
+	padding: 2px;
+}
+
+div.top-level-menu a {
+	font-weight: bolder;
+	background-color: $bgColor;
+	color: #eee;
+	height: 100%;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	font-decoration: none;
+}
+
+div.top-level-menu a:hover {
+	background-color: $bgColorHighlight;
+	color: #fff;
+}
+
+div.top-level-menu a.selected {
+	background-color: $bgColorHighlight;
+	color: #fff;
+}
+
+
+
+div.top-level-menu a {
+  text-decoration: none;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+div.top-level-menu {
+  ##padding-top: 2px;
+  ##padding-bottom: 2px;
+}
+
+table.page-header .page-header-left {
+  text-align: left;
+  font-weight: bolder;
+  font-size: 2em;
+  border: 0;
+  background-color: $bgColorHighlight;
+}
+table.page-header .page-header-middle {
+  border: 0;
+  background-color: $bgColorHighlight;
+}
+
+table.page-header .page-header-right {
+  text-align: right;
+  vertical-align: bottom;
+  border: 0;
+  background-color: $bgColorHighlight;
+}
+
+
+
+table.page-header {
+  width: 100%;
+  text-align: left;
+}
+
+table.pageheader th {
+  width: 25%;
+}
+
+#page-body-leftnav {
+  width: 25%;
+}

@@ -1,0 +1,7 @@
+#macro(parseHeader)
+	#parse("header.vtl")
+#end
+
+#macro(parseFooter)
+	#parse("footer.vtl")
+#end
