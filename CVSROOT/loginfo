@@ -25,3 +25,4 @@
 #DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
+maven-proxy cat $CVSROOT/CVSROOT/damagecontrol-maven-proxy.conf | nc builds.codehaus.org 4711
