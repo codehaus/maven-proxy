@@ -1,5 +1,6 @@
 <project default="jar:install">
   <goal name="run">
+    <mkdir dir="target/repo"/>
   	<java
       classname="org.apache.maven.proxy.standalone.Standalone"
       fork="true">

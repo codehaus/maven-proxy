@@ -28,8 +28,9 @@
     </dependency>
     
     <dependency>
-      <id>jetty</id>
-      <version>4.2.9</version>
+      <groupId>jetty</groupId>
+      <artifactId>org.mortbay.jetty</artifactId>
+      <version>5.0.beta0</version>
     </dependency>
 
 	<dependency>
