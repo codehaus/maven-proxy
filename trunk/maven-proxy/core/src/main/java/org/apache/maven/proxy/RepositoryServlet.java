@@ -145,6 +145,7 @@ public class RepositoryServlet extends HttpServlet
                     File f = new File( localStoreDir, pathInfo );
                     f.getParentFile().mkdirs();
                     long size = -1;
+                    long lastModified = -1;
 
                     InputStream is;
                     if ( !isSnapshot && f.exists() )
@@ -152,6 +153,7 @@ public class RepositoryServlet extends HttpServlet
                         LOGGER.info( "Retrieving from cache: " + f.getAbsolutePath() );
                         is = new FileInputStream( f );
                         size = f.length();
+                        lastModified = f.lastModified();
                     }
                     else
                     {
@@ -161,16 +163,19 @@ public class RepositoryServlet extends HttpServlet
                             RetrievalDetails rd = rc.retrieveArtifact( repoConfig, f, pathInfo, isSnapshot );
                             is = rd.getInputStream();
                             size = rd.getLength();
+                            lastModified = rd.getLastModified();
                         }
                         catch ( NotModifiedFetchException e )
                         {
                             LOGGER.info( "Snapshot update not required : " + f.getAbsolutePath() );
                             is = new FileInputStream( f );
                             size = f.length();
+                            lastModified = f.lastModified();
                         }
                     }
 
                     response.setContentType( "application/x-jar" );
+                    response.setDateHeader( "Last-Modified", lastModified );
                     if ( size != -1 )
                     {
                         response.setContentLength( (int) size );

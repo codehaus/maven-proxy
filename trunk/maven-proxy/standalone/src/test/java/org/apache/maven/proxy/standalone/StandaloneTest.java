@@ -30,6 +30,6 @@ public class StandaloneTest extends TestCase
                 "src/test/test.properties"
             };
         Standalone.main( args );
-        Thread.sleep( 60000 );
+        Thread.sleep( 10000 );
     }
 }
