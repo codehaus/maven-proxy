@@ -61,37 +61,30 @@ public class DownloadEngine
 
     private void processStandard( ProxyRequest request, ProxyResponse response ) throws IOException
     {
-        System.out.println( getExtension( request.getPath() ) );
-        String mimeType = getMimeType( getExtension( request.getPath() ) );
+        String mimeType = getMimeType( request.getPath() );
         GlobalRepoConfiguration globalRepo = rcc.getGlobalRepo();
 
         for ( Iterator iter = rcc.getRepos().iterator(); iter.hasNext(); )
         {
             RepoConfiguration repo = (RepoConfiguration) iter.next();
 
-            ProxyArtifact snapshot = repo.getMetaInformation( request.getPath() );
+            ProxyArtifact artifact = repo.getMetaInformation( request.getPath() );
 
-            if ( snapshot != null )
+            if ( artifact != null )
             {
                 if ( request.isHeadOnly() )
                 {
-                    response.setLastModified( snapshot.getLastModified() );
-                    response.setContentLength( (int) snapshot.getSize() );
-                    response.setContentType( mimeType );
-                    response.sendOK();
+                    sendHeadResponse( response, mimeType, artifact );
                     return;
                 }
 
-                if ( snapshot.getLastModified() < request.getLastModified() )
+                if ( artifact.getLastModified() < request.getLastModified() )
                 {
-                    response.setLastModified( snapshot.getLastModified() );
-                    response.setContentLength( (int) snapshot.getSize() );
-                    response.setContentType( mimeType );
-                    response.sendError( HttpServletResponse.SC_NOT_MODIFIED );
+                    sendNotModifiedResponse( response, mimeType, artifact );
                     return;
                 }
 
-                File targetFile = null;
+                final File targetFile;
                 if ( repo.getCopy() )
                 {
                     LOGGER.info( "Copying " + request.getPath() + " from " + globalRepo + " to " + repo );
@@ -105,11 +98,7 @@ public class DownloadEngine
                     targetFile = fileRepo.getLocalFile( request.getPath() );
                 }
 
-                //FIXME Send content type
-                response.setLastModified( targetFile.lastModified() );
-                response.setContentLength( (int) targetFile.length() );
-                response.setContentType( mimeType );
-                response.sendFile( targetFile );
+                sendBodyResponse( response, mimeType, targetFile );
                 return;
             }
         }
@@ -118,23 +107,37 @@ public class DownloadEngine
     }
 
     /**
-     * @param path
-     * @return
+     * @param response
+     * @param mimeType
+     * @param targetFile
+     * @throws IOException
      */
-    static String getExtension( String path )
+    private void sendBodyResponse( ProxyResponse response, String mimeType, File targetFile ) throws IOException
     {
-        int dotPos = path.lastIndexOf( '.' );
-        if ( dotPos < 0 )
-        {
-            return path;
-        }
-
-        return path.substring( dotPos );
+        response.setLastModified( targetFile.lastModified() );
+        response.setContentType( mimeType );
+        response.setContentLength( (int) targetFile.length() );
+        response.sendFile( targetFile );
+        response.sendOK();
     }
 
-    static String getMimeType( String extension )
+    /**
+     * @param response
+     * @param mimeType
+     * @param artifact
+     */
+    private void sendHeadResponse( ProxyResponse response, String mimeType, ProxyArtifact artifact )
     {
-        MimeTypes.MimeType mimeType = MimeTypes.getMimeType( extension );
+        LOGGER.info( artifact.getRepo() + ": Sending HEAD meta-information" );
+        response.setLastModified( artifact.getLastModified() );
+        response.setContentType( mimeType );
+        response.setContentLength( (int) artifact.getSize() );
+        response.sendOK();
+    }
+
+    static String getMimeType( String path )
+    {
+        MimeTypes.MimeType mimeType = MimeTypes.getMimeTypeByPath( path );
         if ( mimeType == null )
         {
             return "application/octet-stream";
@@ -181,26 +184,24 @@ public class DownloadEngine
 
     private void processSnapshot( ProxyRequest request, ProxyResponse response ) throws IOException
     {
-        String mimeType = getMimeType( getExtension( request.getPath() ) );
+        String mimeType = getMimeType( request.getPath() );
         long modificationTime = retrieveModificationTime( request );
 
         ProxyArtifact latestArtifact = findLatestProxyArtifact( request, response );
 
         if ( latestArtifact instanceof NotFoundProxyArtifact )
         {
-            LOGGER.info( "No SNAPSHOT found: " + request.getPath() );
+            LOGGER.info( "Artifact not found: " + request.getPath() );
             response.sendError( HttpServletResponse.SC_NOT_FOUND );
             return;
         }
+
         LOGGER.info( latestArtifact.getRepo() + ": Found most up-to-date version of " + request.getPath() );
         response.setLastModified( latestArtifact.getLastModified() );
 
         if ( request.isHeadOnly() )
         {
-            LOGGER.info( latestArtifact.getRepo() + ": Sending HEAD meta-information" );
-            response.setContentLength( (int) latestArtifact.getSize() );
-            response.setContentType( mimeType );
-            response.sendOK();
+            sendHeadResponse( response, mimeType, latestArtifact );
             return;
         }
 
@@ -209,10 +210,7 @@ public class DownloadEngine
          */
         if ( modificationTime >= latestArtifact.getLastModified() )
         {
-            LOGGER.info( latestArtifact.getRepo() + ": Sending NOT-MODIFIED response" );
-            response.setContentType( mimeType );
-            response.setContentLength( (int) latestArtifact.getSize() );
-            response.sendError( HttpServletResponse.SC_NOT_MODIFIED );
+            sendNotModifiedResponse( response, mimeType, latestArtifact );
             return;
         }
 
@@ -232,12 +230,25 @@ public class DownloadEngine
             LOGGER.info( globalRepo + ": Sending " + request.getPath() );
         }
 
-        response.setContentType( mimeType );
-        response.setContentLength( (int) downloadFile.length() );
-        response.setLastModified( downloadFile.lastModified() );
-        response.sendFile( downloadFile );
-        response.sendOK();
+        sendBodyResponse( response, mimeType, downloadFile );
         return;
+    }
+
+    /**
+     * @param response
+     * @param mimeType
+     * @param artifact
+     * @throws IOException
+     */
+    private void sendNotModifiedResponse( ProxyResponse response, String mimeType, ProxyArtifact artifact )
+                    throws IOException
+    {
+        LOGGER.info( artifact.getRepo() + ": Sending NOT-MODIFIED response" );
+        response.setContentType( mimeType );
+        response.setContentLength( (int) artifact.getSize() );
+        response.setLastModified( artifact.getLastModified() );
+        response.sendError( HttpServletResponse.SC_NOT_MODIFIED );
+
     }
 
     /**
