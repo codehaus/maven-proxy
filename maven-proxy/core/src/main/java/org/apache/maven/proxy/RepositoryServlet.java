@@ -195,6 +195,7 @@ public class RepositoryServlet extends HttpServlet
             boolean done = false;
             List repos = rcc.getRepos();
             RetrievalComponent rc = new DefaultRetrievalComponent();
+            //This whole thing is inside out.  It should only check repos if local file not found
             for (int i = 0; i < repos.size(); i++)
             {
                 RepoConfiguration repoConfig = (RepoConfiguration) repos.get(i);
@@ -209,6 +210,7 @@ public class RepositoryServlet extends HttpServlet
                     }
                     else
                     {
+                        LOGGER.info("Retrieving from upstream (" + repoConfig.getKey() + "): " + f.getAbsolutePath());
                         rc.retrieveArtifact(repoConfig, f, request.getPathInfo());
                     }
 
