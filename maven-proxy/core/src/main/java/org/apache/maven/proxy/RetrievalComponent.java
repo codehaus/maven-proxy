@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import org.apache.maven.fetch.exceptions.FetchException;
+import org.apache.maven.proxy.config.*;
 
 /**
  * @author  Ben Walding

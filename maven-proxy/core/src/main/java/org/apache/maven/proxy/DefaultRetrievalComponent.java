@@ -8,6 +8,7 @@ import java.io.InputStream;
 import org.apache.maven.fetch.FetchRequest;
 import org.apache.maven.fetch.FetchTool;
 import org.apache.maven.fetch.exceptions.FetchException;
+import org.apache.maven.proxy.config.*;
 
 /**
  * This component should be stateless and hence multithreadable.
