@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -51,16 +50,9 @@ public class RepositoryServlet extends HttpServlet
 
     public void init() throws ServletException
     {
-        final Properties props = (Properties) getServletContext().getAttribute("properties");
+        rcc = (RetrievalComponentConfiguration) getServletContext().getAttribute("config");
 
-        try
-        {
-            rcc = (new PropertyLoader()).load(props);
-        }
-        catch (IOException e)
-        {
-            throw new ServletException(e);
-        }
+        
 
         baseDir = new File(rcc.getLocalStore());
         if (!baseDir.exists())
