@@ -17,7 +17,7 @@ public class HttpServerTest extends TestCase
 
 	public void testRun() throws Exception
 	{
-		HttpServer server = new ProxyRepoServer(9999, "bleh");
+		HttpServer server = new ProxyRepoServer(9999);
 		Thread.sleep(60000);
         
 	}
