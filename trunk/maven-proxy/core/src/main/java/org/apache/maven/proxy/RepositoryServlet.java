@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -29,7 +28,6 @@ public class RepositoryServlet extends HttpServlet
     /** log4j logger */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(RepositoryServlet.class);
 
-    private List retrievers = new ArrayList();
     private RetrievalComponentConfiguration rcc = null;
     private File baseDir;
 
@@ -74,7 +72,11 @@ public class RepositoryServlet extends HttpServlet
 
         if (pathInfo.endsWith("/"))
         {
-            handleBrowseRequest(request, response);
+            if (rcc.isBrowsable())  {
+                handleBrowseRequest(request, response);
+            } else  {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
             return;
         }
         else
@@ -94,7 +96,7 @@ public class RepositoryServlet extends HttpServlet
             RetrievalComponent rc = new DefaultRetrievalComponent();
             for (int i = 0; i < repos.size(); i++)
             {
-                RepoConfiguration repoConfig = (RepoConfiguration) retrievers.get(i);
+                RepoConfiguration repoConfig = (RepoConfiguration) repos.get(i);
 
                 try
                 {
@@ -154,7 +156,15 @@ public class RepositoryServlet extends HttpServlet
         PrintWriter pw = response.getWriter();
 
         pw.println("<html>");
+        pw.println("<head>");
+        pw.println("  <title>maven-proxy</title>");
+        pw.println("  <style type='text/css'>");
+        pw.println("    * { font-family: tahoma,verdana,arial; }");
+        pw.println("    div.dir { left-margin: 1cm; }");
+        pw.println("  </style>");
+        pw.println("</head>");
         pw.println("<body>");
+        pw.println("<div>Browsing " + pathInfo + "</div>");
         File dir = new File(baseDir, pathInfo);
         File[] files = dir.listFiles();
         if (files == null)
@@ -163,8 +173,12 @@ public class RepositoryServlet extends HttpServlet
         }
         for (int i = 0; i < files.length; i++)
         {
-            pw.println("<br/>");
-            pw.println("<a href='" + pathInfo + files[i].getName() + "/'>" + files[i].getName() + "</a>");
+            File theFile = files[i];
+            if (theFile.isDirectory())  {
+                pw.println("<div class='dir'><a href='" + pathInfo + theFile.getName() + "/'>" + theFile.getName() + "</a></div>");
+            } else  {
+                pw.println("<div class='file'><a href='" + pathInfo + theFile.getName() + "'>" + theFile.getName() + "</a></div>");
+            }
         }
         pw.println("</body>");
         pw.println("</html>");

@@ -16,7 +16,24 @@ public class RetrievalComponentConfiguration
     private final Map proxies = new HashMap();
     private final List repos = new ArrayList();
     private String localStore;
+    private boolean browsable;
     private int port;
+
+    /**
+     * @return
+     */
+    public boolean isBrowsable()
+    {
+        return browsable;
+    }
+
+    /**
+     * @param browsable
+     */
+    public void setBrowsable(boolean browsable)
+    {
+        this.browsable = browsable;
+    }
 
     /**
      * @return

@@ -12,7 +12,7 @@ import junit.framework.TestCase;
  */
 public class PropertyLoaderTest extends TestCase
 {
-    public void testSimple() throws IOException
+    public void testSimple() throws IOException, ValidationException
     {
         InputStream is = PropertyLoaderTest.class.getResourceAsStream("PropertyLoaderTest1.properties");
         PropertyLoader loader = new PropertyLoader();
@@ -21,6 +21,8 @@ public class PropertyLoaderTest extends TestCase
         
         /////////////////////// Check Globals ////////////////////////
         assertEquals("rcc.getLocalStore()", "/var/tmp/maven-proxy", rcc.getLocalStore());
+        assertEquals("rcc.getPort()", 9999, rcc.getPort());
+        assertTrue("rcc.isBrowsable()", rcc.isBrowsable());
         
         /////////////////////// Check Proxies ////////////////////////
         assertEquals("rcc.getProxies().size()", 3, rcc.getProxies().size());
@@ -51,20 +53,35 @@ public class PropertyLoaderTest extends TestCase
         assertEquals("repos.size()", 3, repos.size());
 
         RepoConfiguration rcIbiblio = (RepoConfiguration) repos.get(0);
+        verifyRepoIbiblio(rcIbiblio);
+
+        RepoConfiguration rcDist = (RepoConfiguration) repos.get(1);
+        verifyRepoDist(rcDist);
+
+        RepoConfiguration rcPrivate = (RepoConfiguration) repos.get(2);
+        verifyRepoPrivate(rcPrivate);
+    }
+
+    private void verifyRepoIbiblio(RepoConfiguration rcIbiblio)
+    {
         assertNotNull("rcIbiblio", rcIbiblio);
         assertEquals("rcIbiblio.url", "http://www.ibiblio.org/maven", rcIbiblio.getUrl());
         assertNull("rcIbiblio.username", rcIbiblio.getUsername());
         assertNull("rcIbiblio.password", rcIbiblio.getPassword());
         assertEquals("rcIbiblio.proxy", "one", rcIbiblio.getProxy().getKey());
+    }
 
-        RepoConfiguration rcDist = (RepoConfiguration) repos.get(1);
+    private void verifyRepoDist(RepoConfiguration rcDist)
+    {
         assertNotNull("rcDist", rcDist);
         assertEquals("rcDist.url", "http://dist.codehaus.org", rcDist.getUrl());
         assertNull("rcDist.username", rcDist.getUsername());
         assertNull("rcDist.password", rcDist.getPassword());
         assertEquals("rcDist.proxy", "two", rcDist.getProxy().getKey());
+    }
 
-        RepoConfiguration rcPrivate = (RepoConfiguration) repos.get(2);
+    private void verifyRepoPrivate(RepoConfiguration rcPrivate)
+    {
         assertNotNull("rcPrivate", rcPrivate);
         assertEquals("rcPrivate.url", "http://private.example.com/internal", rcPrivate.getUrl());
         assertEquals("rcPrivate.username", "username1", rcPrivate.getUsername());
