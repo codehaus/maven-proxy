@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -25,7 +27,7 @@ public class RepositoryServlet extends HttpServlet
     /** log4j logger */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(RepositoryServlet.class);
 
-    private final DefaultRetrievalComponent rc = new DefaultRetrievalComponent();
+    private List retrievers = new ArrayList();
     private File baseDir;
 
     /* (non-Javadoc)
@@ -55,12 +57,23 @@ public class RepositoryServlet extends HttpServlet
             LOGGER.info("Local Repository (" + baseDir.getAbsolutePath() + ") does not exist");
         }
 
-        rc.setBaseUrl(props.getProperty("repository.remote"));
-        //rc.setBaseDir(baseDir);
-        rc.setProxyHost(props.getProperty(ProxyProperties.PARENT_PROXY_HOST));
-        rc.setProxyPort(Integer.parseInt(props.getProperty(ProxyProperties.PARENT_PROXY_PORT)));
-        rc.setProxyUsername(props.getProperty(ProxyProperties.PARENT_PROXY_USERNAME));
-        rc.setProxyPassword(props.getProperty(ProxyProperties.PARENT_PROXY_PASSWORD));
+        {
+            DefaultRetrievalComponent rc = new DefaultRetrievalComponent();
+            rc.setBaseUrl(props.getProperty(ProxyProperties.REPOSITORY_REMOTE));
+            configureProxy(rc, props);
+            retrievers.add(rc);
+        }
+
+        //I want you motivated to do the configuration reader!
+        //{
+        //    DefaultRetrievalComponent rc = new DefaultRetrievalComponent();
+        //    rc.setBaseUrl("http://dist.codehaus.org/");
+        //            rc.setProxyHost(props.getProperty(ProxyProperties.PARENT_PROXY_HOST));
+        //            rc.setProxyPort(Integer.parseInt(props.getProperty(ProxyProperties.PARENT_PROXY_PORT)));
+        //            rc.setProxyUsername(props.getProperty(ProxyProperties.PARENT_PROXY_USERNAME));
+        //            rc.setProxyPassword(props.getProperty(ProxyProperties.PARENT_PROXY_PASSWORD));
+        //    retrievers.add(rc);
+        //}
     }
 
     public File getFileForRequest(HttpServletRequest request)
@@ -73,26 +86,44 @@ public class RepositoryServlet extends HttpServlet
         LOGGER.info("Received request: " + request.getPathInfo());
         try
         {
-
-            File f = getFileForRequest(request);
-            f.getParentFile().mkdirs();
-            if (f.exists())
+            boolean done = false;
+            for (int i = 0; i < retrievers.size(); i++)
             {
-                LOGGER.info("Retrieving from cache: " + f.getAbsolutePath());
-            }
-            else
-            {
-                rc.retrieveArtifact(f, request.getPathInfo());
-            }
-            InputStream is;
-            is = new FileInputStream(f);
+                DefaultRetrievalComponent rc = (DefaultRetrievalComponent) retrievers.get(i);
 
-            //TODO could tailor the mime type
-            response.setContentType("application/octet-stream");
-            OutputStream os = response.getOutputStream();
-            IOUtility.transferStream(is, os);
-            IOUtility.close(os);
-            IOUtility.close(is);
+                try
+                {
+                    File f = new File(baseDir + request.getPathInfo());
+                    f.getParentFile().mkdirs();
+                    if (f.exists())
+                    {
+                        LOGGER.info("Retrieving from cache: " + f.getAbsolutePath());
+                    }
+                    else
+                    {
+                        rc.retrieveArtifact(f, request.getPathInfo());
+                    }
+
+                    InputStream is = new FileInputStream(f);
+
+                    //TODO could tailor the mime type
+                    response.setContentType("application/octet-stream");
+                    OutputStream os = response.getOutputStream();
+                    IOUtility.transferStream(is, os);
+                    IOUtility.close(os);
+                    IOUtility.close(is);
+                }
+                catch (ResourceNotFoundFetchException ex)
+                {
+                    // if not found, just move on
+                }
+            }
+
+            if (!done)
+            {
+                LOGGER.warn("Could not find " + request.getPathInfo());
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find " + request.getPathInfo());
+            }
         }
         catch (ResourceNotFoundFetchException e)
         {
@@ -107,4 +138,15 @@ public class RepositoryServlet extends HttpServlet
         }
     }
 
+    private void configureProxy(DefaultRetrievalComponent rc, Properties props)
+    {
+        String host = props.getProperty(ProxyProperties.PARENT_PROXY_HOST);
+        if (host != null)
+        {
+            rc.setProxyHost(props.getProperty(ProxyProperties.PARENT_PROXY_HOST));
+            rc.setProxyPort(Integer.parseInt(props.getProperty(ProxyProperties.PARENT_PROXY_PORT)));
+            rc.setProxyUsername(props.getProperty(ProxyProperties.PARENT_PROXY_USERNAME));
+            rc.setProxyPassword(props.getProperty(ProxyProperties.PARENT_PROXY_PASSWORD));
+        }
+    }
 }
