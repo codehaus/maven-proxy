@@ -38,7 +38,7 @@
     <dependency>
       <groupId>jetty</groupId>
       <artifactId>org.mortbay.jetty</artifactId>
-      <version>5.0.beta0</version>
+      <version>5.0.0</version>
     </dependency>
     
     <dependency>
@@ -56,6 +56,18 @@
       <groupId>maven</groupId>
       <artifactId>maven-fetch</artifactId>
       <version>SNAPSHOT</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>velocity</groupId>
+	  <artifactId>velocity</artifactId>
+      <version>1.4</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-collections</groupId>
+	  <artifactId>commons-collections</artifactId>
+      <version>3.1</version>
     </dependency>
   </dependencies>
 
