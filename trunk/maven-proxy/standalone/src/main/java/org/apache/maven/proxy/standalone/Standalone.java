@@ -20,21 +20,27 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.Iterator;
+import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.maven.proxy.ConfigServlet;
 import org.apache.maven.proxy.RepositoryServlet;
 import org.apache.maven.proxy.ResourceServlet;
+import org.apache.maven.proxy.SearchServlet;
+import org.apache.maven.proxy.StyleServlet;
 import org.apache.maven.proxy.config.PropertyLoader;
 import org.apache.maven.proxy.config.RepoConfiguration;
 import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
 import org.apache.maven.proxy.config.ValidationException;
+import org.apache.velocity.app.Velocity;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpServer;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.MultiException;
+import org.mortbay.util.InetAddrPort;
 
 /**
  * @author  Ben Walding
@@ -51,10 +57,8 @@ public class Standalone
         {
             return "Unversioned";
         }
-        else
-        {
-            return name;
-        }
+
+        return name;
     }
 
     static String extractName( String input )
@@ -82,7 +86,7 @@ public class Standalone
         }
     }
 
-    public void doMain( String args[] ) throws MultiException
+    public void doMain( String args[] ) throws Exception
     {
         System.err.println( "maven-proxy " + Standalone.getTag() );
 
@@ -91,6 +95,18 @@ public class Standalone
             System.err.println( "Usage:" );
             System.err.println( "  java -jar maven-proxy-SNAPSHOT-uber.jar maven-proxy.properties" );
             return;
+        }
+
+        InputStream is = getClass().getResourceAsStream( "/velocity.properties" );
+        try
+        {
+            Properties props = new Properties();
+            props.load( is );
+            Velocity.init( props );
+        }
+        finally
+        {
+            is.close();
         }
 
         RetrievalComponentConfiguration rcc = null;
@@ -122,13 +138,14 @@ public class Standalone
         System.out.println( "Starting..." );
 
         HttpServer server = new HttpServer();
-        SocketListener listener = new SocketListener();
-        listener.setPort( rcc.getPort() );
+        SocketListener listener = new SocketListener( new InetAddrPort( rcc.getPort() ) );
+
         server.addListener( listener );
 
         HttpContext context = new HttpContext();
 
         context.setContextPath( "/" );
+        context.setAttribute( "version", Standalone.getTag() );
 
         ServletHandler sh = new ServletHandler();
         System.out.println( "Prefix: '" + rcc.getPrefix() + "'" );
@@ -142,7 +159,9 @@ public class Standalone
         }
 
         sh.addServlet( "images", "/images/*", ResourceServlet.class.getName() );
-        sh.addServlet( "styles", "/styles/*", ResourceServlet.class.getName() );
+        sh.addServlet( "styles", "/servlets/Style", StyleServlet.class.getName() );
+        sh.addServlet( "search", "/servlets/Search", SearchServlet.class.getName() );
+        sh.addServlet( "config", "/servlets/Config", ConfigServlet.class.getName() );
         //sh.addServlet( "webdav", "/webdav/*", ResourceServlet.class.getName() );
 
         context.setAttribute( "config", rcc );
@@ -152,35 +171,46 @@ public class Standalone
         server.start();
         System.out.println( "Started." );
 
-        final String externalAddress;
+        final String addressProxy;
 
         if ( rcc.getServerName() == null )
         {
-            String stub = "http://" + getExternalIP() + ":" + rcc.getPort();
-            if ( rcc.getPrefix().length() == 0 )
-            {
-                externalAddress = stub;
-            }
-            else
-            {
-                externalAddress = stub + "/" + rcc.getPrefix();
-            }
+            addressProxy = "http://" + getExternalIP() + ":" + rcc.getPort();
         }
         else
         {
-            externalAddress = rcc.getServerName();
+            addressProxy = rcc.getServerName();
+        }
+
+        final String addressRepo;
+        if ( rcc.getPrefix().length() == 0 )
+        {
+            addressRepo = addressProxy;
+        }
+        else
+        {
+            addressRepo = addressProxy + "/" + rcc.getPrefix();
         }
 
         System.out.println( "Add the following to your ~/build.properties file:" );
-
-        System.out.println( "   maven.repo.remote=" + externalAddress );
+        System.out.println( "   maven.repo.remote=" + addressRepo );
         if ( rcc.isBrowsable() )
         {
-            System.out.println( "The repository can be browsed at " + externalAddress );
+            System.out.println( "The proxy can be managed at " + addressProxy );
+            System.out.println( "The repository can be browsed at " + addressRepo );
         }
         else
         {
             System.out.println( "Repository browsing is not enabled." );
+        }
+
+        if ( rcc.isSearchable() )
+        {
+            System.out.println( "Repository searching is enabled." );
+        }
+        else
+        {
+            System.out.println( "Repository searching is disabled." );
         }
     }
 
