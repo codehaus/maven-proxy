@@ -52,14 +52,21 @@ public class DownloadEngine
 
     public void process( ProxyRequest request, ProxyResponse response ) throws IOException
     {
-        //If we try to update snapshots, and this is a snapshot
-        if ( rcc.getSnapshotUpdate() && request.isSnapshot() )
+        try
         {
-            processSnapshot( request, response );
-            return;
-        }
+            //If we try to update snapshots, and this is a snapshot
+            if ( rcc.getSnapshotUpdate() && request.isSnapshot() )
+            {
+                processSnapshot( request, response );
+                return;
+            }
 
-        processStandard( request, response );
+            processStandard( request, response );
+        }
+        catch ( Exception e )
+        {
+            response.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+        }
     }
 
     private void processStandard( ProxyRequest request, ProxyResponse response ) throws IOException
