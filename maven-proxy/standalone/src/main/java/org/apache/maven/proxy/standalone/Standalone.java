@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.maven.proxy.ConfigServlet;
+import org.apache.maven.proxy.RedirectServlet;
 import org.apache.maven.proxy.RepositoryServlet;
 import org.apache.maven.proxy.ResourceServlet;
 import org.apache.maven.proxy.SearchServlet;
@@ -162,6 +163,7 @@ public class Standalone
         sh.addServlet( "styles", "/servlets/Style", StyleServlet.class.getName() );
         sh.addServlet( "search", "/servlets/Search", SearchServlet.class.getName() );
         sh.addServlet( "config", "/servlets/Config", ConfigServlet.class.getName() );
+        sh.addServlet( "redirect", "/", RedirectServlet.class.getName() );
         //sh.addServlet( "webdav", "/webdav/*", ResourceServlet.class.getName() );
 
         context.setAttribute( "config", rcc );
