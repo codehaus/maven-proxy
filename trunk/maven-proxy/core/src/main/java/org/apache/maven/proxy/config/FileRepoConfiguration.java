@@ -16,22 +16,31 @@ package org.apache.maven.proxy.config;
  * limitations under the License.
  */
 
+import java.io.File;
+
 /**
+ * Strips file:/// off the front of the configured URL and uses that to find files locally.
  * 
  * @author  Ben Walding
  * @version $Id$
  */
 public class FileRepoConfiguration extends RepoConfiguration
 {
-    /**
-     * @param key
-     * @param url
-     */
-    public FileRepoConfiguration(String key, String url, String description, boolean copy) {
-        super(key, url, description, copy);
-    }
+	private final String basePath;
 
-    
-    
+	public FileRepoConfiguration(String key, String url, String description, boolean copy) {
+		super( key, url, description, copy );
+		basePath = url.substring( 8 );
+	}
+
+	public String getBasePath()
+	{
+		return basePath;
+	}
+
+	public File getLocalFile( String path )
+	{
+		return new File( basePath + path );
+	}
 
 }

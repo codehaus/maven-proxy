@@ -62,16 +62,13 @@ public class DefaultRetrievalComponent implements RetrievalComponent
 
         if (rc instanceof FileRepoConfiguration && !rc.getCopy())
         {
+            FileRepoConfiguration frc = (FileRepoConfiguration) rc;
             //XXX this is a mess, we should not be writing this kind of code here!
             //If we're not copying, we have to handle this specially.
-            String urlString = fr.getUrl();
 
-            //FileRepoConfig = file:///.*
-            String path = urlString.substring(8);
-            File fPath = new File(path);
+            File fPath = frc.getLocalFile(url);
             if (fPath.exists())
             {
-                LOGGER.info("custom repo - " + fPath);
                 return new FileInputStream(fPath);
             }
             else

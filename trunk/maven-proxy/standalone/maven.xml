@@ -3,7 +3,7 @@
   	<java
       classname="org.apache.maven.proxy.standalone.Standalone"
       fork="true">
-        <arg value="src/test/test-health.properties"/>
+        <arg value="src/test/test.properties"/>
         <classpath>
           <path refid="maven-classpath"/>
           <path refid="maven.dependency.classpath"/>

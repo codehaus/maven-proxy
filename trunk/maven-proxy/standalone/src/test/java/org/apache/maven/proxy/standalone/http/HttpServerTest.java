@@ -33,7 +33,7 @@ public class HttpServerTest extends TestCase
         c.addAttribute("port", "9999");
 		server.configure(c);
 		server.start();
-		Thread.sleep(60000);
+		Thread.sleep(1000);
 		server.stop();
 	}
 
