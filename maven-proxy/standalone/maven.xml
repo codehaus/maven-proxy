@@ -7,6 +7,10 @@
     <attainGoal name="build:snapshot:dist"/>
   </goal>
   
+  <pregoal name="test:test-resources">
+    <mkdir dir="target/repo"/>
+  </pregoal>
+  
   <goal name="build:snapshot:dist">
     <j:set var="distBase">target/dist/maven-proxy-${pom.currentVersion}</j:set>
 
