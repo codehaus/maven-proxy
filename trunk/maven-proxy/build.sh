@@ -7,7 +7,7 @@ do
   cd $module
   echo Building maven-proxy:$module
   echo  pwd: `pwd`
-  maven build:snapshot
+  maven clean build:snapshot
   RESULT=$?
   if [ $RESULT -ne "0" ]; then
     echo Exit value of $RESULT in module $module
