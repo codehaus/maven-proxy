@@ -86,7 +86,7 @@ public class Standalone
             }
         }
 
-        repository = props.getProperty("repository.local");
+        repository = props.getProperty(ProxyProperties.REPOSITORY_LOCAL);
 
         System.out.println("Saving repository at " + repository);
         System.out.println("Starting...");
