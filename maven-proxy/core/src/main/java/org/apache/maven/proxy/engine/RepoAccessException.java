@@ -21,7 +21,7 @@ import org.apache.maven.proxy.config.RepoConfiguration;
 /**
  * @author Ben Walding
  */
-public class RepoAccessException extends Exception
+public class RepoAccessException extends RuntimeException
 {
     private final RepoConfiguration repo;
     private final String path;

@@ -25,6 +25,7 @@ import org.apache.maven.proxy.components.ProxyArtifact;
 import org.apache.maven.proxy.components.SnapshotCache;
 import org.apache.maven.proxy.components.impl.DefaultSnapshotCache;
 import org.apache.maven.proxy.components.impl.NoCacheSnapshotCache;
+import org.apache.maven.proxy.engine.RepoAccessException;
 import org.apache.maven.proxy.engine.RetrievalDetails;
 
 /**
@@ -137,17 +138,46 @@ public abstract class RepoConfiguration
      */
     protected abstract ProxyArtifact getMetaInformationInternal( String url ) throws FileNotFoundException;
 
-    public final ProxyArtifact getMetaInformation( String url ) throws FileNotFoundException
+    /**
+     * This routine will not throw an exception unless there is a catastrophic failure.
+     * 
+     * @param url
+     * @return
+     * @throws RepoAccessException
+     */
+    public final ProxyArtifact getMetaInformation( String url )
     {
-        ProxyArtifact pa = getSnapshotCache().getSnapshot( url );
-
-        if ( pa == null )
+        ProxyArtifact pa;
+        try
         {
-            pa = getMetaInformationInternal( url );
+            pa = getSnapshotCache().getSnapshot( url );
+
             if ( pa == null )
             {
-                pa = new NotFoundProxyArtifact( this, url );
+                pa = getMetaInformationInternal( url );
+                if ( pa == null )
+                {
+                    pa = new NotFoundProxyArtifact( this, url );
+                }
             }
+
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( this + ": Failure getting meta information for " + url, e );
+
+            pa = new NotFoundProxyArtifact( this, url );
+            if ( getCacheFailures() )
+            {
+                getSnapshotCache().setSnapshot( url, pa );
+            }
+
+            if ( getHardFail() )
+            {
+                throw new RepoAccessException( this, url, e.getLocalizedMessage(), e );
+            }
+
+            return pa;
         }
 
         getSnapshotCache().setSnapshot( url, pa );

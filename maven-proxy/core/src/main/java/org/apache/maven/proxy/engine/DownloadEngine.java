@@ -1,7 +1,6 @@
 package org.apache.maven.proxy.engine;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -147,7 +146,7 @@ public class DownloadEngine
     /*
      * Finds the most up-to-date repository for a snapshot. Will use the cache
      */
-    private ProxyArtifact findBestSnapshotProxyArtifact( ProxyRequest request, ProxyResponse response )
+    private ProxyArtifact findLatestProxyArtifact( ProxyRequest request, ProxyResponse response )
     {
         ProxyArtifact latestArtifact = null;
 
@@ -155,27 +154,7 @@ public class DownloadEngine
         for ( Iterator iter = rcc.getRepos().iterator(); iter.hasNext(); )
         {
             final RepoConfiguration repo = (RepoConfiguration) iter.next();
-            final ProxyArtifact pArtifact;
-            try
-            {
-                pArtifact = repo.getMetaInformation( request.getPath() );
-            }
-            catch ( FileNotFoundException e )
-            {
-                LOGGER.debug( repo + ": Unable to find " + request.getPath() );
-                continue;
-            }
-            catch ( Exception e )
-            {
-                if ( repo.getHardFail() )
-                {
-                    LOGGER.error( repo + ": Failure getting meta information for " + request.getPath() );
-                    throw new RuntimeException( e );
-                }
-
-                LOGGER.warn( repo + ": Failure getting meta information for " + request.getPath() );
-                continue;
-            }
+            final ProxyArtifact pArtifact = repo.getMetaInformation( request.getPath() );
 
             if ( pArtifact == null )
             {
@@ -205,7 +184,7 @@ public class DownloadEngine
         String mimeType = getMimeType( getExtension( request.getPath() ) );
         long modificationTime = retrieveModificationTime( request );
 
-        ProxyArtifact latestArtifact = findBestSnapshotProxyArtifact( request, response );
+        ProxyArtifact latestArtifact = findLatestProxyArtifact( request, response );
 
         if ( latestArtifact instanceof NotFoundProxyArtifact )
         {
@@ -238,43 +217,27 @@ public class DownloadEngine
         }
 
         GlobalRepoConfiguration globalRepo = rcc.getGlobalRepo();
+        final File downloadFile;
 
         if ( !latestArtifact.getRepo().getCopy() )
         {
-            try
-            {
-                File targetFile = ( (FileRepoConfiguration) latestArtifact.getRepo() ).getLocalFile( request.getPath() );
-                LOGGER.info( latestArtifact.getRepo() + ": Sending " + request.getPath() );
-                response.setContentType( mimeType );
-                response.setContentLength( (int) targetFile.length() );
-                response.setLastModified( targetFile.lastModified() );
-                response.sendFile( targetFile );
-                return;
-            }
-            catch ( Exception e )
-            {
-                e.printStackTrace();
-            }
+            downloadFile = ( (FileRepoConfiguration) latestArtifact.getRepo() ).getLocalFile( request.getPath() );
+            LOGGER.info( latestArtifact.getRepo() + ": Sending " + request.getPath() );
         }
-
-        if ( latestArtifact.getRepo().getCopy() )
+        else
         {
-
-            //XXX need to encapsulate this reading call into something more common across repositories
-            File target = globalRepo.getLocalFile( request.getPath() );
+            downloadFile = globalRepo.getLocalFile( request.getPath() );
             LOGGER.info( latestArtifact.getRepo() + ": Copying " + request.getPath() + " to " + globalRepo );
-            RetrievalDetails rd = download( latestArtifact.getRepo(), target, request );
-
+            latestArtifact.getRepo().retrieveArtifact( downloadFile, request.getPath() );
             LOGGER.info( globalRepo + ": Sending " + request.getPath() );
-            response.setContentType( mimeType );
-            response.setContentLength( (int) rd.getLength() );
-            response.setLastModified( rd.getLastModified() );
-            response.sendFile( target );
-            response.sendOK();
-            return;
         }
 
-        LOGGER.error( "Got to the end of processing without doing anything useful!" );
+        response.setContentType( mimeType );
+        response.setContentLength( (int) downloadFile.length() );
+        response.setLastModified( downloadFile.lastModified() );
+        response.sendFile( downloadFile );
+        response.sendOK();
+        return;
     }
 
     /**
@@ -297,23 +260,6 @@ public class DownloadEngine
         }
 
         return Math.max( request.getLastModified(), request.getIfModifiedSince() );
-    }
-
-    private RetrievalDetails download( RepoConfiguration source, File target, ProxyRequest request ) throws IOException
-
-    {
-        LOGGER.info( "Downloading " + request.getPath() + " from " + source );
-        if ( request.isHeadOnly() )
-        {
-            throw new IllegalStateException( "The request was head only and you're trying to do a download" );
-        }
-
-        if ( !source.getCopy() )
-        {
-            LOGGER.info( source + ": Skipping copy phase." );
-            return null;
-        }
-        return source.retrieveArtifact( target, request.getPath() );
     }
 
     /**
