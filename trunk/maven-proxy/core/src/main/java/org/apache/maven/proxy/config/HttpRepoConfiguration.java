@@ -32,7 +32,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateParser;
-import org.apache.maven.proxy.components.NotFoundProxyArtifact;
 import org.apache.maven.proxy.components.ProxyArtifact;
 import org.apache.maven.proxy.engine.DownloadEngine;
 import org.apache.maven.proxy.engine.RetrievalDetails;
