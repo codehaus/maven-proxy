@@ -99,8 +99,8 @@ public class PropertyLoaderTest extends TestCase {
 	 * @param configuration
 	 */
 	private void verifyRepoLocal(FileRepoConfiguration configuration) {
-		// TODO Auto-generated method stub
-		
+        assertNotNull("configuration", configuration);
+        assertEquals("configuration.getUrl()", "file:///usr/local/custom-repo", configuration.getUrl());
 	}
 
 	private void verifyProxyOne(ProxyConfiguration pcOne) {
