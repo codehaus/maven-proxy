@@ -64,13 +64,15 @@ package org.apache.maven.proxy.config;
  */
 public class RepoConfiguration
 {
+    private final String key;
     private final String url;
     private final String username;
     private final String password;
     private final ProxyConfiguration proxy;
 
-    public RepoConfiguration(String url, String username, String password, ProxyConfiguration proxy)
+    public RepoConfiguration(String key, String url, String username, String password, ProxyConfiguration proxy)
     {
+        this.key = key;
         this.url = url;
         this.username = username;
         this.password = password;
@@ -107,6 +109,15 @@ public class RepoConfiguration
     public String getUsername()
     {
         return username;
+    }
+
+    /**
+     * @return
+     */
+    public String getKey()
+    {
+        // TODO Auto-generated method stub
+        return key;
     }
 
 }

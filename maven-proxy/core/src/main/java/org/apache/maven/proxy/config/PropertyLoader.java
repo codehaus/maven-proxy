@@ -129,7 +129,7 @@ public class PropertyLoader
                     proxy = rcc.getProxy(proxyKey);
                 }
 
-                RepoConfiguration rc = new RepoConfiguration(url, username, password, proxy);
+                RepoConfiguration rc = new RepoConfiguration(key, url, username, password, proxy);
                 rcc.addRepo(rc);
             }
         }
