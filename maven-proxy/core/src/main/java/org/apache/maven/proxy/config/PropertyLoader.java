@@ -41,6 +41,7 @@ public class PropertyLoader
     public static final String DEFAULT_LAST_MODIFIED_DATE_FORMAT = null;
 
     public static final String BROWSABLE = "browsable";
+    public static final String SEARCHABLE = "searchable";
 
     public static final String PREFIX = "prefix";
 
@@ -86,6 +87,7 @@ public class PropertyLoader
         }
 
         rcc.setBrowsable( Boolean.valueOf( getMandatoryProperty( props, BROWSABLE ) ).booleanValue() );
+        rcc.setSearchable( Boolean.valueOf( getOptionalProperty( props, SEARCHABLE, "true" ) ).booleanValue() );
         rcc.setServerName( props.getProperty( SERVERNAME ) );
         rcc.setPrefix( getMandatoryProperty( props, PREFIX ) );
         rcc.setLastModifiedDateFormat( props.getProperty( LAST_MODIFIED_DATE_FORMAT ) );
@@ -196,6 +198,18 @@ public class PropertyLoader
 
         if ( value == null )
             throw new ValidationException( "Missing property: " + key );
+
+        return value;
+    }
+
+    private String getOptionalProperty( Properties props, String key, String defaultValue )
+    {
+        final String value = props.getProperty( key );
+
+        if ( value == null )
+        {
+            return defaultValue;
+        }
 
         return value;
     }

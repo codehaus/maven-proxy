@@ -42,17 +42,19 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "rcc.getLocalStore()", "/var/tmp/proxy-repo", rcc.getLocalStore() );
         assertEquals( "rcc.getPort()", 9999, rcc.getPort() );
         assertEquals( "rcc.getPrefix()", "repository", rcc.getPrefix() );
-        assertEquals( "rcc.getServerName()", "http://localhost:9999/repository", rcc.getServerName() );
+        assertEquals( "rcc.getServerName()", "http://localhost:9999", rcc.getServerName() );
+        assertEquals( "rcc.getSnapshotUpdate()", true, rcc.getSnapshotUpdate() );
         assertEquals( "rcc.getSnapshotUpdateInterval()", 60, rcc.getSnapshotUpdateInterval() );
         assertEquals( "rcc.getLastModifiedDateFormat()", "yyyy/MM/dd hh:mm:ss", rcc.getLastModifiedDateFormat() );
         assertTrue( "rcc.isBrowsable()", rcc.isBrowsable() );
+        assertTrue( "rcc.isSearchable()", rcc.isSearchable() );
 
         /////////////////////// Check Proxies ////////////////////////
         assertEquals( "rcc.getProxies().size()", 3, rcc.getProxies().size() );
         verifyProxyOne( rcc.getProxy( "one" ) );
         verifyProxyTwo( rcc.getProxy( "two" ) );
         verifyProxyThree( rcc.getProxy( "three" ) );
-
+        
         assertNull( "rcc.getProxy(snuffleuffigus)", rcc.getProxy( "snuffleuffigus" ) );
 
         /////////////////////// Check Repos ////////////////////////
