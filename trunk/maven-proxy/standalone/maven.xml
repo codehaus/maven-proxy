@@ -1,5 +1,5 @@
 <project default="jar:install">
-  <goal name="run">
+  <goal name="run" prereqs="jar:jar">
     <mkdir dir="target/repo"/>
   	<java
       classname="org.apache.maven.proxy.standalone.Standalone"

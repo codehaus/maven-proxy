@@ -33,96 +33,100 @@ public class PropertyLoaderTest extends TestCase
 {
     public void testSimple() throws IOException, ValidationException
     {
-        InputStream is = PropertyLoaderTest.class.getResourceAsStream("PropertyLoaderTest1.properties");
+        InputStream is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest1.properties" );
         PropertyLoader loader = new PropertyLoader();
 
-        RetrievalComponentConfiguration rcc = loader.load(is);
+        RetrievalComponentConfiguration rcc = loader.load( is );
 
         /////////////////////// Check Globals ////////////////////////
-        assertEquals("rcc.getLocalStore()", "/var/tmp/proxy-repo", rcc.getLocalStore());
-        assertEquals("rcc.getPort()", 9999, rcc.getPort());
-        assertTrue("rcc.isBrowsable()", rcc.isBrowsable());
+        assertEquals( "rcc.getLocalStore()", "/var/tmp/proxy-repo", rcc.getLocalStore() );
+        assertEquals( "rcc.getPort()", 9999, rcc.getPort() );
+        assertEquals( "rcc.getPrefix()", "repository", rcc.getPrefix() );
+        assertEquals( "rcc.getServerName()", "http://localhost:9999/repository", rcc.getServerName() );
+        assertEquals( "rcc.getSnapshotUpdateInterval()", 60, rcc.getSnapshotUpdateInterval() );
+        assertTrue( "rcc.isBrowsable()", rcc.isBrowsable() );
 
         /////////////////////// Check Proxies ////////////////////////
-        assertEquals("rcc.getProxies().size()", 3, rcc.getProxies().size());
-        verifyProxyOne(rcc.getProxy("one"));
-        verifyProxyTwo(rcc.getProxy("two"));
-        verifyProxyThree(rcc.getProxy("three"));
+        assertEquals( "rcc.getProxies().size()", 3, rcc.getProxies().size() );
+        verifyProxyOne( rcc.getProxy( "one" ) );
+        verifyProxyTwo( rcc.getProxy( "two" ) );
+        verifyProxyThree( rcc.getProxy( "three" ) );
 
-        assertNull("rcc.getProxy(snuffleuffigus)", rcc.getProxy("snuffleuffigus"));
+        assertNull( "rcc.getProxy(snuffleuffigus)", rcc.getProxy( "snuffleuffigus" ) );
 
         /////////////////////// Check Repos ////////////////////////
         List repos = rcc.getRepos();
-        assertEquals("repos.size()", 4, repos.size());
-        verifyRepoLocal((FileRepoConfiguration) repos.get(0));
-        verifyRepoIbiblio((HttpRepoConfiguration) repos.get(1));
-        verifyRepoDist((HttpRepoConfiguration) repos.get(2));
-        verifyRepoPrivate((HttpRepoConfiguration) repos.get(3));
+        assertEquals( "repos.size()", 4, repos.size() );
+        verifyRepoLocal( (FileRepoConfiguration) repos.get( 0 ) );
+        verifyRepoIbiblio( (HttpRepoConfiguration) repos.get( 1 ) );
+        verifyRepoDist( (HttpRepoConfiguration) repos.get( 2 ) );
+        verifyRepoPrivate( (HttpRepoConfiguration) repos.get( 3 ) );
     }
 
-    private void verifyRepoLocal(FileRepoConfiguration configuration)
+    private void verifyRepoLocal( FileRepoConfiguration configuration )
     {
-        assertNotNull("configuration", configuration);
-        assertEquals("configuration.getUrl()", "file:///usr/local/custom-repo", configuration.getUrl());
-        assertEquals("configuration.getDescription()", "Super Secret Custom Repository", configuration.getDescription());
+        assertNotNull( "configuration", configuration );
+        assertEquals( "configuration.getUrl()", "file:///usr/local/custom-repo", configuration.getUrl() );
+        assertEquals( "configuration.getDescription()", "Super Secret Custom Repository", configuration
+                        .getDescription() );
     }
 
-    private void verifyProxyOne(ProxyConfiguration pcOne)
+    private void verifyProxyOne( ProxyConfiguration pcOne )
     {
-        assertNotNull("pcOne", pcOne);
-        assertEquals("pcOne.host", "proxy1.example.com", pcOne.getHost());
-        assertEquals("pcOne.port", 3128, pcOne.getPort());
+        assertNotNull( "pcOne", pcOne );
+        assertEquals( "pcOne.host", "proxy1.example.com", pcOne.getHost() );
+        assertEquals( "pcOne.port", 3128, pcOne.getPort() );
     }
 
-    private void verifyProxyTwo(ProxyConfiguration pcTwo)
+    private void verifyProxyTwo( ProxyConfiguration pcTwo )
     {
-        assertNotNull("pcTwo", pcTwo);
-        assertEquals("pcTwo.host", "proxy2.example.org", pcTwo.getHost());
-        assertEquals("pcTwo.port", 80, pcTwo.getPort());
-        assertEquals("pcTwo.username", "username2", pcTwo.getUsername());
-        assertEquals("pcTwo.password", "password2", pcTwo.getPassword());
+        assertNotNull( "pcTwo", pcTwo );
+        assertEquals( "pcTwo.host", "proxy2.example.org", pcTwo.getHost() );
+        assertEquals( "pcTwo.port", 80, pcTwo.getPort() );
+        assertEquals( "pcTwo.username", "username2", pcTwo.getUsername() );
+        assertEquals( "pcTwo.password", "password2", pcTwo.getPassword() );
     }
 
-    private void verifyProxyThree(ProxyConfiguration pcThree)
+    private void verifyProxyThree( ProxyConfiguration pcThree )
     {
-        assertNotNull("pcThree", pcThree);
-        assertEquals("pcThree.host", "proxy3.example.net", pcThree.getHost());
-        assertEquals("pcThree.port", 3129, pcThree.getPort());
-        assertEquals("pcThree.username", "username3", pcThree.getUsername());
-        assertEquals("pcThree.password", "password3", pcThree.getPassword());
+        assertNotNull( "pcThree", pcThree );
+        assertEquals( "pcThree.host", "proxy3.example.net", pcThree.getHost() );
+        assertEquals( "pcThree.port", 3129, pcThree.getPort() );
+        assertEquals( "pcThree.username", "username3", pcThree.getUsername() );
+        assertEquals( "pcThree.password", "password3", pcThree.getPassword() );
     }
 
-    private void verifyRepoIbiblio(HttpRepoConfiguration rcIbiblio)
+    private void verifyRepoIbiblio( HttpRepoConfiguration rcIbiblio )
     {
-        assertNotNull("rcIbiblio", rcIbiblio);
-        assertEquals("www-ibiblio-org", rcIbiblio.getKey());
-        assertEquals("rcIbiblio.url", "http://www.ibiblio.org/maven", rcIbiblio.getUrl());
-        assertEquals("rcIbiblio.description", "www.ibiblio.org", rcIbiblio.getDescription());
-        assertNull("rcIbiblio.username", rcIbiblio.getUsername());
-        assertNull("rcIbiblio.password", rcIbiblio.getPassword());
-        assertEquals("rcIbiblio.proxy", "one", rcIbiblio.getProxy().getKey());
+        assertNotNull( "rcIbiblio", rcIbiblio );
+        assertEquals( "www-ibiblio-org", rcIbiblio.getKey() );
+        assertEquals( "rcIbiblio.url", "http://www.ibiblio.org/maven", rcIbiblio.getUrl() );
+        assertEquals( "rcIbiblio.description", "www.ibiblio.org", rcIbiblio.getDescription() );
+        assertNull( "rcIbiblio.username", rcIbiblio.getUsername() );
+        assertNull( "rcIbiblio.password", rcIbiblio.getPassword() );
+        assertEquals( "rcIbiblio.proxy", "one", rcIbiblio.getProxy().getKey() );
     }
 
-    private void verifyRepoDist(HttpRepoConfiguration rcDist)
+    private void verifyRepoDist( HttpRepoConfiguration rcDist )
     {
-        assertNotNull("rcDist", rcDist);
-        assertEquals("dist-codehaus-org", rcDist.getKey());
-        assertEquals("rcDist.url", "http://dist.codehaus.org", rcDist.getUrl());
-        assertEquals("rcDist.description", "dist-codehaus-org", rcDist.getDescription());
-        assertNull("rcDist.username", rcDist.getUsername());
-        assertNull("rcDist.password", rcDist.getPassword());
-        assertEquals("rcDist.proxy", "two", rcDist.getProxy().getKey());
+        assertNotNull( "rcDist", rcDist );
+        assertEquals( "dist-codehaus-org", rcDist.getKey() );
+        assertEquals( "rcDist.url", "http://dist.codehaus.org", rcDist.getUrl() );
+        assertEquals( "rcDist.description", "dist-codehaus-org", rcDist.getDescription() );
+        assertNull( "rcDist.username", rcDist.getUsername() );
+        assertNull( "rcDist.password", rcDist.getPassword() );
+        assertEquals( "rcDist.proxy", "two", rcDist.getProxy().getKey() );
     }
 
-    private void verifyRepoPrivate(HttpRepoConfiguration rcPrivate)
+    private void verifyRepoPrivate( HttpRepoConfiguration rcPrivate )
     {
-        assertNotNull("rcPrivate", rcPrivate);
-        assertEquals("private-example-com", rcPrivate.getKey());
-        assertEquals("rcPrivate.url", "http://private.example.com/internal", rcPrivate.getUrl());
-        assertEquals("rcPrivate.description", "Commercial In Confidence Repository", rcPrivate.getDescription());
-        assertEquals("rcPrivate.username", "username1", rcPrivate.getUsername());
-        assertEquals("rcPrivate.password", "password1", rcPrivate.getPassword());
-        assertEquals("rcPrivate.proxy", "three", rcPrivate.getProxy().getKey());
+        assertNotNull( "rcPrivate", rcPrivate );
+        assertEquals( "private-example-com", rcPrivate.getKey() );
+        assertEquals( "rcPrivate.url", "http://private.example.com/internal", rcPrivate.getUrl() );
+        assertEquals( "rcPrivate.description", "Commercial In Confidence Repository", rcPrivate.getDescription() );
+        assertEquals( "rcPrivate.username", "username1", rcPrivate.getUsername() );
+        assertEquals( "rcPrivate.password", "password1", rcPrivate.getPassword() );
+        assertEquals( "rcPrivate.proxy", "three", rcPrivate.getProxy().getKey() );
     }
 
     public void testNullPointers() throws Exception
@@ -131,33 +135,33 @@ public class PropertyLoaderTest extends TestCase
         Properties props = new Properties();
         PropertyLoader loader = new PropertyLoader();
 
-        is = PropertyLoaderTest.class.getResourceAsStream("PropertyLoaderTest1.properties");
-        props.load(is);
-        props.remove(PropertyLoader.REPO_LOCAL_STORE);
-        assertThrowsValidationException(loader, props);
+        is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest1.properties" );
+        props.load( is );
+        props.remove( PropertyLoader.REPO_LOCAL_STORE );
+        assertThrowsValidationException( loader, props );
         props.clear();
 
-        is = PropertyLoaderTest.class.getResourceAsStream("PropertyLoaderTest1.properties");
-        props.load(is);
-        props.remove(PropertyLoader.BROWSABLE);
-        assertThrowsValidationException(loader, props);
+        is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest1.properties" );
+        props.load( is );
+        props.remove( PropertyLoader.BROWSABLE );
+        assertThrowsValidationException( loader, props );
         props.clear();
 
-        is = PropertyLoaderTest.class.getResourceAsStream("PropertyLoaderTest1.properties");
-        props.load(is);
-        props.remove("repo.list");
-        assertThrowsValidationException(loader, props);
+        is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest1.properties" );
+        props.load( is );
+        props.remove( "repo.list" );
+        assertThrowsValidationException( loader, props );
         props.clear();
     }
 
-    private void assertThrowsValidationException(PropertyLoader loader, Properties props)
+    private void assertThrowsValidationException( PropertyLoader loader, Properties props )
     {
         try
         {
-            loader.load(props);
-            fail("Expected ValidationException");
+            loader.load( props );
+            fail( "Expected ValidationException" );
         }
-        catch (ValidationException ex)
+        catch ( ValidationException ex )
         {
             // expected
         }
@@ -165,17 +169,17 @@ public class PropertyLoaderTest extends TestCase
 
     public void testSimple2() throws IOException
     {
-        InputStream is = PropertyLoaderTest.class.getResourceAsStream("PropertyLoaderTest2.properties");
+        InputStream is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest2.properties" );
         try
         {
             PropertyLoader loader = new PropertyLoader();
             Properties props = new Properties();
-            props.load(is);
-            assertThrowsValidationException(loader, props);
+            props.load( is );
+            assertThrowsValidationException( loader, props );
         }
         finally
         {
-            ResourceUtil.close(is);
+            ResourceUtil.close( is );
         }
 
     }

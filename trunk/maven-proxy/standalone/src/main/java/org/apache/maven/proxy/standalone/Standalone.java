@@ -15,18 +15,21 @@ package org.apache.maven.proxy.standalone;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Iterator;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.maven.proxy.RepositoryServlet;
-import org.apache.maven.proxy.config.*;
+import org.apache.maven.proxy.ResourceServlet;
 import org.apache.maven.proxy.config.PropertyLoader;
+import org.apache.maven.proxy.config.RepoConfiguration;
 import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
+import org.apache.maven.proxy.config.ValidationException;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpServer;
 import org.mortbay.http.SocketListener;
@@ -39,88 +42,151 @@ import org.mortbay.util.MultiException;
  */
 public class Standalone
 {
-    private static final String VERSION = "SNAPSHOT";
-    
-    public static void main(String args[])
-    {
-        Standalone launcher;
+    public static final String CVS_NAME = "$Name$";
 
-        PropertyConfigurator.configure(Standalone.class.getResource("/log4j.properties"));
-        
-        try
+    public static String getTag()
+    {
+        String name = extractName( CVS_NAME );
+        if ( name == null || name.trim().length() == 0 )
         {
-            launcher = new Standalone();
-            launcher.doMain(args);
+            return "Unversioned";
         }
-        catch (Exception e)
+        else
         {
-            System.err.println("Internal error:");
-            e.printStackTrace();
-            System.exit(-1);
+            return name;
         }
     }
 
-    public void doMain(String args[]) throws MultiException 
+    static String extractName( String input )
     {
-        System.err.println("maven-proxy " + Standalone.VERSION);
-        
-        if (args.length != 1)
+        String tmp = input;
+        tmp = tmp.substring( 7, tmp.length() - 2 );
+        return tmp;
+    }
+
+    public static void main( String args[] )
+    {
+
+        PropertyConfigurator.configure( Standalone.class.getResource( "/log4j.properties" ) );
+
+        try
         {
-            System.err.println("Usage:");
-            System.err.println("  java -jar maven-proxy-SNAPSHOT-uber.jar maven-proxy.properties");
+            Standalone launcher = new Standalone();
+            launcher.doMain( args );
+        }
+        catch ( Exception e )
+        {
+            System.err.println( "Internal error:" );
+            e.printStackTrace();
+            System.exit( -1 );
+        }
+    }
+
+    public void doMain( String args[] ) throws MultiException
+    {
+        System.err.println( "maven-proxy " + Standalone.getTag() );
+
+        if ( args.length != 1 )
+        {
+            System.err.println( "Usage:" );
+            System.err.println( "  java -jar maven-proxy-SNAPSHOT-uber.jar maven-proxy.properties" );
             return;
         }
 
         RetrievalComponentConfiguration rcc = null;
         try
         {
-            rcc = loadAndValidateConfiguration(args[0]);
+            rcc = loadAndValidateConfiguration( args[0] );
         }
-        catch (ValidationException e)
+        catch ( ValidationException e )
         {
             Throwable t = e;
 
-            System.err.println("Error while loading properties:");
+            System.err.println( "Error while loading properties:" );
 
-            while (t != null)
+            while ( t != null )
             {
-                System.err.println("  " + t.getLocalizedMessage());
+                System.err.println( "  " + t.getLocalizedMessage() );
                 t = t.getCause();
             }
-            
+
             return;
         }
-        
-        System.out.println("Saving repository at " + rcc.getLocalStore());
-        for (Iterator iter = rcc.getRepos().iterator(); iter.hasNext();) {
+
+        System.out.println( "Saving repository at " + rcc.getLocalStore() );
+        for ( Iterator iter = rcc.getRepos().iterator(); iter.hasNext(); )
+        {
             RepoConfiguration repo = (RepoConfiguration) iter.next();
-            System.out.println("Scanning repository: " + repo.getUrl());
-        } 
-        System.out.println("Starting...");
-        
+            System.out.println( "Scanning repository: " + repo.getUrl() );
+        }
+        System.out.println( "Starting..." );
+
         HttpServer server = new HttpServer();
         SocketListener listener = new SocketListener();
-        listener.setPort(rcc.getPort());
-        server.addListener(listener);
+        listener.setPort( rcc.getPort() );
+        server.addListener( listener );
 
         HttpContext context = new HttpContext();
-        context.setContextPath("/");
-        ServletHandler sh = new ServletHandler();
-        sh.addServlet("Repository", "/*", RepositoryServlet.class.getName());
-        context.setAttribute("config", rcc);
-        context.addHandler(sh);
-        server.addContext(context);
 
-        server.start();
-        System.out.println("Started.");
-        System.out.println("Add the following to your ~/build.properties file:");
-        System.out.println("   maven.repo.remote=http://<external ip>:" + rcc.getPort());
-        if (rcc.isBrowsable())  {
-            System.out.println("The repository can be browsed at http://<external ip>:" + rcc.getPort() + "/");
-        } else  {
-            System.out.println("Repository browsing is not enabled.");
+        context.setContextPath( "/" );
+
+        ServletHandler sh = new ServletHandler();
+        System.out.println( "Prefix: '" + rcc.getPrefix() + "'" );
+        if ( rcc.getPrefix().length() == 0 )
+        {
+            sh.addServlet( "Repository", "/*", RepositoryServlet.class.getName() );
+        }
+        else
+        {
+            sh.addServlet( "Repository", "/" + rcc.getPrefix() + "/*", RepositoryServlet.class.getName() );
         }
 
+        sh.addServlet( "images", "/images/*", ResourceServlet.class.getName() );
+        sh.addServlet( "styles", "/styles/*", ResourceServlet.class.getName() );
+        //sh.addServlet( "webdav", "/webdav/*", ResourceServlet.class.getName() );
+
+        context.setAttribute( "config", rcc );
+        context.addHandler( sh );
+        server.addContext( context );
+
+        server.start();
+        System.out.println( "Started." );
+
+        final String externalAddress;
+
+        if ( rcc.getServerName() == null )
+        {
+            externalAddress = "http://" + getExternalIP() + ":" + rcc.getPort();
+        }
+        else
+        {
+            externalAddress = rcc.getServerName();
+        }
+
+        System.out.println( "Add the following to your ~/build.properties file:" );
+
+        System.out.println( "   maven.repo.remote=" + externalAddress );
+        if ( rcc.isBrowsable() )
+        {
+            System.out.println( "The repository can be browsed at " + externalAddress );
+        }
+        else
+        {
+            System.out.println( "Repository browsing is not enabled." );
+        }
+    }
+
+    private String getExternalIP()
+    {
+        try
+        {
+            InetAddress ia = InetAddress.getLocalHost();
+            return ia.getCanonicalHostName();
+        }
+        catch ( Exception e )
+        {
+            return "[external IP address]";
+        }
     }
 
     /**
@@ -131,47 +197,47 @@ public class Standalone
      * @return Returns a <code>Properties</code> object if the load and validation was successfull.
      * @throws ValidationException If there was any problem validating the properties
      */
-    private RetrievalComponentConfiguration loadAndValidateConfiguration(String filename) throws ValidationException
+    private RetrievalComponentConfiguration loadAndValidateConfiguration( String filename ) throws ValidationException
     {
         RetrievalComponentConfiguration rcc;
-        File file = new File(filename);
+        File file = new File( filename );
 
         try
         {
-            rcc = (new PropertyLoader()).load(new FileInputStream(file));
+            rcc = ( new PropertyLoader() ).load( new FileInputStream( file ) );
         }
-        catch (FileNotFoundException ex)
+        catch ( FileNotFoundException ex )
         {
-            System.err.println("No such file: " + file.getAbsolutePath());
+            System.err.println( "No such file: " + file.getAbsolutePath() );
             return null;
         }
-        catch (IOException ex)
+        catch ( IOException ex )
         {
-            throw new ValidationException(ex);
+            throw new ValidationException( ex );
         }
 
         {
             //Verify local repository set
-            String tmp = checkSet(rcc.getLocalStore(), PropertyLoader.REPO_LOCAL_STORE);
+            String tmp = checkSet( rcc.getLocalStore(), PropertyLoader.REPO_LOCAL_STORE );
 
-            file = new File(tmp);
-            if (!file.exists())
+            file = new File( tmp );
+            if ( !file.exists() )
             {
-                throw new ValidationException("The local repository doesn't exist: " + file.getAbsolutePath());
+                throw new ValidationException( "The local repository doesn't exist: " + file.getAbsolutePath() );
             }
 
-            if (!file.isDirectory())
+            if ( !file.isDirectory() )
             {
-                throw new ValidationException("The local repository must be a directory: " + file.getAbsolutePath());
+                throw new ValidationException( "The local repository must be a directory: " + file.getAbsolutePath() );
             }
         }
 
         {
             //Verify remote repository set
             //only warn if missing
-            if (rcc.getRepos().size() < 1)
+            if ( rcc.getRepos().size() < 1 )
             {
-                throw new ValidationException("At least one remote repository must be configured.");
+                throw new ValidationException( "At least one remote repository must be configured." );
             }
         }
 
@@ -179,11 +245,11 @@ public class Standalone
         return rcc;
     }
 
-    private String checkSet(String value, String propertyName) throws ValidationException
+    private String checkSet( String value, String propertyName ) throws ValidationException
     {
-        if (value == null)
+        if ( value == null )
         {
-            throw new ValidationException("Missing property '" + propertyName + "'");
+            throw new ValidationException( "Missing property '" + propertyName + "'" );
         }
 
         return value;

@@ -5,7 +5,7 @@
 <web-app>
     <display-name>maven-proxy-webapp</display-name>
     <description>
-		Maven Repository Proxy Webapp
+		Maven Repository Proxy Webapp $Name$
     </description>
 	
 	<servlet>
@@ -13,9 +13,20 @@
             <servlet-class>org.apache.maven.proxy.RepositoryServlet</servlet-class>
     </servlet>
     
+    <servlet>
+            <servlet-name>ResourceServlet</servlet-name>
+            <servlet-class>org.apache.maven.proxy.ResourceServlet</servlet-class>
+    </servlet>
+    
     <servlet-mapping>
       <servlet-name>RepositoryServlet</servlet-name>
-      <url-pattern>/*</url-pattern>
+      <url-pattern>/repository/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+      <servlet-name>ResourceServlet</servlet-name>
+      <url-pattern>/images/*</url-pattern>
+      <url-pattern>/styles/*</url-pattern>
     </servlet-mapping>
        
 </web-app>
