@@ -13,5 +13,5 @@ import org.apache.maven.fetch.exceptions.FetchException;
 public interface RetrievalComponent
 {
     public static final String ROLE = RetrievalComponent.ROLE;
-    public InputStream retrieveArtifact(File out, String url) throws FetchException, FileNotFoundException;
+    public InputStream retrieveArtifact(RepoConfiguration rc, File out, String url) throws FetchException, FileNotFoundException;
 }
