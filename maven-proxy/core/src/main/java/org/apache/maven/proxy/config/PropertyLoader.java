@@ -16,9 +16,12 @@ package org.apache.maven.proxy.config;
  * limitations under the License.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -164,6 +167,7 @@ public class PropertyLoader
                 rcc.addRepo( rc );
             }
         }
+        validateDirectories( rcc );
         return rcc;
 
     }
@@ -212,6 +216,31 @@ public class PropertyLoader
         }
 
         return value;
+    }
+
+    private void validateDirectories( RetrievalComponentConfiguration rcc ) throws ValidationException
+    {
+        File f = new File( rcc.getLocalStore() );
+        if ( !f.exists() )
+        {
+            throw new ValidationException( "Specified directory does not exist: " + f.getAbsolutePath() );
+        }
+
+        List repos = rcc.getRepos();
+        for ( Iterator iter = repos.iterator(); iter.hasNext(); )
+        {
+            RepoConfiguration repo = (RepoConfiguration) iter.next();
+            if ( repo instanceof FileRepoConfiguration )
+            {
+                FileRepoConfiguration fileRepo = (FileRepoConfiguration) repo;
+                File f2 = new File( fileRepo.getBasePath() );
+                if ( !f2.exists() )
+                {
+                    throw new ValidationException( "Specified directory does not exist: " + f2.getAbsolutePath() );
+                }
+            }
+
+        }
     }
 
 }

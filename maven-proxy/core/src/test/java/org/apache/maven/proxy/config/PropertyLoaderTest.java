@@ -31,6 +31,9 @@ import junit.framework.TestCase;
  */
 public class PropertyLoaderTest extends TestCase
 {
+    /** log4j logger */
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger( PropertyLoaderTest.class );
+    
     public void testSimple() throws IOException, ValidationException
     {
         InputStream is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest1.properties" );
@@ -39,7 +42,7 @@ public class PropertyLoaderTest extends TestCase
         RetrievalComponentConfiguration rcc = loader.load( is );
 
         /////////////////////// Check Globals ////////////////////////
-        assertEquals( "rcc.getLocalStore()", "/var/tmp/proxy-repo", rcc.getLocalStore() );
+        assertEquals( "rcc.getLocalStore()", "./target/repo", rcc.getLocalStore() );
         assertEquals( "rcc.getPort()", 9999, rcc.getPort() );
         assertEquals( "rcc.getPrefix()", "repository", rcc.getPrefix() );
         assertEquals( "rcc.getServerName()", "http://localhost:9999", rcc.getServerName() );
@@ -54,7 +57,7 @@ public class PropertyLoaderTest extends TestCase
         verifyProxyOne( rcc.getProxy( "one" ) );
         verifyProxyTwo( rcc.getProxy( "two" ) );
         verifyProxyThree( rcc.getProxy( "three" ) );
-        
+
         assertNull( "rcc.getProxy(snuffleuffigus)", rcc.getProxy( "snuffleuffigus" ) );
 
         /////////////////////// Check Repos ////////////////////////
@@ -69,7 +72,7 @@ public class PropertyLoaderTest extends TestCase
     private void verifyRepoLocal( FileRepoConfiguration configuration )
     {
         assertNotNull( "configuration", configuration );
-        assertEquals( "configuration.getUrl()", "file:///usr/local/custom-repo", configuration.getUrl() );
+        assertEquals( "configuration.getUrl()", "file:///./target/repo-local", configuration.getUrl() );
         assertEquals( "configuration.getDescription()", "Super Secret Custom Repository", configuration
                         .getDescription() );
     }
@@ -166,6 +169,7 @@ public class PropertyLoaderTest extends TestCase
         }
         catch ( ValidationException ex )
         {
+            LOGGER.info("Received expected validation exception : " + ex);
             // expected
         }
     }
@@ -185,6 +189,22 @@ public class PropertyLoaderTest extends TestCase
             ResourceUtil.close( is );
         }
 
+    }
+
+    public void testSimple3() throws Exception
+    {
+        InputStream is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest3.properties" );
+        try
+        {
+            PropertyLoader loader = new PropertyLoader();
+            Properties props = new Properties();
+            props.load( is );
+            assertThrowsValidationException( loader, props );
+        }
+        finally
+        {            
+            ResourceUtil.close( is );
+        }
     }
 
 }

@@ -4,7 +4,7 @@
 
 #macro (createRow $imgSrc $length $lastModifiedDate $link $repoDescription)
   #set ($lastModifiedString = "")
-  #if ( $lastModifiedDate != "" )
+  #if ( $lastModifiedDate.Class.Name == "java.util.Date")
     #set ($lastModifiedString = $dateFormat.format( $lastModifiedDate ))
   #end
   
@@ -32,8 +32,8 @@
     #createRow( $imgSrc $fileElement.length() $fileElement.lastModifiedDate() "${fileElement.Name}" $repoDescription )
   #end
 #end
-        <div class='browse'>Browsing $pathInfo</div>
 
+<div class='browse'>Browsing $pathInfo</div>
 
 <table width="100%">
         <colgroup>
@@ -44,7 +44,6 @@
           <col width='*'>
           <col width='5*'>
         </colgroup>
-        
         
         <tr class="$ab.Next">
           <th></th>
@@ -67,7 +66,7 @@
       #else
 		#set ($repoDescription = "Global Repository")
 	  #end
-	  
+
 	  #if ( $fileElement.isDirectory() )
         #createRow2( "$retrace/images/folder.png" $fileElement $repoDescription )
       #else
