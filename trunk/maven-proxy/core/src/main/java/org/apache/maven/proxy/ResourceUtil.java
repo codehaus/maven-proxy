@@ -1,4 +1,4 @@
-package org.apache.maven.proxy.config;
+package org.apache.maven.proxy;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -16,22 +16,40 @@ package org.apache.maven.proxy.config;
  * limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Socket;
+
 /**
- * 
  * @author  Ben Walding
  * @version $Id$
  */
-public class FileRepoConfiguration extends RepoConfiguration
+public class ResourceUtil
 {
-    /**
-     * @param key
-     * @param url
-     */
-    public FileRepoConfiguration(String key, String url, String description, boolean copy) {
-        super(key, url, description, copy);
+    public static final void close(Socket s)
+    {
+        try
+        {
+            s.close();
+        }
+        catch (IOException e)
+        {
+            //Don't care.
+        }
     }
 
-    
-    
-
+    /**
+     * @param is
+     */
+    public static void close(InputStream is)
+    {
+        try
+        {
+            is.close();
+        }
+        catch (IOException e)
+        {
+            //Don't care.
+        }
+    }
 }
