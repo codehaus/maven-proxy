@@ -52,20 +52,20 @@ public class PropertyLoaderTest extends TestCase
         assertEquals("rcIbiblio.url", "http://www.ibiblio.org/maven", rcIbiblio.getUrl());
         assertNull("rcIbiblio.username", rcIbiblio.getUsername());
         assertNull("rcIbiblio.password", rcIbiblio.getPassword());
-        assertEquals("rcIbiblio.proxy", "one", rcIbiblio.getProxyKey());
+        assertEquals("rcIbiblio.proxy", "one", rcIbiblio.getProxy().getKey());
 
         RepoConfiguration rcDist = (RepoConfiguration) repos.get(1);
         assertNotNull("rcDist", rcDist);
         assertEquals("rcDist.url", "http://dist.codehaus.org", rcDist.getUrl());
         assertNull("rcDist.username", rcDist.getUsername());
         assertNull("rcDist.password", rcDist.getPassword());
-        assertEquals("rcDist.proxy", "two", rcDist.getProxyKey());
+        assertEquals("rcDist.proxy", "two", rcDist.getProxy().getKey());
 
         RepoConfiguration rcPrivate = (RepoConfiguration) repos.get(2);
         assertNotNull("rcPrivate", rcPrivate);
         assertEquals("rcPrivate.url", "http://private.example.com/internal", rcPrivate.getUrl());
         assertEquals("rcPrivate.username", "username1", rcPrivate.getUsername());
         assertEquals("rcPrivate.password", "password1", rcPrivate.getPassword());
-        assertEquals("rcPrivate.proxy", "three", rcPrivate.getProxyKey());
+        assertEquals("rcPrivate.proxy", "three", rcPrivate.getProxy().getKey());
     }
 }
