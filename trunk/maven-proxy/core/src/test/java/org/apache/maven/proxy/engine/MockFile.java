@@ -1,4 +1,4 @@
-package org.apache.maven.proxy.request;
+package org.apache.maven.proxy.engine;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -16,15 +16,27 @@ package org.apache.maven.proxy.request;
  * limitations under the License.
  */
 
-import org.apache.maven.proxy.utils.URLTool;
+import java.io.File;
 
 /**
- * @author Ben Walding
+ * @author <a href="bwalding@apache.org">Ben Walding</a>
+ * @version $Id$
  */
-public abstract class BaseProxyRequest implements ProxyRequest
+public class MockFile extends File
 {
-    public boolean isSnapshot()
-    {
-        return URLTool.isSnapshot( getPath() );
-    }
+	private boolean dir;
+
+	/**
+	 * @param pathname
+	 */
+	public MockFile(String pathname, boolean dir) {
+		super( pathname );
+		this.dir = dir;
+	}
+
+	public boolean isDirectory()
+	{
+		return dir;
+	}
+
 }

@@ -1,4 +1,4 @@
-package org.apache.maven.proxy.request;
+package org.apache.maven.proxy.engine;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -16,39 +16,43 @@ package org.apache.maven.proxy.request;
  * limitations under the License.
  */
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.maven.proxy.engine.DownloadEngine;
+import org.apache.maven.proxy.request.BaseProxyRequest;
 
 /**
  * @author Ben Walding
  */
-public class HttpProxyRequest extends BaseProxyRequest
+public class MockProxyRequest extends BaseProxyRequest
 {
-    private final HttpServletRequest httpRequest;
+    private final String path;
+    private final long lastModified;
+    private final boolean headOnly;
 
-    public HttpProxyRequest( HttpServletRequest httpRequest )
+    public MockProxyRequest( String path, long lastModified, boolean headOnly )
     {
-        this.httpRequest = httpRequest;
+        this.path = path;
+        this.lastModified = lastModified;
+        this.headOnly = headOnly;
     }
 
     public long getLastModified()
     {
-        return DownloadEngine.round( httpRequest.getDateHeader( "Last-Modified" ) );
+        return DownloadEngine.round(lastModified);
     }
 
     public String getPath()
     {
-        return httpRequest.getPathInfo();
+        return path;
     }
 
     public boolean isHeadOnly()
     {
-        return httpRequest.getMethod().equalsIgnoreCase( "HEAD" );
+        return headOnly;
     }
 
     public String getSourceDescription()
     {
-        return httpRequest.getRemoteAddr();
+        return "Mock";
     }
+
 }

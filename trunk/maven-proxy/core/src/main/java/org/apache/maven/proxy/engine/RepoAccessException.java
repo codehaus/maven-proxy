@@ -1,4 +1,4 @@
-package org.apache.maven.proxy.request;
+package org.apache.maven.proxy.engine;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -16,39 +16,43 @@ package org.apache.maven.proxy.request;
  * limitations under the License.
  */
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.maven.proxy.engine.DownloadEngine;
+import org.apache.maven.proxy.config.RepoConfiguration;
 
 /**
  * @author Ben Walding
  */
-public class HttpProxyRequest extends BaseProxyRequest
+public class RepoAccessException extends Exception
 {
-    private final HttpServletRequest httpRequest;
+    private final RepoConfiguration repo;
+    private final String path;
+    private final String message;
+    private final Throwable cause;
 
-    public HttpProxyRequest( HttpServletRequest httpRequest )
+    public RepoAccessException( RepoConfiguration repo, String path, String message, Throwable cause )
     {
-        this.httpRequest = httpRequest;
+        this.repo = repo;
+        this.path = path;
+        this.message = message;
+        this.cause = cause;
     }
 
-    public long getLastModified()
+    public Throwable getCause()
     {
-        return DownloadEngine.round( httpRequest.getDateHeader( "Last-Modified" ) );
+        return cause;
+    }
+
+    public String getMessage()
+    {
+        return message;
     }
 
     public String getPath()
     {
-        return httpRequest.getPathInfo();
+        return path;
     }
 
-    public boolean isHeadOnly()
+    public RepoConfiguration getRepo()
     {
-        return httpRequest.getMethod().equalsIgnoreCase( "HEAD" );
-    }
-
-    public String getSourceDescription()
-    {
-        return httpRequest.getRemoteAddr();
+        return repo;
     }
 }

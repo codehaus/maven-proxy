@@ -20,8 +20,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.apache.maven.proxy.RetrievalDetails;
 import org.apache.maven.proxy.components.ProxyArtifact;
+import org.apache.maven.proxy.engine.RetrievalDetails;
 
 /**
  * Immutable.
@@ -71,7 +71,6 @@ public abstract class RepoConfiguration
     /**
      * If a file repository is set to "copy" mode, it will copy the found files into 
      * the main repository store.
-     * @return
      */
     public boolean getCopy()
     {

@@ -23,7 +23,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.apache.maven.proxy.ResourceUtil;
+import org.apache.maven.proxy.utils.ResourceUtil;
 
 /**
  * @author Ben Walding
