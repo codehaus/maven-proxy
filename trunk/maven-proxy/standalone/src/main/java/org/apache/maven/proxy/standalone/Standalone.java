@@ -6,8 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.maven.proxy.ProxyProperties;
+import javax.servlet.ServletException;
+
 import org.apache.maven.proxy.RepositoryServlet;
+import org.apache.maven.proxy.config.*;
+import org.apache.maven.proxy.config.PropertyLoader;
+import org.apache.maven.proxy.config.ProxyProperties;
+import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpServer;
 import org.mortbay.http.SocketListener;
@@ -21,7 +26,6 @@ import org.mortbay.util.MultiException;
 public class Standalone
 {
     private Properties props;
-    private String repository;
     private int port;
 
     public static void main(String args[])
@@ -33,14 +37,15 @@ public class Standalone
             launcher = new Standalone();
             launcher.doMain(args);
         }
-        catch (MultiException e)
+        catch (Exception e)
         {
             System.err.println("Internal error:");
             e.printStackTrace();
+            System.exit(-1);
         }
     }
 
-    public void doMain(String args[]) throws MultiException
+    public void doMain(String args[]) throws MultiException, IOException, ValidationException
     {
         if (args.length != 1)
         {
@@ -69,26 +74,9 @@ public class Standalone
         if (props == null)
             return;
 
-        if (props.getProperty(ProxyProperties.PORT) == null)
-        {
-            port = 8080;
-        }
-        else
-        {
-            try
-            {
-                port = Integer.parseInt(props.getProperty(ProxyProperties.PORT));
-            }
-            catch (NumberFormatException ex)
-            {
-                System.err.println("Error in properyfile: " + ProxyProperties.PORT + " must be a integer");
-                return;
-            }
-        }
+        RetrievalComponentConfiguration rcc = (new PropertyLoader()).load(props);
 
-        repository = props.getProperty(ProxyProperties.REPOSITORY_LOCAL);
-
-        System.out.println("Saving repository at " + repository);
+        System.out.println("Saving repository at " + props.getProperty(rcc.getLocalStore()));
         System.out.println("Starting...");
 
         HttpServer server = new HttpServer();
@@ -159,7 +147,7 @@ public class Standalone
         {
             //Verify remote repository set
             //only warn if missing
-            if(!p.containsKey(ProxyProperties.REPOSITORY_REMOTE + ".1"))
+            if (!p.containsKey(ProxyProperties.REPOSITORY_REMOTE + ".1"))
                 System.err.println("At least one remote should be configured.");
         }
 
