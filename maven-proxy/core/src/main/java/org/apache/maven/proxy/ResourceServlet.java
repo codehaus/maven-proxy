@@ -23,27 +23,34 @@ public class ResourceServlet extends HttpServlet
                     IOException
     {
         final String pathInfo = request.getPathInfo();
+        LOGGER.info( "Resource request " + pathInfo );
         if ( pathInfo.equalsIgnoreCase( "/favicon.ico" ) )
         {
-            handleImageRequest( "favicon.ico", "image/x-ico", response );
+            handleResourceRequest( "favicon.ico", "image/x-ico", response );
             return;
         }
 
         if ( pathInfo.equalsIgnoreCase( "/jar.png" ) )
         {
-            handleImageRequest( "jar.png", "image/png", response );
+            handleResourceRequest( "jar.png", "image/png", response );
             return;
         }
 
         if ( pathInfo.equalsIgnoreCase( "/folder.png" ) )
         {
-            handleImageRequest( "folder.png", "image/png", response );
+            handleResourceRequest( "folder.png", "image/png", response );
             return;
         }
 
         if ( pathInfo.equalsIgnoreCase( "/parent.png" ) )
         {
-            handleImageRequest( "parent.png", "image/png", response );
+            handleResourceRequest( "parent.png", "image/png", response );
+            return;
+        }
+
+        if ( pathInfo.equalsIgnoreCase( "/style.css" ) )
+        {
+            handleResourceRequest( "style.css", "text/css", response );
             return;
         }
 
@@ -54,7 +61,7 @@ public class ResourceServlet extends HttpServlet
      * @param string
      * @param response
      */
-    private void handleImageRequest( String image, String type, HttpServletResponse response ) throws IOException
+    private void handleResourceRequest( String image, String type, HttpServletResponse response ) throws IOException
     {
         response.setContentType( type );
         //7 day expiry for images

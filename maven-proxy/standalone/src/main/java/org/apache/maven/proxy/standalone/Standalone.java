@@ -156,7 +156,15 @@ public class Standalone
 
         if ( rcc.getServerName() == null )
         {
-            externalAddress = "http://" + getExternalIP() + ":" + rcc.getPort();
+            String stub = "http://" + getExternalIP() + ":" + rcc.getPort();
+            if ( rcc.getPrefix().length() == 0 )
+            {
+                externalAddress = stub;
+            }
+            else
+            {
+                externalAddress = stub + "/" + rcc.getPrefix();
+            }
         }
         else
         {
