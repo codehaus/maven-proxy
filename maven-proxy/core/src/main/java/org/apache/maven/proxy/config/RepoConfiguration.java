@@ -95,6 +95,6 @@ public abstract class RepoConfiguration
 
     public abstract RetrievalDetails retrieveArtifact( File out, String url ) throws IOException;
 
-    public abstract ProxyArtifact getSnapshot( String url ) throws FileNotFoundException;
+    public abstract ProxyArtifact getMetaInformation( String url ) throws FileNotFoundException;
 
 }

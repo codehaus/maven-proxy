@@ -78,20 +78,9 @@ public class FileRepoConfiguration extends RepoConfiguration
         }
     }
 
-    public long getLastModified( String url )
+    public ProxyArtifact getMetaInformation( String url )
     {
-        ProxyArtifact snapshot = getSnapshot( url );
-
-        if ( snapshot == null )
-        {
-            return snapshot.getLastModified();
-        }
-        return -1;
-    }
-
-    public ProxyArtifact getSnapshot( String url )
-    {
-        File file = getLocalFile( url );
+        final File file = getLocalFile( url );
 
         if ( file.exists() )
         {
