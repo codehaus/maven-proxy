@@ -1,7 +1,11 @@
 <html>
   <head>
     <title>$pageTitle</title>
-    <link type="text/css" rel="stylesheet" href="$retrace/servlets/Style"/>       
+    #if ($stylesheet)
+      <link type="text/css" rel="stylesheet" href="$retrace/${stylesheet}"/>       
+    #else
+      <link type="text/css" rel="stylesheet" href="$retrace/servlets/Style"/>       
+    #end
     <link rel="shortcut icon" href="$retrace/images/favicon.png"/>    
   </head>
   <body>
@@ -27,7 +31,9 @@
 
 <div class="top-level-menu">
 	<a href="$retrace/servlets/Config" #if ($topLevel == "CONFIG")class="selected"#end accessKey="c"><u>C</u>ONFIG</a>
-	<a href="$retrace/servlets/Search" #if ($topLevel == "SEARCH")class="selected"#end accessKey="s"><u>S</u>EARCH</a>
+	#if ($rcc.Searchable)
+      <a href="$retrace/servlets/Search" #if ($topLevel == "SEARCH")class="selected"#end accessKey="s"><u>S</u>EARCH</a>
+	#end
 	<a href="$retrace/repository" #if ($topLevel == "REPOSITORY")class="selected"#end accessKey="r"><u>R</u>EPOSITORY</a>
 	<a href="$retrace/servlets/Admin" #if ($topLevel == "ADMIN")class="selected"#end accessKey="a"><u>A</u>DMIN</a>
 </div>

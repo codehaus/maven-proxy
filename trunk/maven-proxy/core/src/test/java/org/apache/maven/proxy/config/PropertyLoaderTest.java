@@ -21,9 +21,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.proxy.ResourceUtil;
-
 import junit.framework.TestCase;
+
+import org.apache.maven.proxy.ResourceUtil;
 
 /**
  * @author Ben Walding
@@ -48,9 +48,14 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "rcc.getServerName()", "http://localhost:9999", rcc.getServerName() );
         assertEquals( "rcc.getSnapshotUpdate()", true, rcc.getSnapshotUpdate() );
         assertEquals( "rcc.getSnapshotUpdateInterval()", 60, rcc.getSnapshotUpdateInterval() );
-        assertEquals( "rcc.getLastModifiedDateFormat()", "yyyy/MM/dd hh:mm:ss", rcc.getLastModifiedDateFormat() );
+        assertEquals( "rcc.getLastModifiedDateFormat()", "yyyy/MM/dd HH:mm:ss", rcc.getLastModifiedDateFormat() );
         assertTrue( "rcc.isBrowsable()", rcc.isBrowsable() );
         assertTrue( "rcc.isSearchable()", rcc.isSearchable() );
+        assertEquals( "rcc.bgColor", rcc.getBgColor(), "#14B" );
+        assertEquals( "rcc.bgColorHighlight", rcc.getBgColorHighlight(), "#9BF" );
+        assertEquals( "rcc.rowColor", rcc.getRowColor(), "#CCF" );
+        assertEquals( "rcc.rowColorHighlight", rcc.getRowColorHighlight(), "#DDF" );
+        assertEquals( "rcc.styleSheet", rcc.getStylesheet(), "/maven-proxy/style.css" );
 
         /////////////////////// Check Proxies ////////////////////////
         assertEquals( "rcc.getProxies().size()", 3, rcc.getProxies().size() );
@@ -64,8 +69,8 @@ public class PropertyLoaderTest extends TestCase
         List repos = rcc.getRepos();
         assertEquals( "repos.size()", 5, repos.size() );
         verifyRepoGlobal( (GlobalRepoConfiguration) repos.get( 0 ) );
-
         verifyRepoGlobal( rcc.getGlobalRepo() );
+        assertSame( rcc.getGlobalRepo(), repos.get( 0 ) );
 
         verifyRepoLocal( (FileRepoConfiguration) repos.get( 1 ) );
         verifyRepoIbiblio( (HttpRepoConfiguration) repos.get( 2 ) );
@@ -78,6 +83,7 @@ public class PropertyLoaderTest extends TestCase
         assertNotNull( "configuration", configuration );
         assertEquals( "configuration.getUrl()", "file:///./target/repo", configuration.getUrl() );
         assertEquals( "configuration.getDescription()", "Global Repository", configuration.getDescription() );
+        assertEquals( "configuration.getDescription()", true, configuration.getHardFail() );
     }
 
     private void verifyRepoLocal( FileRepoConfiguration configuration )
@@ -86,6 +92,7 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "configuration.getUrl()", "file:///./target/repo-local", configuration.getUrl() );
         assertEquals( "configuration.getDescription()", "Super Secret Custom Repository", configuration
                         .getDescription() );
+        assertEquals( "configuration.getHardFail()", true, configuration.getHardFail() );
     }
 
     private void verifyProxyOne( ProxyConfiguration pcOne )
@@ -119,6 +126,7 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "www-ibiblio-org", rcIbiblio.getKey() );
         assertEquals( "rcIbiblio.url", "http://www.ibiblio.org/maven", rcIbiblio.getUrl() );
         assertEquals( "rcIbiblio.description", "www.ibiblio.org", rcIbiblio.getDescription() );
+        assertEquals( "rcIbiblio.hardfail", true, rcIbiblio.getHardFail() );
         assertNull( "rcIbiblio.username", rcIbiblio.getUsername() );
         assertNull( "rcIbiblio.password", rcIbiblio.getPassword() );
         assertEquals( "rcIbiblio.proxy", "one", rcIbiblio.getProxy().getKey() );
@@ -130,6 +138,7 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "dist-codehaus-org", rcDist.getKey() );
         assertEquals( "rcDist.url", "http://dist.codehaus.org", rcDist.getUrl() );
         assertEquals( "rcDist.description", "dist-codehaus-org", rcDist.getDescription() );
+        assertEquals( "rcDist.hardfail", false, rcDist.getHardFail() );
         assertNull( "rcDist.username", rcDist.getUsername() );
         assertNull( "rcDist.password", rcDist.getPassword() );
         assertEquals( "rcDist.proxy", "two", rcDist.getProxy().getKey() );
@@ -141,6 +150,7 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "private-example-com", rcPrivate.getKey() );
         assertEquals( "rcPrivate.url", "http://private.example.com/internal", rcPrivate.getUrl() );
         assertEquals( "rcPrivate.description", "Commercial In Confidence Repository", rcPrivate.getDescription() );
+        assertEquals( "rcPrivate.hardfail", true, rcPrivate.getHardFail() );
         assertEquals( "rcPrivate.username", "username1", rcPrivate.getUsername() );
         assertEquals( "rcPrivate.password", "password1", rcPrivate.getPassword() );
         assertEquals( "rcPrivate.proxy", "three", rcPrivate.getProxy().getKey() );
@@ -211,6 +221,23 @@ public class PropertyLoaderTest extends TestCase
             Properties props = new Properties();
             props.load( is );
             assertThrowsValidationException( loader, props );
+        }
+        finally
+        {
+            ResourceUtil.close( is );
+        }
+    }
+
+    public void testSimple4() throws Exception
+    {
+        InputStream is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest4.properties" );
+        try
+        {
+            PropertyLoader loader = new PropertyLoader();
+            Properties props = new Properties();
+            props.load( is );
+            loader.load( props );
+            //All good
         }
         finally
         {

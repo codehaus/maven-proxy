@@ -16,12 +16,15 @@ package org.apache.maven.proxy.config;
  * limitations under the License.
  */
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * @author  Ben Walding
@@ -33,6 +36,11 @@ public class RetrievalComponentConfiguration
     private final List repos = new ArrayList();
     private String localStore;
     private String serverName;
+    private String bgColor;
+    private String bgColorHighlight;
+    private String rowColor;
+    private String rowColorHighlight;
+    private String stylesheet;
     private boolean searchable;
     private boolean browsable;
     private int port;
@@ -186,10 +194,90 @@ public class RetrievalComponentConfiguration
         for ( Iterator iter = repos.iterator(); iter.hasNext(); )
         {
             RepoConfiguration repo = (RepoConfiguration) iter.next();
-            if (repo instanceof GlobalRepoConfiguration) {
+            if ( repo instanceof GlobalRepoConfiguration )
+            {
                 return (GlobalRepoConfiguration) repo;
-            }            
+            }
         }
-        return null;        
+        return null;
+    }
+
+    private ThreadLocal dateFormatThreadLocal = new ThreadLocal()
+    {
+        protected synchronized Object initialValue()
+        {
+            DateFormat df;
+
+            if ( getLastModifiedDateFormat() == null || getLastModifiedDateFormat() == "" )
+            {
+                df = new SimpleDateFormat();
+            }
+            else
+            {
+                df = new SimpleDateFormat( getLastModifiedDateFormat() );
+            }
+
+            df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+            return df;
+        }
+    };
+
+    /**
+     * Retrieves and casts the appropriate DateFormat object from a ThreadLocal
+     * @return
+     */
+    public DateFormat getLastModifiedDateFormatForThread()
+    {
+        return (DateFormat) dateFormatThreadLocal.get();
+    }
+
+    public String getBgColor()
+    {
+        return bgColor;
+    }
+
+    public void setBgColor( String bgColor )
+    {
+        this.bgColor = bgColor;
+    }
+
+    public String getBgColorHighlight()
+    {
+        return bgColorHighlight;
+    }
+
+    public void setBgColorHighlight( String bgColorHighlight )
+    {
+        this.bgColorHighlight = bgColorHighlight;
+    }
+
+    public String getStylesheet()
+    {
+        return stylesheet;
+    }
+
+    public void setStylesheet( String stylesheet )
+    {
+        this.stylesheet = stylesheet;
+    }
+
+    public String getRowColor()
+    {
+        return rowColor;
+    }
+
+    public void setRowColor( String rowColor )
+    {
+        this.rowColor = rowColor;
+    }
+
+    public String getRowColorHighlight()
+    {
+        return rowColorHighlight;
+    }
+
+    public void setRowColorHighlight( String rowColorHighlight )
+    {
+        this.rowColorHighlight = rowColorHighlight;
     }
 }

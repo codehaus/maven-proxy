@@ -1,6 +1,4 @@
-package org.apache.maven.proxy.standalone;
-
-import junit.framework.TestCase;
+package org.apache.maven.proxy.request;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -18,18 +16,32 @@ import junit.framework.TestCase;
  * limitations under the License.
  */
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author Ben Walding
  */
-public class StandaloneTest extends TestCase
+public class HttpProxyRequest extends BaseProxyRequest
 {
-    public void testSimple() throws InterruptedException
+    private final HttpServletRequest httpRequest;
+
+    public HttpProxyRequest( HttpServletRequest httpRequest )
     {
-        String[] args = new String[]
-            {
-                "src/test/test.properties"
-            };
-        Standalone.main( args );
-        Thread.sleep( 10000 );
+        this.httpRequest = httpRequest;
+    }
+
+    public long getLastModified()
+    {
+        return httpRequest.getDateHeader( "Last-Modified" );
+    }
+
+    public String getPath()
+    {
+        return httpRequest.getPathInfo();
+    }
+
+    public boolean isHeadOnly()
+    {
+        return httpRequest.getMethod().equalsIgnoreCase( "HEAD" );
     }
 }

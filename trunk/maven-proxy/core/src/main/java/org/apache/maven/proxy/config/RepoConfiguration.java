@@ -1,6 +1,5 @@
 package org.apache.maven.proxy.config;
 
-
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
  * 
@@ -17,9 +16,22 @@ package org.apache.maven.proxy.config;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.apache.maven.proxy.RetrievalDetails;
+import org.apache.maven.proxy.components.ProxyArtifact;
+
 /**
  * Immutable.
- * 
+ *
+ * hardfail - if a repository is set to hard fail, then the download engine will terminate the whole download
+ *            process (with a status 500) if any of the repositories have unexpected errors.
+ *  
+ *            if a repository expects an error - eg. 400 (not found) - then it is not required to terminate the
+ *            download process. 
+ *  
  * @author  Ben Walding
  * @version $Id$
  */
@@ -29,13 +41,15 @@ public abstract class RepoConfiguration
     private final String description;
     private final String url;
     private final boolean copy;
+    private final boolean hardFail;
 
-    public RepoConfiguration( String key, String url, String description, boolean copy )
+    public RepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail )
     {
         this.key = key;
         this.url = url;
         this.description = description;
         this.copy = copy;
+        this.hardFail = hardFail;
     }
 
     /**
@@ -69,9 +83,18 @@ public abstract class RepoConfiguration
         return description;
     }
 
+    public boolean getHardFail()
+    {
+        return hardFail;
+    }
+
     public String toString()
     {
         return "Repo[" + getKey() + "]";
     }
+
+    public abstract RetrievalDetails retrieveArtifact( File out, String url ) throws IOException;
+
+    public abstract ProxyArtifact getSnapshot( String url ) throws FileNotFoundException;
 
 }

@@ -1,6 +1,4 @@
-package org.apache.maven.proxy.standalone;
-
-import junit.framework.TestCase;
+package org.apache.maven.proxy.request;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -18,18 +16,25 @@ import junit.framework.TestCase;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * @author Ben Walding
  */
-public class StandaloneTest extends TestCase
+public interface ProxyResponse
 {
-    public void testSimple() throws InterruptedException
-    {
-        String[] args = new String[]
-            {
-                "src/test/test.properties"
-            };
-        Standalone.main( args );
-        Thread.sleep( 10000 );
-    }
+    void setLastModified( long lastModified );
+
+    void setContentLength( int length );
+
+    public OutputStream getOutputStream() throws IOException;
+
+    //Yes, this is very http, but I don't care.
+    void sendError( int statusCode ) throws IOException;
+
+    void sendFile( File targetFile ) throws IOException;
+
+    void sendOK();
 }

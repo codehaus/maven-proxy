@@ -22,8 +22,7 @@ public class AdminServlet extends MavenProxyServlet
     {
         if ( request.getParameter( "clearSnapshotCache" ) != null )
         {
-            RepositoryServlet.snapshotCache.stop();
-            RepositoryServlet.snapshotCache.start();
+            RepositoryServlet.clearSnapshotCache();            
         }
         return getTemplate( "AdminServlet.vtl" );
     }

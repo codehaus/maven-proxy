@@ -16,24 +16,43 @@ package org.apache.maven.proxy;
  * limitations under the License.
  */
 
-import java.io.File;
-
-import junit.framework.TestCase;
-
-import org.apache.maven.proxy.config.GlobalRepoConfiguration;
 import org.apache.maven.proxy.config.RepoConfiguration;
 
 /**
  * @author Ben Walding
  */
-public class FileElementTest extends TestCase
+public class RepoAccessException extends Exception
 {
-    public void testSimple()
-    {
-        RepoConfiguration repo = new GlobalRepoConfiguration( "./target" );
-        File f = new File( "target/clown.txt" );
+    private final RepoConfiguration repo;
+    private final String path;
+    private final String message;
+    private final Throwable cause;
 
-        FileElement fe = new FileElement( f, "/", repo );
-        assertEquals( "/", fe.getRelativePath() );
+    public RepoAccessException( RepoConfiguration repo, String path, String message, Throwable cause )
+    {
+        this.repo = repo;
+        this.path = path;
+        this.message = message;
+        this.cause = cause;
+    }
+
+    public Throwable getCause()
+    {
+        return cause;
+    }
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public RepoConfiguration getRepo()
+    {
+        return repo;
     }
 }

@@ -1,6 +1,4 @@
-package org.apache.maven.proxy.standalone;
-
-import junit.framework.TestCase;
+package org.apache.maven.proxy.request;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -21,15 +19,17 @@ import junit.framework.TestCase;
 /**
  * @author Ben Walding
  */
-public class StandaloneTest extends TestCase
+public interface ProxyRequest
 {
-    public void testSimple() throws InterruptedException
-    {
-        String[] args = new String[]
-            {
-                "src/test/test.properties"
-            };
-        Standalone.main( args );
-        Thread.sleep( 10000 );
-    }
+    public long getLastModified();
+    public String getPath();
+    
+    public boolean isSnapshot();
+    
+    /**
+     * This feels a bit dirty, but it represents a request where we don't want the actual file,
+     * just the meta information about last update etc.
+     * @return
+     */
+    public boolean isHeadOnly();
 }

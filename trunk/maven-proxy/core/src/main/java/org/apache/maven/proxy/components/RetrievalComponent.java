@@ -18,8 +18,8 @@ package org.apache.maven.proxy.components;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
-import org.apache.maven.fetch.exceptions.FetchException;
 import org.apache.maven.proxy.RetrievalDetails;
 import org.apache.maven.proxy.config.RepoConfiguration;
 
@@ -31,6 +31,19 @@ public interface RetrievalComponent
 {
     String ROLE = RetrievalComponent.ROLE;
 
-    RetrievalDetails retrieveArtifact( RepoConfiguration rc, File out, String url, boolean checkModified ) throws FetchException,
-                    FileNotFoundException;
+    /**
+     * 
+     * @param rc
+     * @param out
+     * @param url
+     * @param checkModified
+     * @param download if false, the file will NOT be downloaded
+     * @return
+     * @throws FetchException
+     * @throws FileNotFoundException
+     */
+    RetrievalDetails retrieveArtifact( RepoConfiguration rc, File out, String url ) throws IOException;
+
+    long getLastModified( RepoConfiguration rc, String url );
+
 }

@@ -46,6 +46,12 @@ public class PropertyLoader
     public static final String BROWSABLE = "browsable";
     public static final String SEARCHABLE = "searchable";
 
+    public static final String STYLESHEET = "stylesheet";
+    public static final String BGCOLOR = "css.bgColor";
+    public static final String BGCOLORHIGHLIGHT = "css.bgColorHighlight";
+    public static final String ROWCOLOR = "css.rowColor";
+    public static final String ROWCOLORHIGHLIGHT = "css.rowColorHighlight";
+
     public static final String PREFIX = "prefix";
 
     private static final String SERVERNAME = "serverName";
@@ -97,6 +103,11 @@ public class PropertyLoader
         rcc.setServerName( props.getProperty( SERVERNAME ) );
         rcc.setPrefix( getMandatoryProperty( props, PREFIX ) );
         rcc.setLastModifiedDateFormat( props.getProperty( LAST_MODIFIED_DATE_FORMAT ) );
+        rcc.setStylesheet( getOptionalProperty( props, STYLESHEET, null ) );
+        rcc.setBgColor( getOptionalProperty( props, BGCOLOR, "#14B" ) );
+        rcc.setBgColorHighlight( getOptionalProperty( props, BGCOLORHIGHLIGHT, "#9BF" ) );
+        rcc.setRowColor( getOptionalProperty( props, ROWCOLOR, "#CCF" ) );
+        rcc.setRowColorHighlight( getOptionalProperty( props, ROWCOLORHIGHLIGHT, "#DDF" ) );
 
         if ( rcc.getPrefix().length() == 0 )
         {
@@ -137,6 +148,7 @@ public class PropertyLoader
                 String password = repoProps.getProperty( "password" );
                 String description = repoProps.getProperty( "description" );
                 String proxyKey = repoProps.getProperty( "proxy" );
+                Boolean hardFail = Boolean.valueOf( repoProps.getProperty( "hardfail", "true" ) );
 
                 ProxyConfiguration proxy = null;
                 if ( proxyKey != null )
@@ -153,13 +165,14 @@ public class PropertyLoader
 
                 if ( url.startsWith( "http://" ) )
                 {
-                    rc = new HttpRepoConfiguration( key, url, description, username, password, proxy );
+                    rc = new HttpRepoConfiguration( key, url, description, username, password, hardFail.booleanValue(),
+                                    proxy );
                 }
 
                 if ( url.startsWith( "file:///" ) )
                 {
                     boolean copy = "true".equalsIgnoreCase( repoProps.getProperty( "copy" ) );
-                    rc = new FileRepoConfiguration( key, url, description, copy );
+                    rc = new FileRepoConfiguration( key, url, description, copy, hardFail.booleanValue() );
                 }
 
                 if ( rc == null )

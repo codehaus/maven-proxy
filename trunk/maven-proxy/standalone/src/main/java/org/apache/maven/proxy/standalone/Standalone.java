@@ -111,7 +111,7 @@ public class Standalone
             is.close();
         }
 
-        RetrievalComponentConfiguration rcc = null;
+        final RetrievalComponentConfiguration rcc;
         try
         {
             rcc = loadAndValidateConfiguration( args[0] );
@@ -160,12 +160,18 @@ public class Standalone
             sh.addServlet( "Repository", "/" + rcc.getPrefix() + "/*", RepositoryServlet.class.getName() );
         }
 
-        sh.addServlet( "images", "/images/*", ResourceServlet.class.getName() );
-        sh.addServlet( "styles", "/servlets/Style", StyleServlet.class.getName() );
-        sh.addServlet( "search", "/servlets/Search", SearchServlet.class.getName() );
-        sh.addServlet( "config", "/servlets/Config", ConfigServlet.class.getName() );
-        sh.addServlet( "redirect", "/", RedirectServlet.class.getName() );
-        sh.addServlet( "admin", "/servlets/Admin", AdminServlet.class.getName() );
+        if ( rcc.isBrowsable() )
+        {
+            sh.addServlet( "styles", "/servlets/Style", StyleServlet.class.getName() );
+            if ( rcc.isSearchable() )
+            {
+                sh.addServlet( "search", "/servlets/Search", SearchServlet.class.getName() );
+            }
+            sh.addServlet( "images", "/images/*", ResourceServlet.class.getName() );
+            sh.addServlet( "config", "/servlets/Config", ConfigServlet.class.getName() );
+            sh.addServlet( "redirect", "/", RedirectServlet.class.getName() );
+            sh.addServlet( "admin", "/servlets/Admin", AdminServlet.class.getName() );
+        }
         //sh.addServlet( "webdav", "/webdav/*", ResourceServlet.class.getName() );
 
         context.setAttribute( "config", rcc );

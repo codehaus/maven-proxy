@@ -1,6 +1,4 @@
-package org.apache.maven.proxy.standalone;
-
-import junit.framework.TestCase;
+package org.apache.maven.proxy;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -18,18 +16,37 @@ import junit.framework.TestCase;
  * limitations under the License.
  */
 
+import org.apache.maven.proxy.request.BaseProxyRequest;
+
 /**
  * @author Ben Walding
  */
-public class StandaloneTest extends TestCase
+public class MockProxyRequest extends BaseProxyRequest
 {
-    public void testSimple() throws InterruptedException
+    private final String path;
+    private final long lastModified;
+    private final boolean headOnly;
+
+    public MockProxyRequest( String path, long lastModified, boolean headOnly )
     {
-        String[] args = new String[]
-            {
-                "src/test/test.properties"
-            };
-        Standalone.main( args );
-        Thread.sleep( 10000 );
+        this.path = path;
+        this.lastModified = lastModified;
+        this.headOnly = headOnly;
     }
+
+    public long getLastModified()
+    {
+        return lastModified;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public boolean isHeadOnly()
+    {
+        return headOnly;
+    }
+
 }
