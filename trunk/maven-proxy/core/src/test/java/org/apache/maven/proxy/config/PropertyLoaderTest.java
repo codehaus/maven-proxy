@@ -124,6 +124,7 @@ public class PropertyLoaderTest extends TestCase
     private void verifyRepoIbiblio(RepoConfiguration rcIbiblio)
     {
         assertNotNull("rcIbiblio", rcIbiblio);
+        assertEquals("www-ibiblio-org", rcIbiblio.getKey());
         assertEquals("rcIbiblio.url", "http://www.ibiblio.org/maven", rcIbiblio.getUrl());
         assertNull("rcIbiblio.username", rcIbiblio.getUsername());
         assertNull("rcIbiblio.password", rcIbiblio.getPassword());
@@ -133,6 +134,7 @@ public class PropertyLoaderTest extends TestCase
     private void verifyRepoDist(RepoConfiguration rcDist)
     {
         assertNotNull("rcDist", rcDist);
+        assertEquals("dist-codehaus-org", rcDist.getKey());
         assertEquals("rcDist.url", "http://dist.codehaus.org", rcDist.getUrl());
         assertNull("rcDist.username", rcDist.getUsername());
         assertNull("rcDist.password", rcDist.getPassword());
@@ -142,6 +144,7 @@ public class PropertyLoaderTest extends TestCase
     private void verifyRepoPrivate(RepoConfiguration rcPrivate)
     {
         assertNotNull("rcPrivate", rcPrivate);
+        assertEquals("private-example-com", rcPrivate.getKey());
         assertEquals("rcPrivate.url", "http://private.example.com/internal", rcPrivate.getUrl());
         assertEquals("rcPrivate.username", "username1", rcPrivate.getUsername());
         assertEquals("rcPrivate.password", "password1", rcPrivate.getPassword());
