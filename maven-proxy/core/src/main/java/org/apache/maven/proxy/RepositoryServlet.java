@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.fetch.exceptions.FetchException;
+import org.apache.maven.fetch.exceptions.ResourceNotFoundFetchException;
 import org.apache.maven.fetch.util.IOUtility;
 
 /**
@@ -33,7 +34,7 @@ public class RepositoryServlet extends HttpServlet
     protected long getLastModified(HttpServletRequest request)
     {
         LOGGER.info("Checking getLastModified(): " + request.getPathInfo());
-        File f = new File(baseDir + request.getPathInfo());
+        File f = getFileForRequest(request);
         if (f.exists() && f.isFile())
         {
             return f.lastModified();
@@ -64,7 +65,7 @@ public class RepositoryServlet extends HttpServlet
 
     public File getFileForRequest(HttpServletRequest request)
     {
-        return new File(baseDir + request.getPathInfo());
+        return new File(baseDir, request.getPathInfo());
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -75,9 +76,16 @@ public class RepositoryServlet extends HttpServlet
 
             File f = getFileForRequest(request);
             f.getParentFile().mkdirs();
-
-            rc.retrieveArtifact(f, request.getPathInfo());
-            InputStream is = new FileInputStream(f);
+            if (f.exists())
+            {
+                LOGGER.info("Retrieving from cache: " + f.getAbsolutePath());
+            }
+            else
+            {
+                rc.retrieveArtifact(f, request.getPathInfo());
+            }
+            InputStream is;
+            is = new FileInputStream(f);
 
             //TODO could tailor the mime type
             response.setContentType("application/octet-stream");
@@ -85,6 +93,12 @@ public class RepositoryServlet extends HttpServlet
             IOUtility.transferStream(is, os);
             IOUtility.close(os);
             IOUtility.close(is);
+        }
+        catch (ResourceNotFoundFetchException e)
+        {
+            //This is not a huge error
+            LOGGER.info("Couldn't find upstream resource : " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
         catch (FetchException e)
         {
