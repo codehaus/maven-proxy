@@ -32,8 +32,20 @@ public class RetrievalComponentConfiguration
     private final Map proxies = new HashMap();
     private final List repos = new ArrayList();
     private String localStore;
+    private String serverName;
     private boolean browsable;
     private int port;
+    private String prefix;
+
+    public String getPrefix()
+    {
+        return prefix;
+    }
+
+    public void setPrefix( String prefix )
+    {
+        this.prefix = prefix;
+    }
 
     /**
      * @return
@@ -46,23 +58,17 @@ public class RetrievalComponentConfiguration
     /**
      * @param browsable
      */
-    public void setBrowsable(boolean browsable)
+    public void setBrowsable( boolean browsable )
     {
         this.browsable = browsable;
     }
 
-    /**
-     * @return
-     */
     public int getPort()
     {
         return port;
     }
 
-    /**
-     * @param port
-     */
-    public void setPort(int port)
+    public void setPort( int port )
     {
         this.port = port;
     }
@@ -78,24 +84,24 @@ public class RetrievalComponentConfiguration
     /**
      * @param localStore
      */
-    public void setLocalStore(String localStore)
+    public void setLocalStore( String localStore )
     {
         this.localStore = localStore;
     }
 
-    public void addProxy(ProxyConfiguration pc)
+    public void addProxy( ProxyConfiguration pc )
     {
-        proxies.put(pc.getKey(), pc);
+        proxies.put( pc.getKey(), pc );
     }
 
-    public void removeProxy(String key)
+    public void removeProxy( String key )
     {
-        proxies.remove(key);
+        proxies.remove( key );
     }
 
-    public ProxyConfiguration getProxy(String key)
+    public ProxyConfiguration getProxy( String key )
     {
-        return (ProxyConfiguration) proxies.get(key);
+        return (ProxyConfiguration) proxies.get( key );
     }
 
     /**
@@ -104,17 +110,45 @@ public class RetrievalComponentConfiguration
      */
     public Set getProxies()
     {
-        return Collections.unmodifiableSet(proxies.entrySet());
+        return Collections.unmodifiableSet( proxies.entrySet() );
     }
 
-    public void addRepo(RepoConfiguration repo)
+    public void addRepo( RepoConfiguration repo )
     {
-        repos.add(repo);
+        repos.add( repo );
     }
 
     public List getRepos()
     {
-        return Collections.unmodifiableList(repos);
+        return Collections.unmodifiableList( repos );
+    }
+
+    public String getServerName()
+    {
+        return serverName;
+    }
+
+    public void setServerName( String serverName )
+    {
+        this.serverName = serverName;
+    }
+
+    private int snapshotUpdateInterval;
+    private boolean snapshotUpdate;
+
+    public int getSnapshotUpdateInterval()
+    {
+        return snapshotUpdateInterval;
+    }
+
+    public void setSnapshotUpdateInterval( int snapshotUpdateInterval )
+    {
+        this.snapshotUpdateInterval = snapshotUpdateInterval;
+    }
+
+    public void setSnapshotUpdate( boolean snapshotUpdate )
+    {
+        this.snapshotUpdate = snapshotUpdate;
     }
 
 }

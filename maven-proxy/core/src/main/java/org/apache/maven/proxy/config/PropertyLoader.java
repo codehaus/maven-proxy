@@ -33,133 +33,166 @@ public class PropertyLoader
     public static final String REPO_CUSTOM_STORE = "repo.custom.store";
 
     public static final String PORT = "port";
+    public static final String SNAPSHOT_UPDATE = "snapshot.update";
+    public static final String SNAPSHOT_UPDATE_INTERVAL = "snapshot.update.interval";
 
     public static final int DEFAULT_PORT = 4321;
 
     public static final String BROWSABLE = "browsable";
 
-    public RetrievalComponentConfiguration load(Properties props) throws ValidationException
+    public static final String PREFIX = "prefix";
+
+    private static final String SERVERNAME = "serverName";
+
+    public RetrievalComponentConfiguration load( Properties props ) throws ValidationException
     {
         RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
 
-        rcc.setLocalStore(getMandatoryProperty(props, REPO_LOCAL_STORE));
+        rcc.setLocalStore( getMandatoryProperty( props, REPO_LOCAL_STORE ) );
 
-        if (props.getProperty(PORT) == null)
+        if ( props.getProperty( PORT ) == null )
         {
-            rcc.setPort(DEFAULT_PORT);
+            rcc.setPort( DEFAULT_PORT );
         }
         else
         {
             try
             {
-                rcc.setPort(Integer.parseInt(props.getProperty(PORT)));
+                rcc.setPort( Integer.parseInt( props.getProperty( PORT ) ) );
             }
-            catch (NumberFormatException ex)
+            catch ( NumberFormatException ex )
             {
-                throw new ValidationException("Property " + PORT + " must be a integer");
+                throw new ValidationException( "Property " + PORT + " must be a integer" );
             }
         }
 
-        rcc.setBrowsable(Boolean.valueOf(getMandatoryProperty(props, BROWSABLE)).booleanValue());
+        rcc.setSnapshotUpdate( Boolean.valueOf( getMandatoryProperty( props, SNAPSHOT_UPDATE ) ).booleanValue() );
+        if ( props.getProperty( SNAPSHOT_UPDATE_INTERVAL ) == null )
+        {
+            rcc.setSnapshotUpdateInterval( 0 );
+        }
+        else
+        {
+            try
+            {
+                rcc.setSnapshotUpdateInterval( Integer.parseInt( props.getProperty( SNAPSHOT_UPDATE_INTERVAL ) ) );
+            }
+            catch ( NumberFormatException ex )
+            {
+                throw new ValidationException( "Property " + SNAPSHOT_UPDATE_INTERVAL + " must be a integer" );
+            }
+        }
+
+        rcc.setBrowsable( Boolean.valueOf( getMandatoryProperty( props, BROWSABLE ) ).booleanValue() );
+        rcc.setServerName( props.getProperty( SERVERNAME ) );
+        rcc.setPrefix( getMandatoryProperty( props, PREFIX ) );
+
+        if ( rcc.getPrefix().length() == 0 )
+        {
+            System.err.println( "Using an empty 'prefix' is deprecated behaviour.  Please set a prefix." );
+        }
 
         {
-            String propertyList = props.getProperty("proxy.list");
-            if (propertyList != null)
+            String propertyList = props.getProperty( "proxy.list" );
+            if ( propertyList != null )
             {
-                StringTokenizer tok = new StringTokenizer(propertyList, ",");
-                while (tok.hasMoreTokens())
+                StringTokenizer tok = new StringTokenizer( propertyList, "," );
+                while ( tok.hasMoreTokens() )
                 {
                     String key = tok.nextToken();
-                    String host = getMandatoryProperty(props, "proxy." + key + ".host");
-                    int port = Integer.parseInt(getMandatoryProperty(props, "proxy." + key + ".port"));
+                    String host = getMandatoryProperty( props, "proxy." + key + ".host" );
+                    int port = Integer.parseInt( getMandatoryProperty( props, "proxy." + key + ".port" ) );
                     // the username and password isn't required
-                    String username = props.getProperty("proxy." + key + ".username");
-                    String password = props.getProperty("proxy." + key + ".password");
-                    ProxyConfiguration pc = new ProxyConfiguration(key, host, port, username, password);
-                    rcc.addProxy(pc);
+                    String username = props.getProperty( "proxy." + key + ".username" );
+                    String password = props.getProperty( "proxy." + key + ".password" );
+                    ProxyConfiguration pc = new ProxyConfiguration( key, host, port, username, password );
+                    rcc.addProxy( pc );
                 }
             }
         }
 
         {
-            String repoList = getMandatoryProperty(props, "repo.list");
+            String repoList = getMandatoryProperty( props, "repo.list" );
 
-            StringTokenizer tok = new StringTokenizer(repoList, ",");
-            while (tok.hasMoreTokens())
+            StringTokenizer tok = new StringTokenizer( repoList, "," );
+            while ( tok.hasMoreTokens() )
             {
                 String key = tok.nextToken();
 
-                Properties repoProps = getSubset(props, "repo." + key + ".");
-                String url = getMandatoryProperty(props, "repo." + key + ".url");
+                Properties repoProps = getSubset( props, "repo." + key + "." );
+                String url = getMandatoryProperty( props, "repo." + key + ".url" );
                 // the username, password and proxy are not mandatory
-                String username = repoProps.getProperty("username");
-                String password = repoProps.getProperty("password");
-                String description = repoProps.getProperty("description");
-                String proxyKey = repoProps.getProperty("proxy");
+                String username = repoProps.getProperty( "username" );
+                String password = repoProps.getProperty( "password" );
+                String description = repoProps.getProperty( "description" );
+                String proxyKey = repoProps.getProperty( "proxy" );
 
                 ProxyConfiguration proxy = null;
-                if (proxyKey != null)
+                if ( proxyKey != null )
                 {
-                    proxy = rcc.getProxy(proxyKey);
+                    proxy = rcc.getProxy( proxyKey );
                 }
 
-                if (description == null || description.trim().length() == 0)
+                if ( description == null || description.trim().length() == 0 )
                 {
                     description = key;
                 }
 
                 RepoConfiguration rc = null;
 
-                if (url.startsWith("http://"))
+                if ( url.startsWith( "http://" ) )
                 {
-                    rc = new HttpRepoConfiguration(key, url, description, username, password, proxy);
+                    rc = new HttpRepoConfiguration( key, url, description, username, password, proxy );
                 }
 
-                if (url.startsWith("file:///"))
+                if ( url.startsWith( "file:///" ) )
                 {
-                    boolean copy = "true".equalsIgnoreCase(repoProps.getProperty("copy"));
-                    rc = new FileRepoConfiguration(key, url, description, copy);
+                    boolean copy = "true".equalsIgnoreCase( repoProps.getProperty( "copy" ) );
+                    rc = new FileRepoConfiguration( key, url, description, copy );
                 }
 
-                if (rc == null) { throw new ValidationException("Unknown upstream repository type: " + url); }
+                if ( rc == null )
+                {
+                    throw new ValidationException( "Unknown upstream repository type: " + url );
+                }
 
-                rcc.addRepo(rc);
+                rcc.addRepo( rc );
             }
         }
         return rcc;
 
     }
 
-    private Properties getSubset(Properties props, String prefix)
+    private Properties getSubset( Properties props, String prefix )
     {
         Enumeration keys = props.keys();
         Properties result = new Properties();
-        while (keys.hasMoreElements())
+        while ( keys.hasMoreElements() )
         {
             String key = (String) keys.nextElement();
-            String value = props.getProperty(key);
-            if (key.startsWith(prefix))
+            String value = props.getProperty( key );
+            if ( key.startsWith( prefix ) )
             {
-                String newKey = key.substring(prefix.length());
-                result.setProperty(newKey, value);
+                String newKey = key.substring( prefix.length() );
+                result.setProperty( newKey, value );
             }
         }
         return result;
     }
 
-    public RetrievalComponentConfiguration load(InputStream is) throws IOException, ValidationException
+    public RetrievalComponentConfiguration load( InputStream is ) throws IOException, ValidationException
     {
         Properties props = new Properties();
-        props.load(is);
-        return load(props);
+        props.load( is );
+        return load( props );
     }
 
-    private String getMandatoryProperty(Properties props, String key) throws ValidationException
+    private String getMandatoryProperty( Properties props, String key ) throws ValidationException
     {
-        final String value = props.getProperty(key);
+        final String value = props.getProperty( key );
 
-        if (value == null)
-            throw new ValidationException("Missing property: " + key);
+        if ( value == null )
+            throw new ValidationException( "Missing property: " + key );
 
         return value;
     }

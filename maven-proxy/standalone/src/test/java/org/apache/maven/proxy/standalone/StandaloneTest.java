@@ -1,5 +1,7 @@
 package org.apache.maven.proxy.standalone;
 
+import junit.framework.TestCase;
+
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
  * 
@@ -16,29 +18,18 @@ package org.apache.maven.proxy.standalone;
  * limitations under the License.
  */
 
-import java.io.IOException;
-
-import org.apache.maven.proxy.standalone.http.AbstractHttpServer;
-import org.apache.maven.proxy.standalone.http.Request;
-import org.apache.maven.proxy.standalone.http.Response;
-
-
 /**
- * The ProxyRepoServer implements an HttpServer that serves files from a
- * virtual maven repository.
+ * @author Ben Walding
  */
-public class ProxyRepoServer extends AbstractHttpServer
+public class StandaloneTest extends TestCase
 {
-
-	/* (non-Javadoc)
-	 * @see org.apache.maven.proxy.standalone.http.AbstractHttpServer#getResponse(org.apache.maven.proxy.standalone.http.Request)
-	 */
-	public Response getResponse( Request request ) throws IOException
-	{
-        Response response = new Response();
-        return response;
+    public void testSimple() throws InterruptedException
+    {
+        String[] args = new String[]
+            {
+                "src/test/test.properties"
+            };
+        Standalone.main( args );
+        Thread.sleep( 60000 );
     }
-
-	
-
 }
