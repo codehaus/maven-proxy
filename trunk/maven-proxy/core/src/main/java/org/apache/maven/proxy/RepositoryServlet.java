@@ -17,14 +17,16 @@ package org.apache.maven.proxy;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -35,7 +37,9 @@ import org.apache.maven.fetch.exceptions.FetchException;
 import org.apache.maven.fetch.exceptions.NotModifiedFetchException;
 import org.apache.maven.fetch.exceptions.ResourceNotFoundFetchException;
 import org.apache.maven.fetch.util.IOUtility;
+import org.apache.maven.proxy.components.RetrievalComponent;
 import org.apache.maven.proxy.components.SnapshotCache;
+import org.apache.maven.proxy.components.impl.DefaultRetrievalComponent;
 import org.apache.maven.proxy.components.impl.DefaultSnapshotCache;
 import org.apache.maven.proxy.components.impl.NoCacheSnapshotCache;
 import org.apache.maven.proxy.config.FileRepoConfiguration;
@@ -57,7 +61,7 @@ public class RepositoryServlet extends MavenProxyServlet
 
     private RetrievalComponentConfiguration rcc = null;
 
-    private SnapshotCache snapshotCache;
+    static SnapshotCache snapshotCache;
 
     private File localStoreDir;
 
@@ -91,12 +95,19 @@ public class RepositoryServlet extends MavenProxyServlet
     {
         protected synchronized Object initialValue()
         {
+            DateFormat df;
+
             if ( rcc.getLastModifiedDateFormat() == null || rcc.getLastModifiedDateFormat() == "" )
             {
-                return new SimpleDateFormat();
+                df = new SimpleDateFormat();
+            }
+            else
+            {
+                df = new SimpleDateFormat( rcc.getLastModifiedDateFormat() );
             }
 
-            return new SimpleDateFormat( rcc.getLastModifiedDateFormat() );
+            df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+            return df;
         }
     };
 
@@ -109,7 +120,7 @@ public class RepositoryServlet extends MavenProxyServlet
         if ( rcc.getSnapshotUpdate() )
         {
             //Multiply by 1000 because the config file is in seconds, but the cache is in milliseconds
-            snapshotCache = new DefaultSnapshotCache( rcc.getSnapshotUpdateInterval() * 1000);
+            snapshotCache = new DefaultSnapshotCache( rcc.getSnapshotUpdateInterval() * 1000 );
         }
         else
         {
@@ -159,13 +170,15 @@ public class RepositoryServlet extends MavenProxyServlet
     private void handleDownloadRequest( HttpServletRequest request, HttpServletResponse response )
                     throws FileNotFoundException, IOException
     {
+        String pathInfo = request.getPathInfo();
+        DateFormat df = getDateFormat();
+
         try
         {
             boolean done = false;
             List repos = rcc.getRepos();
             RetrievalComponent rc = new DefaultRetrievalComponent();
             //This whole thing is inside out.  It should only check repos if local file not found
-            String pathInfo = request.getPathInfo();
             boolean isSnapshot = URLTool.isSnapshot( pathInfo );
             if ( isSnapshot )
             {
@@ -194,60 +207,73 @@ public class RepositoryServlet extends MavenProxyServlet
                     long size = -1;
                     long lastModified = -1;
 
-                    InputStream is;
-                    if ( !isSnapshot && f.exists() )
+                    InputStream is;/*
+                     if ( !isSnapshot && f.exists() )
+                     {
+                     LOGGER.info( "Retrieving from cache: " + f.getAbsolutePath() );
+                     is = new FileInputStream( f );
+                     size = f.length();
+                     lastModified = f.lastModified();
+                     }
+                     else
+                     {*/
+                    //So they've asked for a snapshot... lets check their headers and 304 them if they don't really want it
+                    if ( isSnapshot )
                     {
-                        LOGGER.info( "Retrieving from cache: " + f.getAbsolutePath() );
-                        is = new FileInputStream( f );
-                        size = f.length();
-                        lastModified = f.lastModified();
-                    }
-                    else
-                    {
-                        //So they've asked for a snapshot... lets check their headers and 304 them if they don't really want it
-                        if ( isSnapshot )
-                        {
-                            long clientLastModified = request.getDateHeader( "Last-Modified" );
-                            long cacheLastModified = snapshotCache.getLastModified( pathInfo );
+                        long clientLastModified = request.getDateHeader( "Last-Modified" );
+                        long cacheLastModified = snapshotCache.getLastModified( pathInfo );
 
-                            if ( cacheLastModified > -1 && clientLastModified > cacheLastModified )
+                        LOGGER.debug( "Client requested a snapshot newer than "
+                                        + df.format( new Date( clientLastModified ) ) );
+
+                        if ( cacheLastModified > -1 )
+                        {
+                            LOGGER.debug( "Our snapsnot was modified at " + df.format( new Date( cacheLastModified ) ) );
+
+                            if ( clientLastModified > cacheLastModified )
                             {
                                 //Cache hit - no snapshot update required.
-                                LOGGER.info("Client already has latest version of snapshot. Sending SC_NOT_MODIFIED");
+                                LOGGER.info( "Client already has latest version of snapshot. Sending SC_NOT_MODIFIED" );
                                 response.setDateHeader( "Last-Modified", cacheLastModified );
                                 response.sendError( HttpServletResponse.SC_NOT_MODIFIED );
                                 return;
                             }
-
                         }
-
-                        LOGGER.info( "Retrieving from upstream (" + repoConfig.getKey() + " " + f.getAbsolutePath() );
-                        try
+                        else
                         {
-                            RetrievalDetails rd = rc.retrieveArtifact( repoConfig, f, pathInfo, isSnapshot );
-                            is = rd.getInputStream();
-                            size = rd.getLength();
-                            lastModified = rd.getLastModified();
-                        }
-                        catch ( NotModifiedFetchException e )
-                        {
-                            //XXX should this just send an SC_NOT_MODIFIED?
-                            LOGGER.info( "Snapshot update not required : " + f.getAbsolutePath() );
-                            is = new FileInputStream( f );
-                            size = f.length();
-                            lastModified = f.lastModified();
+                            LOGGER.debug( "We haven't seen this snapshot before, or it was last checked too long ago" );
                         }
                     }
 
+                    //Now handle non snapshot requests
+                    LOGGER.info( "Retrieving from upstream (" + repoConfig.getKey() + " " + f.getAbsolutePath() );
+                    try
+                    {
+                        RetrievalDetails rd = rc.retrieveArtifact( repoConfig, f, pathInfo, isSnapshot );
+                        is = rd.getInputStream();
+                        size = rd.getLength();
+                        lastModified = rd.getLastModified();
+                    }
+                    catch ( NotModifiedFetchException e )
+                    {
+                        LOGGER.info( "Update not required : " + f.getAbsolutePath() );
+                        response.setDateHeader( "Last-Modified", f.lastModified() );
+                        response.sendError( HttpServletResponse.SC_NOT_MODIFIED );
+                        return;
+                    }
+                    /*
+                     }
+                     */
                     response.setContentType( "application/x-jar" );
                     response.setDateHeader( "Last-Modified", lastModified );
                     if ( size != -1 )
                     {
                         response.setContentLength( (int) size );
                     }
-                    
-                    if (isSnapshot) {
-                        snapshotCache.setLastModified(pathInfo, lastModified);
+
+                    if ( isSnapshot )
+                    {
+                        snapshotCache.setLastModified( pathInfo, lastModified );
                     }
 
                     OutputStream os = response.getOutputStream();
@@ -273,6 +299,11 @@ public class RepositoryServlet extends MavenProxyServlet
             e.printStackTrace();
             response.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage() );
         }
+        finally
+        {
+            LOGGER.info( "Download request complete: " + pathInfo );
+        }
+
     }
 
     /**
@@ -301,16 +332,20 @@ public class RepositoryServlet extends MavenProxyServlet
         context.put( "retrace", retrace );
         context.put( "pathInfo", pathInfo );
 
-        File dir = new File( localStoreDir, pathInfo );
-        File[] files = dir.listFiles();
-        if ( files == null )
-        {
-            files = new File[0];
-        }
         List repos = rcc.getRepos();
         Set fileElements = new TreeSet( new FileElementComparator( repos ) );
 
-        fileElements.addAll( MergedFileList.filenames( files, null ) );
+        /*
+         File dir = new File( localStoreDir, pathInfo );
+         File[] files = dir.listFiles();
+         if ( files == null )
+         {
+         files = new File[0];
+         }
+         Set fileElements = new TreeSet( new FileElementComparator( repos ) );
+
+         fileElements.addAll( MergedFileList.filenames( files, pathInfo, null ) );
+         */
 
         //Now we merge in any local file repositories that might be configured
         for ( int i = 0; i < repos.size(); i++ )
@@ -323,19 +358,28 @@ public class RepositoryServlet extends MavenProxyServlet
                 String path = repoConfig.getUrl().substring( 8 );
                 File fPath = new File( path, pathInfo );
                 File[] newfiles = fPath.listFiles();
-                fileElements.addAll( MergedFileList.filenames( newfiles, repoConfig ) );
+                fileElements.addAll( MergedFileList.filenames( newfiles, pathInfo, repoConfig ) );
             }
         }
 
         context.put( "fileElements", fileElements );
         context.put( "ab", new ABToggler() );
-        context.put( "dateFormat", dateFormatThreadLocal.get() );
+        context.put( "dateFormat", getDateFormat() );
         return getTemplate( "RepositoryServlet.vtl" );
     }
 
     public String getTopLevel()
     {
         return "REPOSITORY";
+    }
+
+    /**
+     * Retrieves and casts the appropriate DateFormat object from the ThreadLocal
+     * @return
+     */
+    private DateFormat getDateFormat()
+    {
+        return (DateFormat) dateFormatThreadLocal.get();
     }
 
 }

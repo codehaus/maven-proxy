@@ -2,39 +2,10 @@
 #parseHeader()
 
 
-#macro (createRow $imgSrc $length $lastModifiedDate $link $repoDescription)
-  #set ($lastModifiedString = "")
-  #if ( $lastModifiedDate.Class.Name == "java.util.Date")
-    #set ($lastModifiedString = $dateFormat.format( $lastModifiedDate ))
-  #end
-  
-  #set ($lengthString = "")
-  #if ($length.toString() != "-1")
-    #set ($lengthString = $length)
-  #end
-  
-        <tr class="${ab.Next}">
-          <td>
-            <a href="$link"><img src="$imgSrc" alt=""/></a>
-          </td>
-          <td style='text-align:right'>$lengthString</td>
-          <td>$lastModifiedString</td>
-          <td><a href="$link">$link</a></td>
-          <td>$repoDescription</td>
-          <td></td>
-        </tr>
-#end
 
-#macro (createRow2 $imgSrc $fileElement $repoDescription)
-  #if ($fileElement.isDirectory())
-    #createRow( $imgSrc $fileElement.length() $fileElement.lastModifiedDate() "${fileElement.Name}/" $repoDescription )
-  #else
-    #createRow( $imgSrc $fileElement.length() $fileElement.lastModifiedDate() "${fileElement.Name}" $repoDescription )
-  #end
-#end
+<h1>Browsing $pathInfo</h1>
 
-<div class='browse'>Browsing $pathInfo</div>
-
+<div class="h1">
 <table width="100%">
         <colgroup>
           <col width='20px'>
@@ -73,4 +44,6 @@
         #createRow2( "$retrace/images/jar.png" $fileElement $repoDescription )
       #end
     #end
+  </table>
+  </div>
 #parseFooter()

@@ -19,6 +19,7 @@ package org.apache.maven.proxy.config;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -175,5 +176,20 @@ public class RetrievalComponentConfiguration
     public void setSearchable( boolean searchable )
     {
         this.searchable = searchable;
+    }
+
+    /**
+     * @return the global repo configuration
+     */
+    public GlobalRepoConfiguration getGlobalRepo()
+    {
+        for ( Iterator iter = repos.iterator(); iter.hasNext(); )
+        {
+            RepoConfiguration repo = (RepoConfiguration) iter.next();
+            if (repo instanceof GlobalRepoConfiguration) {
+                return (GlobalRepoConfiguration) repo;
+            }            
+        }
+        return null;        
     }
 }

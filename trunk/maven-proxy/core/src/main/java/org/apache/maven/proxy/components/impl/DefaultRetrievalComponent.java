@@ -1,4 +1,4 @@
-package org.apache.maven.proxy;
+package org.apache.maven.proxy.components.impl;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -24,6 +24,8 @@ import org.apache.maven.fetch.FetchRequest;
 import org.apache.maven.fetch.FetchTool;
 import org.apache.maven.fetch.exceptions.FetchException;
 import org.apache.maven.fetch.exceptions.ResourceNotFoundFetchException;
+import org.apache.maven.proxy.RetrievalDetails;
+import org.apache.maven.proxy.components.RetrievalComponent;
 import org.apache.maven.proxy.config.FileRepoConfiguration;
 import org.apache.maven.proxy.config.HttpRepoConfiguration;
 import org.apache.maven.proxy.config.RepoConfiguration;
@@ -44,8 +46,8 @@ public class DefaultRetrievalComponent implements RetrievalComponent
     public RetrievalDetails retrieveArtifact( RepoConfiguration rc, File out, String url, boolean checkModified )
                     throws FetchException, FileNotFoundException
     {
-        FetchRequest fr = new FetchRequest( rc.getUrl() + "/" + url );
-        LOGGER.info( "Retrieving URL: " + fr.getUrl() );
+        FetchRequest fr = new FetchRequest( rc.getUrl() + url );
+        LOGGER.info( rc + ": Retrieving URL: " + fr.getUrl() );
         if ( rc instanceof HttpRepoConfiguration )
         {
             HttpRepoConfiguration hrc = (HttpRepoConfiguration) rc;
@@ -71,13 +73,10 @@ public class DefaultRetrievalComponent implements RetrievalComponent
             File fPath = frc.getLocalFile( url );
             if ( fPath.exists() )
             {
+                LOGGER.info( rc + ": Found " + fPath + " in repository" );
                 return new RetrievalDetails( fPath );
-
             }
-            else
-            {
-                throw new ResourceNotFoundFetchException( fPath.getAbsolutePath() );
-            }
+            throw new ResourceNotFoundFetchException( fPath.getAbsolutePath() );
         }
 
         FetchTool bean = new FetchTool();

@@ -7,10 +7,11 @@
     <attainGoal name="build:snapshot:dist"/>
   </goal>
   
-  <pregoal name="test:test-resources">
+  <preGoal name="test:test-resources">
     <mkdir dir="target/repo"/>
-  </pregoal>
-  
+    <mkdir dir="target/repo-local"/>
+  </preGoal>
+    
   <goal name="build:snapshot:dist">
     <zip file="target/maven-proxy-standalone-SNAPSHOT.zip">
       <fileset dir="target">

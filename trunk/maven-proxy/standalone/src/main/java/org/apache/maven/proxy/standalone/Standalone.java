@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.maven.proxy.AdminServlet;
 import org.apache.maven.proxy.ConfigServlet;
 import org.apache.maven.proxy.RedirectServlet;
 import org.apache.maven.proxy.RepositoryServlet;
@@ -164,6 +165,7 @@ public class Standalone
         sh.addServlet( "search", "/servlets/Search", SearchServlet.class.getName() );
         sh.addServlet( "config", "/servlets/Config", ConfigServlet.class.getName() );
         sh.addServlet( "redirect", "/", RedirectServlet.class.getName() );
+        sh.addServlet( "admin", "/servlets/Admin", AdminServlet.class.getName() );
         //sh.addServlet( "webdav", "/webdav/*", ResourceServlet.class.getName() );
 
         context.setAttribute( "config", rcc );

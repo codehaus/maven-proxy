@@ -1,9 +1,11 @@
 package org.apache.maven.proxy.components;
 
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
+
 /**
  * @author Ben Walding
  */
-public interface SnapshotCache
+public interface SnapshotCache extends Startable
 {
     long getLastModified( String item );
 

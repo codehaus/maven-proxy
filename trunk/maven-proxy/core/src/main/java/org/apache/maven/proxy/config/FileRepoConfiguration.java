@@ -26,21 +26,51 @@ import java.io.File;
  */
 public class FileRepoConfiguration extends RepoConfiguration
 {
-	private final String basePath;
+    private final String basePath;
 
-	public FileRepoConfiguration(String key, String url, String description, boolean copy) {
-		super( key, url, description, copy );
-		basePath = url.substring( 8 );
-	}
+    public FileRepoConfiguration( String key, String url, String description, boolean copy )
+    {
+        super( key, url, description, copy );
+        basePath = url.substring( 8 );
+    }
 
-	public String getBasePath()
-	{
-		return basePath;
-	}
+    public String getBasePath()
+    {
+        return basePath;
+    }
 
-	public File getLocalFile( String path )
-	{
-		return new File( basePath + path );
-	}
+    /**
+     * Given a relative path, returns the absolute file in the repository
+     */
+    public File getLocalFile( String path )
+    {
+        return new File( basePath + path );
+    }
 
+    /**
+     * Given an absolute file, returns the relative path
+     * @param currentFile
+     * @return
+     * @throws IOException
+     */
+    /*
+    public String getRelativePath( File file ) throws IOException
+    {
+        File basePathFile = new File( getBasePath() );
+        File currentFile = file;
+        String result = "";
+
+        while ( currentFile != null )
+        {
+            
+            if ( currentFile.getCanonicalFile().equals( basePathFile.getCanonicalFile() ) )
+            {
+                return result;
+            }
+
+            result = "/" + currentFile.getName() + result;
+            currentFile = currentFile.getParentFile();
+        }
+        throw new IllegalStateException( file + " was not found under " + basePath );
+    }*/
 }
