@@ -148,22 +148,23 @@ public class RepositoryServlet extends HttpServlet
                 System.out.println( "Ideally download a new snapshot of this file" );
             }
 
+            File f = getFileForRequest(request);
+            
+            //Basically, we were asked for /repository/a but "a" is a directory, so we need to go to /repository/a/ 
+            if (f.isDirectory()) {
+                LOGGER.info("Redirecting /repository/a -> /repository/a/");
+                response.sendRedirect(request.getRequestURI() + "/");
+                return;
+            }
+            f.getParentFile().mkdirs();
+            
+            
             for ( int i = 0; i < repos.size(); i++ )
             {
                 RepoConfiguration repoConfig = (RepoConfiguration) repos.get( i );
 
                 try
                 {
-                    File f = getFileForRequest(request);
-                    
-                    //Basically, we were asked for /repository/a but "a" is a directory, so we need to go to /repository/a/ 
-                    if (f.isDirectory()) {
-                        LOGGER.info("Stupid user... /repository/a -> /repository/a/");
-                        response.sendRedirect(request.getRequestURI() + "/");
-                        return;
-                    }
-                    
-                    f.getParentFile().mkdirs();
                     long size = -1;
                     long lastModified = -1;
 
