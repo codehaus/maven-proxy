@@ -65,6 +65,7 @@ public class DownloadEngine
         }
         catch ( Exception e )
         {
+            LOGGER.error( e );
             response.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
     }
