@@ -1,0 +1,7 @@
+<project default="build:snapshot">
+
+  <goal name="build:snapshot">
+    <attainGoal name="war:webapp"/>
+  </goal>
+  
+</project>
