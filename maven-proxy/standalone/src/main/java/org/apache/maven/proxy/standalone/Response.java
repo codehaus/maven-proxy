@@ -65,8 +65,8 @@ import java.io.InputStream;
 public class Response
 {
 	private InputStream inputStream;
-    private String contentType;
-    private long contentLength;
+    private String contentType = "application/octet-stream";
+    private long contentLength = -1;
     /**
 	 * @return Returns the inputStream.
 	 */

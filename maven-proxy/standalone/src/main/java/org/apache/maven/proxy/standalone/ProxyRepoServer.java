@@ -12,8 +12,7 @@ public class ProxyRepoServer extends HttpServer
 {
 	private String classpath;
 
-	private static int DefaultServerPort = 2001;
-
+	
 	/**
 	 * Constructs a ClassFileServer.
 	 *
@@ -35,11 +34,13 @@ public class ProxyRepoServer extends HttpServer
 	 * @exception ClassNotFoundException if the class corresponding
 	 * to <b>path</b> could not be loaded.
 	 */
-	public Response getResult(String path) throws IOException
+	public Response getResult(Request request) throws IOException
 	{
-		System.out.println("reading: " + path);
-		File f = new File(classpath + File.separator + path.replace('.', File.separatorChar) + ".class");
-		int length = (int) (f.length());
+		System.out.println("reading: " + request);
+		
+        
+        
+        int length = (int) (f.length());
 
 		if (length == 0)
 		{
@@ -57,54 +58,5 @@ public class ProxyRepoServer extends HttpServer
 		}
 	}
 
-	/**
-	 * Main method to create the class server that reads
-	 * class files. This takes two command line arguments, the
-	 * port on which the server accepts requests and the
-	 * root of the classpath. To start up the server: <br><br>
-	 *
-	 * <code>   java ClassFileServer <port> <classpath>
-	 * </code><br><br>
-	 *
-	 * The codebase of an RMI server using this webserver would
-	 * simply contain a URL with the host and port of the web
-	 * server (if the webserver's classpath is the same as
-	 * the RMI server's classpath): <br><br>
-	 *
-	 * <code>   java -Djava.rmi.server.codebase=http://zaphod:2001/ RMIServer
-	 * </code> <br><br>
-	 *
-	 * You can create your own class server inside your RMI server
-	 * application instead of running one separately. In your server
-	 * main simply create a ClassFileServer: <br><br>
-	 *
-	 * <code>   new ClassFileServer(port, classpath);
-	 * </code>
-	 */
-	public static void main(String args[])
-	{
-		int port = DefaultServerPort;
-		String classpath = "";
-
-		if (args.length >= 1)
-		{
-			port = Integer.parseInt(args[0]);
-		}
-
-		if (args.length >= 2)
-		{
-			classpath = args[1];
-		}
-
-		try
-		{
-			new ProxyRepoServer(port, classpath);
-			System.out.println("ClassFileServer started...");
-		}
-		catch (IOException e)
-		{
-			System.out.println("Unable to start ClassServer: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
+	
 }

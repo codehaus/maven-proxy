@@ -19,6 +19,7 @@ public class HttpServerTest extends TestCase
 	{
 		HttpServer server = new ProxyRepoServer(9999, "bleh");
 		Thread.sleep(60000);
+        
 	}
     
     

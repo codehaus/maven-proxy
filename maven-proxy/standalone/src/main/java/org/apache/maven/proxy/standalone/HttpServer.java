@@ -44,7 +44,7 @@ public abstract class HttpServer implements Runnable
 	 * to <b>path</b> could not be loaded.
 	 * @exception IOException if error occurs reading the class
 	 */
-	public abstract Response getResult(String path) throws IOException;
+	public abstract Response getResponse(Request request) throws IOException;
 
 	/**
 	 * The "listen" thread that accepts a connection to the
@@ -79,17 +79,18 @@ public abstract class HttpServer implements Runnable
 			{
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				String path = getPath(in);
-				Response rr = getResult(path);
+                Request request = new Request(path);
+				Response response = getResponse(request);
 				// send bytecodes in response (assumes HTTP/1.0 or later)
 				try
 				{
 					out.writeBytes("HTTP/1.0 200 OK\r\n");
-					if (rr.getContentLength() != -1)
+					if (response.getContentLength() != -1)
 					{
-						out.writeBytes("Content-Length: " + rr.getContentLength() + "\r\n");
+						out.writeBytes("Content-Length: " + response.getContentLength() + "\r\n");
 					}
-					out.writeBytes("Content-Type: application/octet-stream\r\n\r\n");
-					transferStream(rr.getInputStream(), out);
+					out.writeBytes("Content-Type: " + response.getContentType() + "\r\n\r\n");
+					transferStream(response.getInputStream(), out);
 					out.flush();
 				}
 				catch (IOException ie)
