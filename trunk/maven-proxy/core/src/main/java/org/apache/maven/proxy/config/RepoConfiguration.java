@@ -17,7 +17,6 @@ package org.apache.maven.proxy.config;
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.maven.proxy.components.NotFoundProxyArtifact;
@@ -131,12 +130,11 @@ public abstract class RepoConfiguration
     public abstract RetrievalDetails retrieveArtifact( File out, String url ) throws IOException;
 
     /**
-     * 
      * @param url
      * @return
-     * @throws FileNotFoundException
+     * @throws Exception Should not throw exceptions, but if it does, maven-proxy handles it.
      */
-    protected abstract ProxyArtifact getMetaInformationInternal( String url ) throws FileNotFoundException;
+    protected abstract ProxyArtifact getMetaInformationInternal( String url ) throws Exception;
 
     /**
      * This routine will not throw an exception unless there is a catastrophic failure.
