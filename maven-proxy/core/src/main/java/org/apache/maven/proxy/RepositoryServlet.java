@@ -32,6 +32,7 @@ public class RepositoryServlet extends HttpServlet
      */
     protected long getLastModified(HttpServletRequest request)
     {
+        LOGGER.info("Checking getLastModified(): " + request.getPathInfo());
         File f = new File(baseDir + request.getPathInfo());
         if (f.exists() && f.isFile())
         {
