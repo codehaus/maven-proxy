@@ -18,4 +18,14 @@ public class NoCacheSnapshotCache implements SnapshotCache
         //Nothing to do
     }
 
+    
+    public void start() throws Exception
+    {
+        //Nothing to do
+    }
+
+    public void stop() throws Exception
+    {
+        //Nothing to do
+    }
 }

@@ -1,12 +1,60 @@
 #set ($pageTitle = "Search proxy")
 #parseHeader()
 
+<h1>Search Criteria</h1>
+<div class="h1">
+<form action="Search" method="get">
 <table>
   <tbody>
-    <tr>
-      <td>Searching for</td><td>$!searchControls.Search</td>
-    </tr>
+    <tr><input name="search" value="$!searchControls.Search"/></tr>
+    <tr><input type="submit" value="Search"/></tr>    
   </tbody>
 </table>
+</form>
+</div>
 
+#if ($searchResults)
+
+<br/>
+<h1>Search Results</h1>
+<div class="h1">
+  Searching for "$!searchControls.Search"
+  <br/>
+
+<table width="100%">
+##  <thead>
+        <colgroup>
+          <col width='20px'>
+          <col width='50px'>
+          <col width='180px'>
+          <col width='*'>
+          <col width='*'>
+          <col width='5*'>
+        </colgroup>
+        
+        <tr class="$ab.Next">
+          <th></th>
+          <th>Size (bytes)</th>
+          <th>Last Modified</th>
+          <th>Name</th>
+          <th>Repository</th>
+          <th></th>
+        </tr>
+##    </thead>
+##    <tbody>
+    #foreach ($fileElement in $searchResults)
+      #if ( $fileElement.Repo )
+        #set ($repoDescription = $fileElement.getRepo().getDescription())
+      #else
+		#set ($repoDescription = "Global Repository")
+	  #end
+
+      #createRow( "../images/jar.png" $fileElement.Length $fileElement.lastModifiedDate() "../repository${fileElement.RelativePath}/${fileElement.Name}" "${fileElement.RelativePath}/${fileElement.Name}" $repoDescription )
+    #end
+##    </tbody>
+  </table>
+</div>
+
+</div>
+#end
 #parseFooter()

@@ -33,7 +33,7 @@ public class PropertyLoaderTest extends TestCase
 {
     /** log4j logger */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger( PropertyLoaderTest.class );
-    
+
     public void testSimple() throws IOException, ValidationException
     {
         InputStream is = PropertyLoaderTest.class.getResourceAsStream( "PropertyLoaderTest1.properties" );
@@ -62,11 +62,22 @@ public class PropertyLoaderTest extends TestCase
 
         /////////////////////// Check Repos ////////////////////////
         List repos = rcc.getRepos();
-        assertEquals( "repos.size()", 4, repos.size() );
-        verifyRepoLocal( (FileRepoConfiguration) repos.get( 0 ) );
-        verifyRepoIbiblio( (HttpRepoConfiguration) repos.get( 1 ) );
-        verifyRepoDist( (HttpRepoConfiguration) repos.get( 2 ) );
-        verifyRepoPrivate( (HttpRepoConfiguration) repos.get( 3 ) );
+        assertEquals( "repos.size()", 5, repos.size() );
+        verifyRepoGlobal( (GlobalRepoConfiguration) repos.get( 0 ) );
+
+        verifyRepoGlobal( rcc.getGlobalRepo() );
+
+        verifyRepoLocal( (FileRepoConfiguration) repos.get( 1 ) );
+        verifyRepoIbiblio( (HttpRepoConfiguration) repos.get( 2 ) );
+        verifyRepoDist( (HttpRepoConfiguration) repos.get( 3 ) );
+        verifyRepoPrivate( (HttpRepoConfiguration) repos.get( 4 ) );
+    }
+
+    private void verifyRepoGlobal( GlobalRepoConfiguration configuration )
+    {
+        assertNotNull( "configuration", configuration );
+        assertEquals( "configuration.getUrl()", "file:///./target/repo", configuration.getUrl() );
+        assertEquals( "configuration.getDescription()", "Global Repository", configuration.getDescription() );
     }
 
     private void verifyRepoLocal( FileRepoConfiguration configuration )
@@ -169,7 +180,7 @@ public class PropertyLoaderTest extends TestCase
         }
         catch ( ValidationException ex )
         {
-            LOGGER.info("Received expected validation exception : " + ex);
+            LOGGER.info( "Received expected validation exception : " + ex );
             // expected
         }
     }
@@ -202,7 +213,7 @@ public class PropertyLoaderTest extends TestCase
             assertThrowsValidationException( loader, props );
         }
         finally
-        {            
+        {
             ResourceUtil.close( is );
         }
     }

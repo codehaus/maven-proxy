@@ -54,7 +54,10 @@ public class PropertyLoader
     {
         RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
 
-        rcc.setLocalStore( getMandatoryProperty( props, REPO_LOCAL_STORE ) );
+        String localStore = getMandatoryProperty( props, REPO_LOCAL_STORE );
+        GlobalRepoConfiguration globalRepo = new GlobalRepoConfiguration( localStore );
+        rcc.setLocalStore( localStore );
+        rcc.addRepo( globalRepo );
 
         if ( props.getProperty( PORT ) == null )
         {

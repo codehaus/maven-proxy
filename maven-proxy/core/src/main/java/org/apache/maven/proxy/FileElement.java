@@ -12,11 +12,13 @@ import org.apache.maven.proxy.config.RepoConfiguration;
 public class FileElement
 {
     private final File file;
+    private final String relativePath;
     private final RepoConfiguration repo;
 
-    public FileElement( File file, RepoConfiguration repo )
+    public FileElement( File file, String relativePath, RepoConfiguration repo )
     {
         this.file = file;
+        this.relativePath = relativePath;
         //Could get away with passing the repo in - just need repo ordering key and description
         this.repo = repo;
     }
@@ -44,6 +46,11 @@ public class FileElement
         return file;
     }
 
+    public String getRelativePath()
+    {
+        return relativePath;
+    }
+
     public String getName()
     {
         return getFile().getName();
@@ -63,7 +70,8 @@ public class FileElement
         {
             return null;
         }
-        
+
         return new Date( getFile().lastModified() );
     }
+
 }

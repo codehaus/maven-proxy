@@ -1,4 +1,4 @@
-package org.apache.maven.proxy;
+package org.apache.maven.proxy.components;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.apache.maven.fetch.exceptions.FetchException;
+import org.apache.maven.proxy.RetrievalDetails;
 import org.apache.maven.proxy.config.RepoConfiguration;
 
 /**

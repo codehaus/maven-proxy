@@ -58,7 +58,7 @@ public class DefaultSnapshotCache implements SnapshotCache
                 return -1;
             }
 
-            return cacheElement.lastUpdated;
+            return cacheElement.lastModified;
         }
     }
 
@@ -81,6 +81,22 @@ public class DefaultSnapshotCache implements SnapshotCache
 
             cacheElement.lastModified = lastModified;
             cacheElement.lastUpdated = System.currentTimeMillis();
+        }
+    }
+
+    public void start() throws Exception
+    {
+        synchronized ( cache )
+        {
+            cache.clear();
+        }
+    }
+
+    public void stop() throws Exception
+    {
+        synchronized ( cache )
+        {
+            cache.clear();
         }
     }
 

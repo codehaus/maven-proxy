@@ -12,16 +12,16 @@ import org.apache.maven.proxy.config.RepoConfiguration;
  */
 public class MergedFileList
 {
-    public static List filenames(File[] input, RepoConfiguration repo)
+    public static List filenames( File[] input, String relativePath, RepoConfiguration repo )
     {
         List array = new ArrayList();
-        if (input != null)
+        if ( input != null )
         {
-            for (int i = 0; i < input.length; i++)
+            for ( int i = 0; i < input.length; i++ )
             {
                 File file = input[i];
-                FileElement fe = new FileElement(file, repo);
-                array.add(fe);
+                FileElement fe = new FileElement( file, relativePath, repo );
+                array.add( fe );
             }
         }
         return array;

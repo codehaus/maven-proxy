@@ -1,5 +1,6 @@
 package org.apache.maven.proxy.config;
 
+
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
  * 
@@ -28,8 +29,8 @@ public abstract class RepoConfiguration
     private final String description;
     private final String url;
     private final boolean copy;
-    
-    public RepoConfiguration(String key, String url, String description, boolean copy)
+
+    public RepoConfiguration( String key, String url, String description, boolean copy )
     {
         this.key = key;
         this.url = url;
@@ -45,8 +46,6 @@ public abstract class RepoConfiguration
         return url;
     }
 
-    
-
     /**
      * @return
      */
@@ -54,7 +53,7 @@ public abstract class RepoConfiguration
     {
         return key;
     }
-    
+
     /**
      * If a file repository is set to "copy" mode, it will copy the found files into 
      * the main repository store.
@@ -64,9 +63,15 @@ public abstract class RepoConfiguration
     {
         return copy;
     }
-    
-    public String getDescription() {
+
+    public String getDescription()
+    {
         return description;
+    }
+
+    public String toString()
+    {
+        return "Repo[" + getKey() + "]";
     }
 
 }
