@@ -22,7 +22,7 @@ package org.apache.maven.proxy.config;
  * @author  Ben Walding
  * @version $Id$
  */
-public class RepoConfiguration
+public abstract class RepoConfiguration
 {
     private final String key;
     private final String description;
