@@ -9,7 +9,6 @@ import org.apache.maven.fetch.FetchRequest;
 import org.apache.maven.fetch.FetchResponse;
 import org.apache.maven.fetch.FetchTool;
 import org.apache.maven.fetch.exceptions.FetchException;
-import org.apache.maven.fetch.exceptions.ResourceNotFoundFetchException;
 
 /**
  * @author  Ben Walding
