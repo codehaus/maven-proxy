@@ -4,3 +4,4 @@ maven.log
 .project
 .classpath
 velocity.log
+.clover

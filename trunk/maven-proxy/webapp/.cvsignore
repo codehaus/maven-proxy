@@ -1,2 +1,5 @@
 .classpath
 .project
+.clover
+target
+maven.log
