@@ -50,7 +50,22 @@ public class Standalone
             return;
         }
 
-        props = loadAndValidateProperties(args[0]);
+        try
+        {
+            props = loadAndValidateProperties(args[0]);
+        }
+        catch (ValidationException e)
+        {
+            Throwable t = e;
+
+            System.err.println("Error while loading properties:");
+
+            while (t != null)
+            {
+                System.err.println("  " + t.getLocalizedMessage());
+                t = t.getCause();
+            }
+        }
         // a error message should have been displayed
         if (props == null)
             return;
@@ -102,12 +117,12 @@ public class Standalone
      *       logging to the handler of the exception.
      * @param filename The name of the properties file.
      * @return Returns a <code>Properties</code> object if the load and validation was successfull.
+     * @throws ValidationException If there was any problem validating the properties
      */
-    private Properties loadAndValidateProperties(String filename)
+    private Properties loadAndValidateProperties(String filename) throws ValidationException
     {
         File file;
         Properties p;
-        String tmp;
 
         file = new File(filename);
 
@@ -124,48 +139,43 @@ public class Standalone
         }
         catch (IOException ex)
         {
-            Throwable t = ex;
 
-            System.err.println("Error while loading properties:");
+            throw new ValidationException(ex);
+        }
 
-            while (t != null)
+        {
+            //Verify local repository set
+            String tmp = checkPropertySet(p, ProxyProperties.REPOSITORY_LOCAL);
+
+            file = new File(tmp);
+            if (!file.exists())
             {
-                System.err.println("  " + t.getLocalizedMessage());
-                t = t.getCause();
+                throw new ValidationException("The local repository doesn't exist: " + file.getAbsolutePath());
             }
 
-            return null;
+            if (!file.isDirectory())
+            {
+                throw new ValidationException("The local repository must be a directory: " + file.getAbsolutePath());
+            }
         }
 
-        // validate
-        tmp = p.getProperty(ProxyProperties.REPOSITORY_LOCAL);
-        if (tmp == null)
         {
-            System.err.println("Missing property '" + ProxyProperties.REPOSITORY_LOCAL + "'");
-            return null;
-        }
-
-        file = new File(tmp);
-        if (!file.exists())
-        {
-            System.err.println("The local repository doesn't exist: " + file.getAbsolutePath());
-            return null;
-        }
-
-        if (!file.isDirectory())
-        {
-            System.err.println("The local repository must be a directory: " + file.getAbsolutePath());
-            return null;
-        }
-
-        tmp = p.getProperty("repository.remote");
-        if (tmp == null)
-        {
-            System.err.println("Missing property 'repository.remote'");
-            return null;
+            //Verify remote repository set
+            String tmp = checkPropertySet(p, ProxyProperties.REPOSITORY_REMOTE);
         }
 
         // all ok
         return p;
+    }
+
+    private String checkPropertySet(Properties p, String value) throws ValidationException
+    {
+        String prop = p.getProperty(value);
+        if (prop == null)
+        {
+            throw new ValidationException("Missing property '" + value + "'");
+        }
+
+        return prop;
     }
 }
