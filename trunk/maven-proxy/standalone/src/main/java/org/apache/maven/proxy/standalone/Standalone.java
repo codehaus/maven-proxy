@@ -90,7 +90,7 @@ public class Standalone
         repository = props.getProperty("repository.local");
 
         System.out.println("Saving repository at " + repository);
-        System.out.println("Starting");
+        System.out.println("Starting...");
 
         HttpServer server = new HttpServer();
         SocketListener listener = new SocketListener();
@@ -99,16 +99,14 @@ public class Standalone
 
         HttpContext context = new HttpContext();
         context.setContextPath("/");
-        context.setResourceBase("./docroot/");
         ServletHandler sh = new ServletHandler();
         sh.addServlet("Repository", "/*", RepositoryServlet.class.getName());
         context.setAttribute("properties", props);
         context.addHandler(sh);
-        context.addHandler(new ResourceHandler());
         server.addContext(context);
 
         server.start();
-        System.out.println("Started");
+        System.out.println("Started.");
     }
 
     /**
