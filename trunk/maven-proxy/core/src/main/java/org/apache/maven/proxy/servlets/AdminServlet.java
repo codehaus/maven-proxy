@@ -22,8 +22,15 @@ public class AdminServlet extends MavenProxyServlet
     {
         if ( request.getParameter( "clearSnapshotCache" ) != null )
         {
-            RepositoryServlet.clearSnapshotCache();            
+            RepositoryServlet.clearSnapshotCache();
         }
+
+        if ( request.getParameter( "shutdown" ) != null )
+        {
+            //FIXME need to stop accepting connections, finish ones that are going, then shutdown Jetty.
+            System.exit( 0 );
+        }
+
         return getTemplate( "AdminServlet.vtl" );
     }
 
