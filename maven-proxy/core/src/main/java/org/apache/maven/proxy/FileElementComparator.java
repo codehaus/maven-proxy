@@ -29,8 +29,13 @@ public class FileElementComparator implements Comparator
             return 1;
         }
         
+        
         int nameCompare = fe1.getFile().getName().compareTo(fe2.getFile().getName());
         if (nameCompare != 0) { return nameCompare; }
+
+        if (fe1.isDirectory() && fe2.isDirectory()) {
+            return 0;
+        }
 
         if (fe1.getRepo() == null) { return -1; }
 
