@@ -11,6 +11,8 @@
         <include name="maven-proxy-standalone-*uber.jar"/>
       </fileset>
     </zip>
+    <copy file="target/maven-proxy-standalone-SNAPSHOT.zip"
+          todir="/dist/maven-proxy/distributions/"/>
   </goal>
   
   <goal name="run" prereqs="jar:jar">
