@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project>
   <pomVersion>3</pomVersion>
+  <extend>../common/base-project.xml</extend>
   
   <id>maven-proxy-webapp</id>
   <name>Maven Repository Proxy</name>
