@@ -27,27 +27,6 @@
     </url>
   </repository>
 
-  <dependencies>
-    <dependency>
-      <id>servletapi</id>
-      <version>2.3</version>
-    </dependency>
-    
-    <dependency>
-      <id>jetty</id>
-      <version>4.2.9</version>
-    </dependency>
-
-	<dependency>
-      <id>log4j</id>
-      <version>1.2.8</version>
-    </dependency>
-
-    <dependency>
-      <id>maven:maven-fetch</id>
-      <version>SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
