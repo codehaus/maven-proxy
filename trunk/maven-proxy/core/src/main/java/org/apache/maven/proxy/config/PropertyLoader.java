@@ -83,7 +83,8 @@ public class PropertyLoader
         }
 
         rcc.setSnapshotUpdate( Boolean.valueOf( getMandatoryProperty( props, SNAPSHOT_UPDATE ) ).booleanValue() );
-        rcc.setSnapshotCacheFailures( Boolean.valueOf( getMandatoryProperty( props, SNAPSHOT_CACHE_FAILURES ) ).booleanValue() );
+        rcc.setSnapshotCacheFailures( Boolean.valueOf( getOptionalProperty( props, SNAPSHOT_CACHE_FAILURES, "false" ) )
+                        .booleanValue() );
         if ( props.getProperty( SNAPSHOT_UPDATE_INTERVAL ) == null )
         {
             rcc.setSnapshotUpdateInterval( 0 );
