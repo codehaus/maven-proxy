@@ -7,7 +7,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
  */
 public interface SnapshotCache extends Startable
 {
-    long getLastModified( String item );
+    ProxyArtifact getSnapshot( String path );
 
-    void setLastModified( String item, long lastModified );
+    void setSnapshot( String path, ProxyArtifact snapshot );
+
 }

@@ -38,48 +38,29 @@ public class ProxyConfiguration
         this.password = password;
     }
     
-    
-    
-    /**
-     * @return
-     */
     public String getHost()
     {
         return host;
     }
 
-    /**
-     * @return
-     */
     public String getKey()
     {
         return key;
     }
 
-    /**
-     * @return
-     */
     public String getPassword()
     {
         return password;
     }
 
-    /**
-     * @return
-     */
     public int getPort()
     {
         return port;
     }
 
-    /**
-     * @return
-     */
     public String getUsername()
     {
         return username;
     }
-
-    
 
 }

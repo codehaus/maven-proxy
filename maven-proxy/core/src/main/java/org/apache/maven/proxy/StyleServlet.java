@@ -5,18 +5,29 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
-import org.apache.velocity.servlet.VelocityServlet;
 
 /**
  * @author Ben Walding
  */
-public class StyleServlet extends VelocityServlet
+public class StyleServlet extends MavenProxyServlet
 {
 
-    protected Template handleRequest( HttpServletRequest arg0, HttpServletResponse response, Context arg2 )
+    public Template handleRequestInternal( HttpServletRequest request, HttpServletResponse response, Context context )
                     throws Exception
     {
-        response.setContentType("text/css");
-        return getTemplate("StyleServlet.vtl");
+        context.put( "bgColor", getRCC().getBgColor() );
+        context.put( "bgColorHighlight", getRCC().getBgColorHighlight() );
+        context.put( "rowColor", getRCC().getRowColor() );
+        context.put( "rowColorHighlight", getRCC().getRowColorHighlight() );
+        response.setContentType( "text/css" );
+        return getTemplate( "StyleServlet.vtl" );
+    }
+
+    /** 
+     * Not used.
+     */
+    public String getTopLevel()
+    {
+        return "MISC";
     }
 }

@@ -17,6 +17,16 @@ package org.apache.maven.proxy.config;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.apache.maven.proxy.IOUtility;
+import org.apache.maven.proxy.RetrievalDetails;
+import org.apache.maven.proxy.components.ProxyArtifact;
 
 /**
  * Strips file:/// off the front of the configured URL and uses that to find files locally.
@@ -28,9 +38,9 @@ public class FileRepoConfiguration extends RepoConfiguration
 {
     private final String basePath;
 
-    public FileRepoConfiguration( String key, String url, String description, boolean copy )
+    public FileRepoConfiguration( String key, String url, String description, boolean copy, boolean hardFail )
     {
-        super( key, url, description, copy );
+        super( key, url, description, copy, hardFail );
         basePath = url.substring( 8 );
     }
 
@@ -47,30 +57,55 @@ public class FileRepoConfiguration extends RepoConfiguration
         return new File( basePath + path );
     }
 
-    /**
-     * Given an absolute file, returns the relative path
-     * @param currentFile
-     * @return
-     * @throws IOException
-     */
-    /*
-    public String getRelativePath( File file ) throws IOException
+    public RetrievalDetails retrieveArtifact( File out, String url ) throws IOException
     {
-        File basePathFile = new File( getBasePath() );
-        File currentFile = file;
-        String result = "";
-
-        while ( currentFile != null )
+        try
         {
-            
-            if ( currentFile.getCanonicalFile().equals( basePathFile.getCanonicalFile() ) )
+            File file = getLocalFile( url );
+            if ( !file.exists() )
             {
-                return result;
+                throw new FileNotFoundException();
             }
 
-            result = "/" + currentFile.getName() + result;
-            currentFile = currentFile.getParentFile();
+            if ( getCopy() )
+            {
+                InputStream is = new FileInputStream( file );
+                OutputStream os = new FileOutputStream( out );
+                IOUtility.transferStream( is, os );
+                //out.setLastModified( file.lastModified() );
+                IOUtility.close( is );
+                IOUtility.close( os );
+            }
+            return new RetrievalDetails( out );
         }
-        throw new IllegalStateException( file + " was not found under " + basePath );
-    }*/
+        catch ( Exception e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    public long getLastModified( String url )
+    {
+        ProxyArtifact snapshot = getSnapshot( url );
+
+        if ( snapshot == null )
+        {
+            return snapshot.getLastModified();
+        }
+        return -1;
+    }
+
+    public ProxyArtifact getSnapshot( String url )
+    {
+        File file = getLocalFile( url );
+
+        if ( file.exists() )
+        {
+            ProxyArtifact snapshot = new ProxyArtifact( this, url );
+            snapshot.setSize( file.length() );
+            snapshot.setLastModified( file.lastModified() );
+            return snapshot;
+        }
+        return null;
+    }
 }

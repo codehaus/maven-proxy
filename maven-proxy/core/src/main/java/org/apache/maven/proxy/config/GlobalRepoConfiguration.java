@@ -7,7 +7,7 @@ public class GlobalRepoConfiguration extends FileRepoConfiguration
 {
     public GlobalRepoConfiguration( String basePath )
     {
-        super( "global", "file:///" + basePath, "Global Repository", false );
+        super( "global", "file:///" + basePath, "Global Repository", false, true );
     }
 
 }

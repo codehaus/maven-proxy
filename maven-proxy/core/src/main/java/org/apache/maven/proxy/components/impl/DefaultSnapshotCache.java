@@ -3,6 +3,7 @@ package org.apache.maven.proxy.components.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.proxy.components.ProxyArtifact;
 import org.apache.maven.proxy.components.SnapshotCache;
 
 class CacheElement
@@ -10,8 +11,8 @@ class CacheElement
     //Full name of artifact
     String item;
 
-    //When was the artifact modified
-    long lastModified;
+    //Snapshot details
+    ProxyArtifact snapshot;
 
     //When was this cache entry last updated
     long lastUpdated;
@@ -36,7 +37,7 @@ public class DefaultSnapshotCache implements SnapshotCache
         this.snapshotUpdateInterval = snapshotUpdateInterval;
     }
 
-    public long getLastModified( String item )
+    public ProxyArtifact getSnapshot( String item )
     {
         synchronized ( cache )
         {
@@ -46,8 +47,9 @@ public class DefaultSnapshotCache implements SnapshotCache
             if ( cacheElement == null )
             {
                 LOGGER.debug( "Unable to find " + item + " in snapshot cache" );
-                return -1;
+                return null;
             }
+            
 
             long age = System.currentTimeMillis() - cacheElement.lastUpdated;
             if ( age > snapshotUpdateInterval )
@@ -55,14 +57,14 @@ public class DefaultSnapshotCache implements SnapshotCache
                 LOGGER.info( "Expiring " + cacheElement.item + " from snapshot cache (" + age + " > "
                                 + snapshotUpdateInterval + ")" );
                 cache.remove( item );
-                return -1;
+                return null;
             }
 
-            return cacheElement.lastModified;
+            return cacheElement.snapshot;
         }
     }
 
-    public void setLastModified( String item, long lastModified )
+    public void setSnapshot( String item, ProxyArtifact snapshot )
     {
         synchronized ( cache )
         {
@@ -79,7 +81,7 @@ public class DefaultSnapshotCache implements SnapshotCache
                 LOGGER.info( "Updating " + item + " in snapshot cache" );
             }
 
-            cacheElement.lastModified = lastModified;
+            cacheElement.snapshot = snapshot;
             cacheElement.lastUpdated = System.currentTimeMillis();
         }
     }

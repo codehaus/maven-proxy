@@ -17,18 +17,15 @@ package org.apache.maven.proxy;
  */
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.proxy.config.FileRepoConfiguration;
 import org.apache.maven.proxy.config.RepoConfiguration;
-import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
@@ -37,13 +34,6 @@ import org.apache.velocity.context.Context;
  */
 public class SearchServlet extends MavenProxyServlet
 {
-    private RetrievalComponentConfiguration rcc;
-
-    public void init() throws ServletException
-    {
-        rcc = (RetrievalComponentConfiguration) getServletContext().getAttribute( "config" );
-    }
-
     public Template handleRequestInternal( HttpServletRequest request, HttpServletResponse response, Context context )
                     throws Exception
     {
@@ -56,7 +46,7 @@ public class SearchServlet extends MavenProxyServlet
         {
             List results = new ArrayList();
 
-            for ( Iterator iter = rcc.getRepos().iterator(); iter.hasNext(); )
+            for ( Iterator iter = getRCC().getRepos().iterator(); iter.hasNext(); )
             {
                 RepoConfiguration repo = (RepoConfiguration) iter.next();
                 if ( repo instanceof FileRepoConfiguration )
@@ -77,8 +67,8 @@ public class SearchServlet extends MavenProxyServlet
         }
 
         context.put( "ab", new ABToggler() );
-        context.put( "dateFormat", dateFormatThreadLocal.get() );
-        context.put( "rcc", rcc );
+        context.put( "dateFormat", getRCC().getLastModifiedDateFormatForThread() );
+        context.put( "rcc", getRCC() );
         return getTemplate( "SearchServlet.vtl" );
     }
 
@@ -111,18 +101,4 @@ public class SearchServlet extends MavenProxyServlet
     {
         return "SEARCH";
     }
-
-    private ThreadLocal dateFormatThreadLocal = new ThreadLocal()
-    {
-        protected synchronized Object initialValue()
-        {
-            if ( rcc.getLastModifiedDateFormat() == null || rcc.getLastModifiedDateFormat() == "" )
-            {
-                return new SimpleDateFormat();
-            }
-
-            return new SimpleDateFormat( rcc.getLastModifiedDateFormat() );
-        }
-    };
-
 }

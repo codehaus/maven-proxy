@@ -10,18 +10,17 @@ import java.io.InputStream;
  */
 public class RetrievalDetails
 {
-    private InputStream is;
+    /** log4j logger */
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger( RetrievalDetails.class );
+    
+    
+    private File file;
     private long lastModified;
     private long length;
 
-    public RetrievalDetails( InputStream is )
+    public RetrievalDetails( File file, long length, long lastModified )
     {
-        this( is, -1, -1 );
-    }
-
-    public RetrievalDetails( InputStream is, long length, long lastModified )
-    {
-        this.is = is;
+        this.file = file;
         this.length = length;
         this.lastModified = lastModified;
     }
@@ -29,12 +28,13 @@ public class RetrievalDetails
     public RetrievalDetails( File path ) throws FileNotFoundException
     {
 
-        this( new FileInputStream( path ), path.length(), path.lastModified() );
+        this( path, path.length(), path.lastModified() );
     }
 
-    public InputStream getInputStream()
+    public InputStream getInputStream() throws FileNotFoundException
     {
-        return is;
+        LOGGER.info("Some bastard is creating an inputstream");
+        return new FileInputStream(file);
     }
 
     public long getLength()

@@ -1,5 +1,6 @@
 package org.apache.maven.proxy.components.impl;
 
+import org.apache.maven.proxy.components.ProxyArtifact;
 import org.apache.maven.proxy.components.SnapshotCache;
 
 /**
@@ -8,17 +9,16 @@ import org.apache.maven.proxy.components.SnapshotCache;
 public class NoCacheSnapshotCache implements SnapshotCache
 {
 
-    public long getLastModified( String item )
+    public ProxyArtifact getSnapshot( String path )
     {
-        return -1;
+        return null;
     }
 
-    public void setLastModified( String item, long lastModified )
+    public void setSnapshot( String item, ProxyArtifact snapshot )
     {
         //Nothing to do
     }
 
-    
     public void start() throws Exception
     {
         //Nothing to do

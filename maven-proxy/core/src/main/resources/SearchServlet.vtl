@@ -49,7 +49,7 @@
 		#set ($repoDescription = "Global Repository")
 	  #end
 
-      #createRow( "../images/jar.png" $fileElement.Length $fileElement.lastModifiedDate() "../repository${fileElement.RelativePath}/${fileElement.Name}" "${fileElement.RelativePath}/${fileElement.Name}" $repoDescription )
+      #createRow( "../images/jar.png" $fileElement.length() $fileElement.lastModifiedDate() "../repository${fileElement.RelativePath}/${fileElement.Name}" "${fileElement.RelativePath}/${fileElement.Name}" $repoDescription )
     #end
 ##    </tbody>
   </table>
