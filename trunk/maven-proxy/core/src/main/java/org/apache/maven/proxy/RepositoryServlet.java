@@ -134,12 +134,27 @@ public class RepositoryServlet extends HttpServlet
         final String pathInfo = request.getPathInfo();
         LOGGER.info("Received request: " + pathInfo);
 
-        if (pathInfo.equalsIgnoreCase("/favicon.ico"))
+        if (rcc.isBrowsable())
         {
-            handleImageRequest("favicon.ico", response);
-            return;
-        }
+            if (pathInfo.equalsIgnoreCase("/favicon.ico"))
+            {
+                handleImageRequest("favicon.ico", "image/x-ico", response);
+                return;
+            }
 
+            if (pathInfo.equalsIgnoreCase("/jar.png"))
+            {
+                handleImageRequest("jar.png", "image/png", response);
+                return;
+            }
+
+            if (pathInfo.equalsIgnoreCase("/parent.png"))
+            {
+                handleImageRequest("parent.png", "image/png", response);
+                return;
+            }
+        }
+        
         if (pathInfo.endsWith("/"))
         {
             if (rcc.isBrowsable())
@@ -163,16 +178,14 @@ public class RepositoryServlet extends HttpServlet
      * @param string
      * @param response
      */
-    private void handleImageRequest(String string, HttpServletResponse response) throws IOException
+    private void handleImageRequest(String image, String type, HttpServletResponse response) throws IOException
     {
-        response.setContentType("x-ico");
+        response.setContentType(type);
         OutputStream os = response.getOutputStream();
-        InputStream is = getClass().getResourceAsStream("favicon.ico");
+        InputStream is = getClass().getResourceAsStream(image);
         IOUtility.transferStream(is, os);
         IOUtility.close(is);
     }
-
-    
 
     private void handleDownloadRequest(HttpServletRequest request, HttpServletResponse response)
         throws FileNotFoundException, IOException
@@ -201,7 +214,7 @@ public class RepositoryServlet extends HttpServlet
 
                     InputStream is = new FileInputStream(f);
 
-                    response.setContentType("application/octet-stream");
+                    response.setContentType("application/x-jar");
                     OutputStream os = response.getOutputStream();
                     IOUtility.transferStream(is, os);
                     IOUtility.close(is);
@@ -254,12 +267,14 @@ public class RepositoryServlet extends HttpServlet
             files = new File[0];
         }
 
-        pw.println("<table>");
+        pw.println("<table width='100%'>");
         pw.println("<colgroup>");
-        pw.println("  <col width='3*'>");
+        pw.println("  <col width='20px'>");
         pw.println("  <col width='*'>");
+        pw.println("  <col width='5*'>");
         pw.println("</colgroup>");
-        pw.println("<tr class='dir'><td><a href='..'>..</a></td><td></td></tr>");
+        pw.println(
+            "<tr class='dir'><td><img src='/parent.png' alt=''/></td><td/><td><a href='..'>..</a></td><td></td></tr>");
         for (int i = 0; i < files.length; i++)
         {
             File theFile = files[i];
@@ -276,14 +291,14 @@ public class RepositoryServlet extends HttpServlet
             else
             {
                 pw.println(
-                    "<tr class='file'><td><a href='"
+                    "<tr class='file'><td><img src='/jar.png' alt=''/></td><td>"
+                        + theFile.length()
+                        + "</td><td><a href='"
                         + pathInfo
                         + theFile.getName()
                         + "'>"
                         + theFile.getName()
-                        + "</a></td><td>"
-                        + theFile.length()
-                        + "</td></tr>");
+                        + "</a></td></tr>");
             }
         }
         pw.println("</table>");
