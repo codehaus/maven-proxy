@@ -3,3 +3,4 @@ target
 .classpath
 .project
 build.properties
+velocity.log
