@@ -37,6 +37,8 @@ public class PropertyLoader
     public static final String SNAPSHOT_UPDATE_INTERVAL = "snapshot.update.interval";
 
     public static final int DEFAULT_PORT = 4321;
+    public static final String LAST_MODIFIED_DATE_FORMAT = "lastModifiedDateFormat";
+    public static final String DEFAULT_LAST_MODIFIED_DATE_FORMAT = null;
 
     public static final String BROWSABLE = "browsable";
 
@@ -86,6 +88,7 @@ public class PropertyLoader
         rcc.setBrowsable( Boolean.valueOf( getMandatoryProperty( props, BROWSABLE ) ).booleanValue() );
         rcc.setServerName( props.getProperty( SERVERNAME ) );
         rcc.setPrefix( getMandatoryProperty( props, PREFIX ) );
+        rcc.setLastModifiedDateFormat( props.getProperty( LAST_MODIFIED_DATE_FORMAT ) );
 
         if ( rcc.getPrefix().length() == 0 )
         {

@@ -135,6 +135,7 @@ public class RetrievalComponentConfiguration
 
     private int snapshotUpdateInterval;
     private boolean snapshotUpdate;
+    private String lastModifiedDateFormat;
 
     public int getSnapshotUpdateInterval()
     {
@@ -149,6 +150,16 @@ public class RetrievalComponentConfiguration
     public void setSnapshotUpdate( boolean snapshotUpdate )
     {
         this.snapshotUpdate = snapshotUpdate;
+    }
+
+    public String getLastModifiedDateFormat()
+    {
+        return lastModifiedDateFormat;
+    }
+    
+    public void setLastModifiedDateFormat( String lastModifiedDateFormat )
+    {
+        this.lastModifiedDateFormat = lastModifiedDateFormat;
     }
 
 }

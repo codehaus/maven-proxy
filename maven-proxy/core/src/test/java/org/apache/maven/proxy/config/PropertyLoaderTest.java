@@ -44,6 +44,7 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "rcc.getPrefix()", "repository", rcc.getPrefix() );
         assertEquals( "rcc.getServerName()", "http://localhost:9999/repository", rcc.getServerName() );
         assertEquals( "rcc.getSnapshotUpdateInterval()", 60, rcc.getSnapshotUpdateInterval() );
+        assertEquals( "rcc.getLastModifiedDateFormat()", "yyyy/MM/dd hh:mm:ss", rcc.getLastModifiedDateFormat() );
         assertTrue( "rcc.isBrowsable()", rcc.isBrowsable() );
 
         /////////////////////// Check Proxies ////////////////////////

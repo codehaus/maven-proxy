@@ -36,3 +36,31 @@ tr.file-b
   background-color: #eee; 
   border: 1px solid black; 
 }
+
+td, th
+{
+	border-left: 1px solid #999;
+	border-right: 1px solid #999;
+	padding-left: 2px; 
+	padding-right: 2px;
+}
+
+th
+{
+	font-weight: bolder;
+	text-align: left;
+}
+
+img
+{
+  border: 0;
+}
+
+div.browse 
+{
+  border: 1px solid black;
+  background-color: #ddd;
+  padding: 2px;
+  margin-bottom: 3px;
+  font-weight: bolder;
+}
