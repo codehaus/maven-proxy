@@ -1,4 +1,4 @@
-package org.apache.maven.proxy;
+package org.apache.maven.proxy.config;
 
 /**
  * @author  Ben Walding

@@ -1,4 +1,4 @@
-package org.apache.maven.proxy;
+package org.apache.maven.proxy.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +15,23 @@ public class RetrievalComponentConfiguration
 {
     private final Map proxies = new HashMap();
     private final List repos = new ArrayList();
+    private String localStore;
+
+    /**
+     * @return
+     */
+    public String getLocalStore()
+    {
+        return localStore;
+    }
+
+    /**
+     * @param localStore
+     */
+    public void setLocalStore(String localStore)
+    {
+        this.localStore = localStore;
+    }
 
     public void addProxy(ProxyConfiguration pc)
     {
@@ -44,8 +61,9 @@ public class RetrievalComponentConfiguration
     {
         repos.add(repo);
     }
-    
-    public List getRepos() {
+
+    public List getRepos()
+    {
         return Collections.unmodifiableList(repos);
     }
 

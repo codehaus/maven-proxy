@@ -1,4 +1,4 @@
-package org.apache.maven.proxy;
+package org.apache.maven.proxy.config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,10 +11,14 @@ import java.util.StringTokenizer;
  */
 public class PropertyLoader
 {
+    private static final String REPO_LOCAL_STORE = "repo.local.store";
+
     public RetrievalComponentConfiguration load(Properties props) throws IOException
     {
         RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
 
+        rcc.setLocalStore(props.getProperty(REPO_LOCAL_STORE));
+        
         {
             String propertyList = props.getProperty("proxy.list");
             StringTokenizer tok = new StringTokenizer(propertyList, ",");
