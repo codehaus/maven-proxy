@@ -50,6 +50,7 @@ import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
  */
 public class RepositoryServlet extends HttpServlet
 {
+
     /** log4j logger */
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger( RepositoryServlet.class );
 
@@ -90,6 +91,7 @@ public class RepositoryServlet extends HttpServlet
 
     private ThreadLocal dateFormatThreadLocal = new ThreadLocal()
     {
+
         protected synchronized Object initialValue()
         {
             if ( rcc.getLastModifiedDateFormat() == null || rcc.getLastModifiedDateFormat() == "" )
@@ -152,7 +154,7 @@ public class RepositoryServlet extends HttpServlet
     }
 
     private void handleDownloadRequest( HttpServletRequest request, HttpServletResponse response )
-                    throws FileNotFoundException, IOException
+            throws FileNotFoundException, IOException
     {
         try
         {
@@ -266,7 +268,6 @@ public class RepositoryServlet extends HttpServlet
 
         PrintWriter pw = response.getWriter();
 
-        
         pw.println( "<html>" );
         pw.println( "<head>" );
         pw.println( "  <title>maven-proxy - " + pathInfo + "</title>" );
@@ -278,16 +279,16 @@ public class RepositoryServlet extends HttpServlet
         File[] files = dir.listFiles();
         if ( files == null )
         {
-            files = new File[0];
+            files = new File[ 0 ];
         }
         List repos = rcc.getRepos();
         Set fileList = new TreeSet( new FileElementComparator( repos ) );
 
         fileList.addAll( MergedFileList.filenames( files, null ) );
-
         for ( int i = 0; i < repos.size(); i++ )
         {
             RepoConfiguration repoConfig = (RepoConfiguration) repos.get( i );
+            LOGGER.info( "Browsing " + repoConfig.getUrl() );
             if ( repoConfig instanceof FileRepoConfiguration )
             {
                 //FileRepoConfiguration frc = (FileRepoConfiguration) repoConfig;
@@ -314,7 +315,7 @@ public class RepositoryServlet extends HttpServlet
 
         if ( !pathInfo.equals( "/" ) )
         {
-            toggle = ( toggle == 'a' ? 'b' : 'a' );
+            toggle = (toggle == 'a' ? 'b' : 'a');
             pw.println( createRow( "dir-" + toggle, retrace + "/images/parent.png", "", -1, "..", "" ) );
         }
         else
@@ -329,7 +330,7 @@ public class RepositoryServlet extends HttpServlet
         {
             FileElement fe = (FileElement) fileIter.next();
 
-            toggle = ( toggle == 'a' ? 'b' : 'a' );
+            toggle = (toggle == 'a' ? 'b' : 'a');
             File theFile = fe.getFile();
             String repoDescription;
 
@@ -366,7 +367,7 @@ public class RepositoryServlet extends HttpServlet
     }
 
     protected String createRow( String cssClass, String imgSrc, String length, long lastModified, String link,
-                    String repoDescription )
+            String repoDescription )
     {
         DateFormat df = (DateFormat) dateFormatThreadLocal.get();
         String lastModString = "";
@@ -374,9 +375,10 @@ public class RepositoryServlet extends HttpServlet
         {
             lastModString = df.format( new Date( lastModified ) );
         }
-        return "<tr class='" + cssClass + "'><td><a href='" + link + "'><img src='" + imgSrc + "' alt=''/></a></td><td style='text-align:right'>" + length + "</td><td>"
-                        + lastModString + "</td><td><a href='" + link + "/'>" + link + "</a></td><td>"
-                        + repoDescription + "</td><td></td></tr>";
+        return "<tr class='" + cssClass + "'><td><a href='" + link + "'><img src='" + imgSrc
+                + "' alt=''/></a></td><td style='text-align:right'>" + length + "</td><td>" + lastModString
+                + "</td><td><a href='" + link + "/'>" + link + "</a></td><td>" + repoDescription
+                + "</td><td></td></tr>";
     }
 
     protected String createRow( String cssClass, String imgSrc, File theFile, String repoDescription )
@@ -388,7 +390,7 @@ public class RepositoryServlet extends HttpServlet
         else
         {
             return createRow( cssClass, imgSrc, "" + theFile.length(), theFile.lastModified(), theFile.getName(),
-                            repoDescription );
+                    repoDescription );
         }
     }
 }
