@@ -13,7 +13,7 @@
   <inceptionYear>2003</inceptionYear>
   <siteAddress>projects.walding.com</siteAddress>
   <siteDirectory>/var/www/projects.walding.com/html/overlord</siteDirectory>
-  <package>com.walding.overlord</package>
+  <package>org.apache.maven.proxy</package>
   <description>Simulates a remote repository that has upstream providers.
    You download from it, it downloads from parent.  Avoids full mirroring.
   </description>
@@ -37,6 +37,11 @@
     <dependency>
       <id>jetty</id>
       <version>4.2.9</version>
+    </dependency>
+
+    <dependency>
+      <id>maven:maven-fetch</id>
+      <version>SNAPSHOT</version>
     </dependency>
   </dependencies>
 
