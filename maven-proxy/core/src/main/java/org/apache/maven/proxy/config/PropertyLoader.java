@@ -58,6 +58,7 @@ package org.apache.maven.proxy.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -65,82 +66,96 @@ import java.util.StringTokenizer;
  * @author  Ben Walding
  * @version $Id$
  */
-public class PropertyLoader
-{
-    public static final String REPO_LOCAL_STORE = "repo.local.store";
-    public static final String PORT = "port";
-    public static final int DEFAULT_PORT = 4321;
-    public static final String BROWSABLE = "browsable";
+public class PropertyLoader {
+	public static final String REPO_LOCAL_STORE = "repo.local.store";
+	public static final String REPO_CUSTOM_STORE = "repo.custom.store";
+	public static final String PORT = "port";
+	public static final int DEFAULT_PORT = 4321;
+	public static final String BROWSABLE = "browsable";
 
-    public RetrievalComponentConfiguration load(Properties props) throws IOException, ValidationException
-    {
-        RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
+	public RetrievalComponentConfiguration load(Properties props) throws IOException, ValidationException {
+		RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
 
-        rcc.setLocalStore(props.getProperty(REPO_LOCAL_STORE));
-        
-        if (props.getProperty(PORT) == null)
-        {
-            rcc.setPort(DEFAULT_PORT);
-        }
-        else
-        {
-            try
-            {
-                rcc.setPort(Integer.parseInt(props.getProperty(PORT)));
-            }
-            catch (NumberFormatException ex)
-            {
-                throw new ValidationException("Property " + PORT + " must be a integer");
-            }
-        }
-        
-        rcc.setBrowsable(Boolean.valueOf(props.getProperty(BROWSABLE)).booleanValue());
+		rcc.setLocalStore(props.getProperty(REPO_LOCAL_STORE));
 
-        {
-            String propertyList = props.getProperty("proxy.list");
-            StringTokenizer tok = new StringTokenizer(propertyList, ",");
-            while (tok.hasMoreTokens())
-            {
-                String key = tok.nextToken();
-                String host = props.getProperty("proxy." + key + ".host");
-                int port = Integer.parseInt(props.getProperty("proxy." + key + ".port"));
-                String username = props.getProperty("proxy." + key + ".username");
-                String password = props.getProperty("proxy." + key + ".password");
-                ProxyConfiguration pc = new ProxyConfiguration(key, host, port, username, password);
-                rcc.addProxy(pc);
-            }
-        }
+		if (props.getProperty(PORT) == null) {
+			rcc.setPort(DEFAULT_PORT);
+		} else {
+			try {
+				rcc.setPort(Integer.parseInt(props.getProperty(PORT)));
+			} catch (NumberFormatException ex) {
+				throw new ValidationException("Property " + PORT + " must be a integer");
+			}
+		}
 
-        {
-            String repoList = props.getProperty("repo.list");
+		rcc.setBrowsable(Boolean.valueOf(props.getProperty(BROWSABLE)).booleanValue());
 
-            StringTokenizer tok = new StringTokenizer(repoList, ",");
-            while (tok.hasMoreTokens())
-            {
-                String key = tok.nextToken();
-                String url = props.getProperty("repo." + key + ".url");
-                String username = props.getProperty("repo." + key + ".username");
-                String password = props.getProperty("repo." + key + ".password");
-                String proxyKey = props.getProperty("repo." + key + ".proxy");
+		{
+			String propertyList = props.getProperty("proxy.list");
+			StringTokenizer tok = new StringTokenizer(propertyList, ",");
+			while (tok.hasMoreTokens()) {
+				String key = tok.nextToken();
+				String host = props.getProperty("proxy." + key + ".host");
+				int port = Integer.parseInt(props.getProperty("proxy." + key + ".port"));
+				String username = props.getProperty("proxy." + key + ".username");
+				String password = props.getProperty("proxy." + key + ".password");
+				ProxyConfiguration pc = new ProxyConfiguration(key, host, port, username, password);
+				rcc.addProxy(pc);
+			}
+		}
 
-                ProxyConfiguration proxy = null;
-                if (proxyKey != null)
-                {
-                    proxy = rcc.getProxy(proxyKey);
-                }
+		{
+			String repoList = props.getProperty("repo.list");
 
-                RepoConfiguration rc = new RepoConfiguration(key, url, username, password, proxy);
-                rcc.addRepo(rc);
-            }
-        }
-        return rcc;
+			StringTokenizer tok = new StringTokenizer(repoList, ",");
+			while (tok.hasMoreTokens()) {
+				String key = tok.nextToken();
 
-    }
-    
-    public RetrievalComponentConfiguration load(InputStream is) throws IOException, ValidationException
-    {
-        Properties props = new Properties();
-        props.load(is);
-        return load(props);
-    }
+				Properties repoProps = getSubset(props, "repo." + key + ".");
+				String url = repoProps.getProperty("url");
+				String username = repoProps.getProperty("username");
+				String password = repoProps.getProperty("password");
+				String proxyKey = repoProps.getProperty("proxy");
+
+				ProxyConfiguration proxy = null;
+				if (proxyKey != null) {
+					proxy = rcc.getProxy(proxyKey);
+				}
+
+				RepoConfiguration rc = null;
+
+				if (url.startsWith("http://")) {
+					rc = new HttpRepoConfiguration(key, url, username, password, proxy);
+				}
+				
+				if (url.startsWith("file://")) {
+					rc = new FileRepoConfiguration(key, url);
+				}
+
+				rcc.addRepo(rc);
+			}
+		}
+		return rcc;
+
+	}
+
+	private Properties getSubset(Properties props, String prefix) {
+		Enumeration keys = props.keys();
+		Properties result = new Properties();
+		while (keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			String value = props.getProperty(key);
+			if (key.startsWith(prefix)) {
+				String newKey = key.substring(prefix.length());
+				result.setProperty(newKey, value);
+			}
+		}
+		return result;
+	}
+
+	public RetrievalComponentConfiguration load(InputStream is) throws IOException, ValidationException {
+		Properties props = new Properties();
+		props.load(is);
+		return load(props);
+	}
 }

@@ -66,88 +66,89 @@ import junit.framework.TestCase;
  * @author  Ben Walding
  * @version $Id$
  */
-public class PropertyLoaderTest extends TestCase
-{
-    public void testSimple() throws IOException, ValidationException
-    {
-        InputStream is = PropertyLoaderTest.class.getResourceAsStream("PropertyLoaderTest1.properties");
-        PropertyLoader loader = new PropertyLoader();
+public class PropertyLoaderTest extends TestCase {
+	public void testSimple() throws IOException, ValidationException {
+		InputStream is = PropertyLoaderTest.class.getResourceAsStream("PropertyLoaderTest1.properties");
+		PropertyLoader loader = new PropertyLoader();
 
-        RetrievalComponentConfiguration rcc = loader.load(is);
+		RetrievalComponentConfiguration rcc = loader.load(is);
 
-        /////////////////////// Check Globals ////////////////////////
-        assertEquals("rcc.getLocalStore()", "/var/tmp/maven-proxy", rcc.getLocalStore());
-        assertEquals("rcc.getPort()", 9999, rcc.getPort());
-        assertTrue("rcc.isBrowsable()", rcc.isBrowsable());
+		/////////////////////// Check Globals ////////////////////////
+		assertEquals("rcc.getLocalStore()", "/var/tmp/proxy-repo", rcc.getLocalStore());
+		assertEquals("rcc.getPort()", 9999, rcc.getPort());
+		assertTrue("rcc.isBrowsable()", rcc.isBrowsable());
 
-        /////////////////////// Check Proxies ////////////////////////
-        assertEquals("rcc.getProxies().size()", 3, rcc.getProxies().size());
-        verifyProxyOne(rcc.getProxy("one"));
-        verifyProxyTwo(rcc.getProxy("two"));
-        verifyProxyThree(rcc.getProxy("three"));
+		/////////////////////// Check Proxies ////////////////////////
+		assertEquals("rcc.getProxies().size()", 3, rcc.getProxies().size());
+		verifyProxyOne(rcc.getProxy("one"));
+		verifyProxyTwo(rcc.getProxy("two"));
+		verifyProxyThree(rcc.getProxy("three"));
 
-        assertNull("rcc.getProxy(snuffleuffigus)", rcc.getProxy("snuffleuffigus"));
+		assertNull("rcc.getProxy(snuffleuffigus)", rcc.getProxy("snuffleuffigus"));
 
-        /////////////////////// Check Repos ////////////////////////
-        List repos = rcc.getRepos();
-        assertEquals("repos.size()", 3, repos.size());
-        verifyRepoIbiblio((RepoConfiguration) repos.get(0));
-        verifyRepoDist((RepoConfiguration) repos.get(1));
-        verifyRepoPrivate((RepoConfiguration) repos.get(2));
-    }
+		/////////////////////// Check Repos ////////////////////////
+		List repos = rcc.getRepos();
+		assertEquals("repos.size()", 4, repos.size());
+		verifyRepoLocal((FileRepoConfiguration) repos.get(0));
+		verifyRepoIbiblio((HttpRepoConfiguration) repos.get(1));
+		verifyRepoDist((HttpRepoConfiguration) repos.get(2));
+		verifyRepoPrivate((HttpRepoConfiguration) repos.get(3));
+	}
 
-    private void verifyProxyOne(ProxyConfiguration pcOne)
-    {
-        assertNotNull("pcOne", pcOne);
-        assertEquals("pcOne.host", "proxy1.example.com", pcOne.getHost());
-        assertEquals("pcOne.port", 3128, pcOne.getPort());
-    }
+	/**
+	 * @param configuration
+	 */
+	private void verifyRepoLocal(FileRepoConfiguration configuration) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    private void verifyProxyTwo(ProxyConfiguration pcTwo)
-    {
-        assertNotNull("pcTwo", pcTwo);
-        assertEquals("pcTwo.host", "proxy2.example.org", pcTwo.getHost());
-        assertEquals("pcTwo.port", 80, pcTwo.getPort());
-        assertEquals("pcTwo.username", "username2", pcTwo.getUsername());
-        assertEquals("pcTwo.password", "password2", pcTwo.getPassword());
-    }
+	private void verifyProxyOne(ProxyConfiguration pcOne) {
+		assertNotNull("pcOne", pcOne);
+		assertEquals("pcOne.host", "proxy1.example.com", pcOne.getHost());
+		assertEquals("pcOne.port", 3128, pcOne.getPort());
+	}
 
-    private void verifyProxyThree(ProxyConfiguration pcThree)
-    {
-        assertNotNull("pcThree", pcThree);
-        assertEquals("pcThree.host", "proxy3.example.net", pcThree.getHost());
-        assertEquals("pcThree.port", 3129, pcThree.getPort());
-        assertEquals("pcThree.username", "username3", pcThree.getUsername());
-        assertEquals("pcThree.password", "password3", pcThree.getPassword());
-    }
+	private void verifyProxyTwo(ProxyConfiguration pcTwo) {
+		assertNotNull("pcTwo", pcTwo);
+		assertEquals("pcTwo.host", "proxy2.example.org", pcTwo.getHost());
+		assertEquals("pcTwo.port", 80, pcTwo.getPort());
+		assertEquals("pcTwo.username", "username2", pcTwo.getUsername());
+		assertEquals("pcTwo.password", "password2", pcTwo.getPassword());
+	}
 
-    private void verifyRepoIbiblio(RepoConfiguration rcIbiblio)
-    {
-        assertNotNull("rcIbiblio", rcIbiblio);
-        assertEquals("www-ibiblio-org", rcIbiblio.getKey());
-        assertEquals("rcIbiblio.url", "http://www.ibiblio.org/maven", rcIbiblio.getUrl());
-        assertNull("rcIbiblio.username", rcIbiblio.getUsername());
-        assertNull("rcIbiblio.password", rcIbiblio.getPassword());
-        assertEquals("rcIbiblio.proxy", "one", rcIbiblio.getProxy().getKey());
-    }
+	private void verifyProxyThree(ProxyConfiguration pcThree) {
+		assertNotNull("pcThree", pcThree);
+		assertEquals("pcThree.host", "proxy3.example.net", pcThree.getHost());
+		assertEquals("pcThree.port", 3129, pcThree.getPort());
+		assertEquals("pcThree.username", "username3", pcThree.getUsername());
+		assertEquals("pcThree.password", "password3", pcThree.getPassword());
+	}
 
-    private void verifyRepoDist(RepoConfiguration rcDist)
-    {
-        assertNotNull("rcDist", rcDist);
-        assertEquals("dist-codehaus-org", rcDist.getKey());
-        assertEquals("rcDist.url", "http://dist.codehaus.org", rcDist.getUrl());
-        assertNull("rcDist.username", rcDist.getUsername());
-        assertNull("rcDist.password", rcDist.getPassword());
-        assertEquals("rcDist.proxy", "two", rcDist.getProxy().getKey());
-    }
+	private void verifyRepoIbiblio(HttpRepoConfiguration rcIbiblio) {
+		assertNotNull("rcIbiblio", rcIbiblio);
+		assertEquals("www-ibiblio-org", rcIbiblio.getKey());
+		assertEquals("rcIbiblio.url", "http://www.ibiblio.org/maven", rcIbiblio.getUrl());
+		assertNull("rcIbiblio.username", rcIbiblio.getUsername());
+		assertNull("rcIbiblio.password", rcIbiblio.getPassword());
+		assertEquals("rcIbiblio.proxy", "one", rcIbiblio.getProxy().getKey());
+	}
 
-    private void verifyRepoPrivate(RepoConfiguration rcPrivate)
-    {
-        assertNotNull("rcPrivate", rcPrivate);
-        assertEquals("private-example-com", rcPrivate.getKey());
-        assertEquals("rcPrivate.url", "http://private.example.com/internal", rcPrivate.getUrl());
-        assertEquals("rcPrivate.username", "username1", rcPrivate.getUsername());
-        assertEquals("rcPrivate.password", "password1", rcPrivate.getPassword());
-        assertEquals("rcPrivate.proxy", "three", rcPrivate.getProxy().getKey());
-    }
+	private void verifyRepoDist(HttpRepoConfiguration rcDist) {
+		assertNotNull("rcDist", rcDist);
+		assertEquals("dist-codehaus-org", rcDist.getKey());
+		assertEquals("rcDist.url", "http://dist.codehaus.org", rcDist.getUrl());
+		assertNull("rcDist.username", rcDist.getUsername());
+		assertNull("rcDist.password", rcDist.getPassword());
+		assertEquals("rcDist.proxy", "two", rcDist.getProxy().getKey());
+	}
+
+	private void verifyRepoPrivate(HttpRepoConfiguration rcPrivate) {
+		assertNotNull("rcPrivate", rcPrivate);
+		assertEquals("private-example-com", rcPrivate.getKey());
+		assertEquals("rcPrivate.url", "http://private.example.com/internal", rcPrivate.getUrl());
+		assertEquals("rcPrivate.username", "username1", rcPrivate.getUsername());
+		assertEquals("rcPrivate.password", "password1", rcPrivate.getPassword());
+		assertEquals("rcPrivate.proxy", "three", rcPrivate.getProxy().getKey());
+	}
 }

@@ -63,6 +63,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -73,7 +77,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.maven.fetch.exceptions.FetchException;
 import org.apache.maven.fetch.exceptions.ResourceNotFoundFetchException;
 import org.apache.maven.fetch.util.IOUtility;
-import org.apache.maven.proxy.config.*;
+import org.apache.maven.proxy.config.RepoConfiguration;
+import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
 
 /**
  * @author  Ben Walding
@@ -181,6 +186,8 @@ public class RepositoryServlet extends HttpServlet
     private void handleImageRequest(String image, String type, HttpServletResponse response) throws IOException
     {
         response.setContentType(type);
+        //7 day expiry for images
+        response.setDateHeader("Expires", System.currentTimeMillis() + 7 * 60 * 60 * 24 * 1000);
         OutputStream os = response.getOutputStream();
         InputStream is = getClass().getResourceAsStream(image);
         IOUtility.transferStream(is, os);
@@ -277,9 +284,14 @@ public class RepositoryServlet extends HttpServlet
         pw.println("</colgroup>");
         pw.println(
             "<tr class='dir'><td><img src='/parent.png' alt=''/></td><td/><td><a href='..'>..</a></td><td></td></tr>");
-        for (int i = 0; i < files.length; i++)
-        {
-            File theFile = files[i];
+        
+        List fileArray = new ArrayList(Arrays.asList(files));
+        
+        Collections.sort(fileArray, new FileComparator());
+        
+        for (Iterator fileIter = fileArray.iterator(); fileIter.hasNext();) {
+			File theFile = (File) fileIter.next();
+
             if (theFile.isDirectory())
             {
                 pw.println(
