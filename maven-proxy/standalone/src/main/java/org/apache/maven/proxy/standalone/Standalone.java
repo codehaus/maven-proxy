@@ -87,9 +87,10 @@ public class Standalone
                 System.err.println("  " + t.getLocalizedMessage());
                 t = t.getCause();
             }
+            
+            return;
         }
         
-
         System.out.println("Saving repository at " + rcc.getLocalStore());
         for (Iterator iter = rcc.getRepos().iterator(); iter.hasNext();) {
             RepoConfiguration repo = (RepoConfiguration) iter.next();
