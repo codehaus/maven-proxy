@@ -39,4 +39,18 @@ public class DefaultSnapshotCacheTest extends TestCase
         assertNull( cache.getSnapshot( "a" ) );
         assertNull( cache.getSnapshot( "b" ) );
     }
+    
+//  Under heavy load this might fail - if it can't execute the first set and check in less than a second
+    public void testCacheNull() throws InterruptedException
+    {
+        SnapshotCache cache = new DefaultSnapshotCache( 1000 );
+        //long now = System.currentTimeMillis();
+        ProxyArtifact pArtifact = new ProxyArtifact( null, "a" );
+        pArtifact.setLastModified( 10101L );
+        cache.setSnapshot( pArtifact.getPath(), pArtifact );
+        assertEquals( 10101L, cache.getSnapshot( "a" ).getLastModified() );
+        Thread.sleep( 1500 );
+        assertNull( cache.getSnapshot( "a" ) );
+        assertNull( cache.getSnapshot( "b" ) );
+    }
 }

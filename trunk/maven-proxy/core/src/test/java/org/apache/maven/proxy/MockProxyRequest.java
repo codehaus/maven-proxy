@@ -49,4 +49,9 @@ public class MockProxyRequest extends BaseProxyRequest
         return headOnly;
     }
 
+    public String getSourceDescription()
+    {
+        return "Mock";
+    }
+
 }
