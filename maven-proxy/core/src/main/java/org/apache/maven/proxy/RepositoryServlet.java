@@ -134,6 +134,7 @@ public class RepositoryServlet extends HttpServlet
         return new File(localStoreDir, request.getPathInfo());
     }
 
+    
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         final String pathInfo = request.getPathInfo();
