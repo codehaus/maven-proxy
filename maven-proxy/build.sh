@@ -6,6 +6,7 @@ for module in core standalone webapp;
 do
   cd $module
   echo Building maven-proxy:$module
+  echo  pwd: `pwd`
   maven build:snapshot
   RESULT=$?
   if [ $RESULT -ne "0" ]; then
