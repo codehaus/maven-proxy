@@ -53,7 +53,7 @@
 	  </resource>
       <resource>    	
 				<directory>src/main/resources</directory>
-				<includes><include>velocity/**/*</include></includes>
+				<includes><include>**/*</include></includes>
 	  </resource>
     </resources>
    
