@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<document>
+
+  <properties>
+    <title>maven-proxy</title>
+    <author email="ben@walding.com">Ben Walding</author>
+  </properties>
+
+  <body>
+
+    <section name="Overview">
+      <p>
+        <a href="http://suds.health.qld.gov.au/">suds.health.qld.gov.au</a>
+      </p>
+    </section>
+    
+    <section name="Build Status">
+      <img src="http://builds.codehaus.org/public/images/lastcompletedstatus?project_name=maven-proxy"/>
+      <p>
+        maven-proxy's build status can be viewed at <a href="http://builds.codehaus.org/public/project?project_name=maven-proxy">http://builds.codehaus.org/public/project?project_name=maven-proxy</a>
+      </p>
+    </section>
+
+  </body>
+</document>

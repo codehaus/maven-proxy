@@ -1,4 +1,9 @@
 <project default="jar:install">
+
+  <goal name="build:nightly">
+    <attainGoal name="uberjar"/>
+  </goal>
+  
   <goal name="run" prereqs="jar:jar">
     <mkdir dir="target/repo"/>
   	<java
