@@ -25,7 +25,24 @@ public class RepositoryServlet extends HttpServlet
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(RepositoryServlet.class);
 
     private final DefaultRetrievalComponent rc = new DefaultRetrievalComponent();
-    File baseDir;
+    private File baseDir;
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#getLastModified(javax.servlet.http.HttpServletRequest)
+     */
+    protected long getLastModified(HttpServletRequest request)
+    {
+        File f = new File(baseDir + request.getPathInfo());
+        if (f.exists() && f.isFile())
+        {
+            return f.lastModified();
+        }
+        else
+        {
+            return super.getLastModified(request);
+        }
+    }
+
     public void init() throws ServletException
     {
         Properties props = (Properties) getServletContext().getAttribute("properties");
@@ -44,13 +61,18 @@ public class RepositoryServlet extends HttpServlet
         rc.setProxyPassword(props.getProperty(ProxyProperties.PARENT_PROXY_PASSWORD));
     }
 
+    public File getFileForRequest(HttpServletRequest request)
+    {
+        return new File(baseDir + request.getPathInfo());
+    }
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         LOGGER.info("Received request: " + request.getPathInfo());
         try
         {
 
-            File f = new File(baseDir + request.getPathInfo());
+            File f = getFileForRequest(request);
             f.getParentFile().mkdirs();
 
             rc.retrieveArtifact(f, request.getPathInfo());
