@@ -56,6 +56,7 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "rcc.rowColor", rcc.getRowColor(), "#CCF" );
         assertEquals( "rcc.rowColorHighlight", rcc.getRowColorHighlight(), "#DDF" );
         assertEquals( "rcc.styleSheet", rcc.getStylesheet(), "/maven-proxy/style.css" );
+        assertTrue( "rcc.getSnapshotCacheFailures()", rcc.getSnapshotCacheFailures());
 
         /////////////////////// Check Proxies ////////////////////////
         assertEquals( "rcc.getProxies().size()", 3, rcc.getProxies().size() );

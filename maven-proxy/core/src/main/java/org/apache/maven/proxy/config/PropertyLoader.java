@@ -38,6 +38,7 @@ public class PropertyLoader
     public static final String PORT = "port";
     public static final String SNAPSHOT_UPDATE = "snapshot.update";
     public static final String SNAPSHOT_UPDATE_INTERVAL = "snapshot.update.interval";
+    public static final String SNAPSHOT_CACHE_FAILURES = "snapshot.cache.failures";
 
     public static final int DEFAULT_PORT = 4321;
     public static final String LAST_MODIFIED_DATE_FORMAT = "lastModifiedDateFormat";
@@ -82,6 +83,7 @@ public class PropertyLoader
         }
 
         rcc.setSnapshotUpdate( Boolean.valueOf( getMandatoryProperty( props, SNAPSHOT_UPDATE ) ).booleanValue() );
+        rcc.setSnapshotCacheFailures( Boolean.valueOf( getMandatoryProperty( props, SNAPSHOT_CACHE_FAILURES ) ).booleanValue() );
         if ( props.getProperty( SNAPSHOT_UPDATE_INTERVAL ) == null )
         {
             rcc.setSnapshotUpdateInterval( 0 );

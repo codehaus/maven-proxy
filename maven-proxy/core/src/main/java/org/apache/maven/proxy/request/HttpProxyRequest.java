@@ -44,4 +44,9 @@ public class HttpProxyRequest extends BaseProxyRequest
     {
         return httpRequest.getMethod().equalsIgnoreCase( "HEAD" );
     }
+
+    public String getSourceDescription()
+    {
+        return httpRequest.getRemoteAddr();
+    }
 }

@@ -10,6 +10,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.maven.proxy.components.NotFoundProxyArtifact;
 import org.apache.maven.proxy.components.ProxyArtifact;
 import org.apache.maven.proxy.components.SnapshotCache;
 import org.apache.maven.proxy.components.impl.DefaultSnapshotCache;
@@ -52,6 +53,8 @@ public class DownloadEngine
 
     public void process( ProxyRequest request, ProxyResponse response ) throws IOException
     {
+        LOGGER.debug( "Request: source=" + request.getSourceDescription() + ", path=" + request.getPath()
+                        + ", lastModified=" + request.getLastModified() + ", headOnly=" + request.isHeadOnly() );
         try
         {
             //If we try to update snapshots, and this is a snapshot
@@ -182,11 +185,23 @@ public class DownloadEngine
 
         if ( latestArtifact == null )
         {
+            if ( rcc.getSnapshotCacheFailures() )
+            {
+                LOGGER.info( "Caching fact that " + request.getPath() + " was not found." );
+                NotFoundProxyArtifact npa = new NotFoundProxyArtifact( rcc.getGlobalRepo(), request.getPath() );
+                snapshotCache.setSnapshot( request.getPath(), npa );
+            }
             response.sendError( HttpServletResponse.SC_NOT_FOUND );
             return;
         }
 
         snapshotCache.setSnapshot( request.getPath(), latestArtifact );
+
+        if ( latestArtifact instanceof NotFoundProxyArtifact )
+        {
+            response.sendError( HttpServletResponse.SC_NOT_FOUND );
+            return;
+        }
 
         response.setLastModified( latestArtifact.getLastModified() );
 
@@ -211,15 +226,12 @@ public class DownloadEngine
 
         GlobalRepoConfiguration globalRepo = rcc.getGlobalRepo();
 
-        File targetFile = globalRepo.getLocalFile( request.getPath() );
-
         if ( !latestArtifact.getRepo().getCopy() )
         {
             try
             {
-                LOGGER
-                                .info( "Transferring " + request.getPath() + " directly to user from "
-                                                + latestArtifact.getRepo() );
+                File targetFile = ( (FileRepoConfiguration) latestArtifact.getRepo() ).getLocalFile( request.getPath() );
+                LOGGER.info( latestArtifact + ": Sending " + request.getPath() );
                 latestArtifact.getRepo().retrieveArtifact( targetFile, request.getPath() );
                 //FIXME Send content type
                 response.setLastModified( targetFile.lastModified() );

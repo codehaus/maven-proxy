@@ -23,6 +23,7 @@ public interface ProxyRequest
 {
     public long getLastModified();
     public String getPath();
+    public String getSourceDescription();
     
     public boolean isSnapshot();
     

@@ -5,31 +5,46 @@
 <div class="h1">
 <table>
   <tr class="${ab.Next}">
-    <th">Local Store</th><td>$rcc.LocalStore</td>
+    <th>Local Store</th><td>$rcc.LocalStore</td>
   </tr>
   <tr class="${ab.Next}">
-    <th">Server Name</th><td>$!rcc.ServerName</td>
+    <th>Server Name</th><td>$!rcc.ServerName</td>
   </tr>
   <tr class="${ab.Next}">
-    <th">Port</th><td>$rcc.Port</td>
+    <th>Port</th><td>$rcc.Port</td>
   </tr>
   <tr class="${ab.Next}">
-    <th">Prefix</th><td>$rcc.Prefix</td>
+    <th>Prefix</th><td>$rcc.Prefix</td>
   </tr>
   <tr class="${ab.Next}">
-    <th">Browsable</th><td>$rcc.Browsable</td>
+    <th>Browsable</th><td>$rcc.Browsable</td>
   </tr>
   <tr class="${ab.Next}">
-    <th">Searchable</th><td>$rcc.Searchable</td>
+    <th>Searchable</th><td>$rcc.Searchable</td>
   </tr>
   <tr class="${ab.Next}">
-    <th">Last Modified Date Format</th><td>$!rcc.LastModifiedDataFormat</td>
+    <th>Last Modified Date Format</th><td>$!rcc.LastModifiedDataFormat</td>
   </tr>
   <tr class="${ab.Next}">
-    <th">Snapshot Update</th><td>$rcc.SnapshotUpdate</td>
+    <th>Snapshot Update</th><td>$rcc.SnapshotUpdate</td>
   </tr>
   <tr class="${ab.Next}">
-    <th">Snapshot Update Interval</th><td>$rcc.SnapshotUpdateInterval</td>
+    <th>Snapshot Update Interval</th><td>$rcc.SnapshotUpdateInterval</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Stylesheet</th><td>$!rcc.Stylesheet</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>BgColor</th><td>$!rcc.BgColor</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>BgColorHighlight</th><td>$!rcc.BgColorHighlight</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>RowColor</th><td>$!rcc.RowColor</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>RowColorHighlight</th><td>$!rcc.RowColorHighlight</td>
   </tr>
 </table>
 </div>
@@ -48,6 +63,9 @@
   </tr>
   <tr class="${ab.Next}">
     <th>Copy</th><td>$repo.Copy</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Hard Fail</th><td>$repo.HardFail</td>
   </tr>
   #if ($repo.Proxy)
   <tr class="${ab.Next}">

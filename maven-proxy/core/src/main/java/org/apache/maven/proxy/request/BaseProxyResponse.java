@@ -34,7 +34,7 @@ public abstract class BaseProxyResponse implements ProxyResponse
     //Nothing to do here yet
     public void sendFile( File file ) throws IOException
     {
-        InputStream is = new FileInputStream( file );
+        InputStream is = new FileInputStream( file );        
         OutputStream os = getOutputStream();
         try
         {

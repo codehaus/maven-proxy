@@ -69,11 +69,11 @@ public class DownloadEngineTest extends TestCase
     {
         if ( !target.exists() )
         {
-            LOGGER.info( "Skipping deletion of non-existent target: " + target );
+            LOGGER.debug( "Skipping deletion of non-existent target: " + target );
             return;
         }
 
-        LOGGER.info( "Starting removal of: " + target );
+        LOGGER.debug( "Starting removal of: " + target );
         File children[] = target.listFiles();
         for ( int i = 0; i < children.length; i++ )
         {
@@ -95,7 +95,7 @@ public class DownloadEngineTest extends TestCase
                 }
             }
         }
-        LOGGER.info( "Finished removal of: " + target );
+        LOGGER.debug( "Finished removal of: " + target );
     }
 
     /**
@@ -348,6 +348,33 @@ public class DownloadEngineTest extends TestCase
 
     /**
      * Test non existent SNAPSHOT
+     */
+    public void testNonExistentSnapshotWithFailuresCached() throws IOException
+    {
+        RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
+        GlobalRepoConfiguration globalRepo = new GlobalRepoConfiguration( "target/repo" );
+        MockRepoConfiguration mockRepo = new MockRepoConfiguration( "MockA", "target/mock-a", "MockA", true, true );
+        rcc.addRepo( globalRepo );
+        rcc.addRepo( mockRepo );
+
+        rcc.setSnapshotUpdate( true );
+        rcc.setSnapshotUpdateInterval( 3600 );
+        rcc.setSnapshotCacheFailures( true );
+
+        MockProxyRequest pRequest = new MockProxyRequest( "/gubba/gubba-SNAPSHOT.jar", 2000L, true );
+        MockProxyResponse pResponse = new MockProxyResponse();
+        DownloadEngine engine = new DownloadEngine( rcc );
+        engine.process( pRequest, pResponse );
+        assertEquals( HttpServletResponse.SC_NOT_FOUND, pResponse.getStatusCode() );
+        assertEquals( 1, mockRepo.getHits() );
+        
+        pResponse = new MockProxyResponse();
+        engine.process( pRequest, pResponse );
+        assertEquals( 1, mockRepo.getHits() );
+    }
+
+    /**
+     * Test non existent artifact
      */
     public void testNonExistentArtifact() throws IOException
     {

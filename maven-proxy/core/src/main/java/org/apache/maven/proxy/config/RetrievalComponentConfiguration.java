@@ -45,6 +45,10 @@ public class RetrievalComponentConfiguration
     private boolean browsable;
     private int port;
     private String prefix;
+    private boolean snapshotUpdate;
+    private int snapshotUpdateInterval;
+    private boolean snapshotCacheFailures;
+    private String lastModifiedDateFormat;
 
     public String getPrefix()
     {
@@ -141,10 +145,6 @@ public class RetrievalComponentConfiguration
     {
         this.serverName = serverName;
     }
-
-    private int snapshotUpdateInterval;
-    private boolean snapshotUpdate;
-    private String lastModifiedDateFormat;
 
     public int getSnapshotUpdateInterval()
     {
@@ -279,5 +279,15 @@ public class RetrievalComponentConfiguration
     public void setRowColorHighlight( String rowColorHighlight )
     {
         this.rowColorHighlight = rowColorHighlight;
+    }
+
+    public boolean getSnapshotCacheFailures()
+    {
+        return snapshotCacheFailures;
+    }
+
+    public void setSnapshotCacheFailures( boolean snapshotCacheFailures )
+    {
+        this.snapshotCacheFailures = snapshotCacheFailures;
     }
 }
