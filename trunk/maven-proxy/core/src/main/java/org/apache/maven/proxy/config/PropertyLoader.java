@@ -133,7 +133,7 @@ public class PropertyLoader
                 String username = repoProps.getProperty( "username" );
                 String password = repoProps.getProperty( "password" );
                 String description = repoProps.getProperty( "description" );
-                String proxyKey = repoProps.getProperty( "cache.failures" );
+                String proxyKey = repoProps.getProperty( "proxy" );
                 
                 Boolean cacheFailures = Boolean.valueOf( repoProps.getProperty( "cache.failures", "false" ) );
                 Long cachePeriod = Long.valueOf( repoProps.getProperty( "cache.period", "0" ) );
