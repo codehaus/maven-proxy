@@ -82,7 +82,7 @@ public class DownloadEngine
         {
             RepoConfiguration repo = (RepoConfiguration) iter.next();
 
-            ProxyArtifact snapshot = repo.getSnapshot( request.getPath() );
+            ProxyArtifact snapshot = repo.getMetaInformation( request.getPath() );
 
             if ( snapshot != null )
             {
@@ -142,11 +142,11 @@ public class DownloadEngine
         //Find latest snapshot
         for ( Iterator iter = rcc.getRepos().iterator(); iter.hasNext(); )
         {
-            RepoConfiguration repo = (RepoConfiguration) iter.next();
+            final RepoConfiguration repo = (RepoConfiguration) iter.next();
             final ProxyArtifact pArtifact;
             try
             {
-                pArtifact = repo.getSnapshot( request.getPath() );
+                pArtifact = repo.getMetaInformation( request.getPath() );
             }
             catch ( FileNotFoundException e )
             {

@@ -40,7 +40,7 @@ public class FlakyRepoConfiguration extends RepoConfiguration
         this.flakyStatus = flakyStatus;
     }
 
-    public ProxyArtifact getSnapshot( String url ) throws FileNotFoundException
+    public ProxyArtifact getMetaInformation( String url ) throws FileNotFoundException
     {
         if ( flakyStatus )
         {

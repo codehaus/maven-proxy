@@ -102,7 +102,7 @@ public class HttpRepoConfiguration extends RepoConfiguration
         return client;
     }
 
-    public ProxyArtifact getSnapshot( String url )
+    public ProxyArtifact getMetaInformation( String url )
     {
         try
         {
