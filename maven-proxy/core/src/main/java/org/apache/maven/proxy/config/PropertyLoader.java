@@ -12,13 +12,30 @@ import java.util.StringTokenizer;
 public class PropertyLoader
 {
     private static final String REPO_LOCAL_STORE = "repo.local.store";
+    private static final String PORT = "port";
 
-    public RetrievalComponentConfiguration load(Properties props) throws IOException
+    public RetrievalComponentConfiguration load(Properties props) throws IOException, ValidationException
     {
         RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
 
         rcc.setLocalStore(props.getProperty(REPO_LOCAL_STORE));
         
+        if (props.getProperty(PORT) == null)
+        {
+            rcc.setPort(8080);
+        }
+        else
+        {
+            try
+            {
+                rcc.setPort(Integer.parseInt(props.getProperty(PORT)));
+            }
+            catch (NumberFormatException ex)
+            {
+                throw new ValidationException("Property " + PORT + " must be a integer");
+            }
+        }
+
         {
             String propertyList = props.getProperty("proxy.list");
             StringTokenizer tok = new StringTokenizer(propertyList, ",");
@@ -59,7 +76,8 @@ public class PropertyLoader
         return rcc;
 
     }
-    public RetrievalComponentConfiguration load(InputStream is) throws IOException
+    
+    public RetrievalComponentConfiguration load(InputStream is) throws IOException, ValidationException
     {
         Properties props = new Properties();
         props.load(is);

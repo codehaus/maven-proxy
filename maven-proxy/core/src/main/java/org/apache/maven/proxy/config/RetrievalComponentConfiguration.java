@@ -16,6 +16,23 @@ public class RetrievalComponentConfiguration
     private final Map proxies = new HashMap();
     private final List repos = new ArrayList();
     private String localStore;
+    private int port;
+
+    /**
+     * @return
+     */
+    public int getPort()
+    {
+        return port;
+    }
+
+    /**
+     * @param port
+     */
+    public void setPort(int port)
+    {
+        this.port = port;
+    }
 
     /**
      * @return
