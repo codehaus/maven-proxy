@@ -1,4 +1,5 @@
 #!/bin/sh
+echo Building maven-proxy
 
 
 for module in core standalone webapp;
