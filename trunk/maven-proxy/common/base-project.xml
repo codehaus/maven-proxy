@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <project>
   <pomVersion>3</pomVersion>
-  
-  <id>maven-proxy</id>
+  <id>maven:nil-by-mouth</id>
   <name>Maven Repository Proxy</name>
-  <currentVersion>1.0-dev</currentVersion>
+  <currentVersion>SNAPSHOT</currentVersion>
   <organization>
     <name>Walding Consulting Services</name>
     <url></url>
@@ -52,8 +51,6 @@
 
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
-    
-
     <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
     
     <!-- Unit test cases -->
