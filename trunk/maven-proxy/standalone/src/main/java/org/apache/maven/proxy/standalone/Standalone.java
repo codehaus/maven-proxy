@@ -11,7 +11,6 @@ import org.apache.maven.proxy.RepositoryServlet;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpServer;
 import org.mortbay.http.SocketListener;
-import org.mortbay.http.handler.ResourceHandler;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.MultiException;
 
@@ -159,7 +158,7 @@ public class Standalone
 
         {
             //Verify remote repository set
-            String tmp = checkPropertySet(p, ProxyProperties.REPOSITORY_REMOTE);
+            checkPropertySet(p, ProxyProperties.REPOSITORY_REMOTE);
         }
 
         // all ok
