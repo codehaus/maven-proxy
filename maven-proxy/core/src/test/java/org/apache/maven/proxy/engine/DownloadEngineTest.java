@@ -25,7 +25,6 @@ import junit.framework.TestCase;
 
 import org.apache.maven.proxy.config.GlobalRepoConfiguration;
 import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
-import org.apache.maven.proxy.engine.DownloadEngine;
 
 /**
  * This is the core test of how the proxy works with snapshots, partial downloads etc.  
@@ -484,6 +483,32 @@ public class DownloadEngineTest extends TestCase
         assertEquals( HttpServletResponse.SC_NOT_MODIFIED, pResponse.getStatusCode() );
 
         assertNull( pResponse.getContent() );
+    }
+
+    /**
+     * Test behaviour when a repository is hit twice before the server has a chance to download from first attempt
+     */
+    public void testSlowRepositoryGettingHitTwice() throws IOException
+    {
+        RetrievalComponentConfiguration rcc = new RetrievalComponentConfiguration();
+        GlobalRepoConfiguration globalRepo = new GlobalRepoConfiguration( "target/repo" );
+        SlowRepoConfiguration mockRepo = new SlowRepoConfiguration( "MockA", "target/mock-a", "MockA", true, true,
+                        true, 3600, 1000 );
+        rcc.addRepo( globalRepo );
+        rcc.addRepo( mockRepo );
+
+        rcc.setSnapshotUpdate( true );
+
+        MockProxyRequest pRequest = new MockProxyRequest( "/gubba/gubba-SNAPSHOT.jar", 2000L, true, -1 );
+        MockProxyResponse pResponse = new MockProxyResponse();
+        DownloadEngine engine = new DownloadEngine( rcc );
+        engine.process( pRequest, pResponse );
+        assertEquals( HttpServletResponse.SC_NOT_FOUND, pResponse.getStatusCode() );
+        assertEquals( 1, mockRepo.getHits() );
+
+        pResponse = new MockProxyResponse();
+        engine.process( pRequest, pResponse );
+        assertEquals( 1, mockRepo.getHits() );
     }
 
 }
