@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <display-name>maven-proxy</display-name>
+    <description>
+		Maven Repository Proxy                
+    </description>
+	
+	<listener>
+		<listener-class>
+ 			org.codehaus.plexus.servlet.PlexusServletContextListener
+	    </listener-class>
+	</listener>
+	
+    <servlet>
+            <servlet-name>RepositoryServlet</servlet-name>
+            <servlet-class>org.apache.maven.proxy.RepositoryServlet</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>RepositoryServlet</servlet-name>
+      <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+      <servlet-name>RepositoryServlet</servlet-name>
+      <url-pattern>/a</url-pattern>
+    </servlet-mapping>
+
+</web-app>

@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<project>
+  <pomVersion>3</pomVersion>
+  
+  <id>maven-proxy</id>
+  <name>Maven Repository Proxy</name>
+  <currentVersion>1.0-dev</currentVersion>
+  <organization>
+    <name>Walding Consulting Services</name>
+    <url></url>
+    <logo></logo>
+  </organization>
+  <inceptionYear>2003</inceptionYear>
+  <siteAddress>projects.walding.com</siteAddress>
+  <siteDirectory>/var/www/projects.walding.com/html/overlord</siteDirectory>
+  <package>org.apache.maven.proxy</package>
+  <description>Simulates a remote repository that has upstream providers.
+   You download from it, it downloads from parent.  Avoids full mirroring.
+  </description>
+  <logo>/images/overlord.png</logo>
+  	
+  <repository>
+    <connection>
+      scm:cvs:pserver:anoncvs@cvs.walding.com:/home/cvs:overlord
+    </connection>
+    <url>
+      http://cvs.walding.com/viewcvs/overlord/
+    </url>
+  </repository>
+
+  <dependencies>
+    <dependency>
+      <id>servletapi</id>
+      <version>2.3</version>
+    </dependency>
+    
+    <dependency>
+      <id>jetty</id>
+      <version>4.2.9</version>
+    </dependency>
+
+	<dependency>
+      <id>log4j</id>
+      <version>1.2.8</version>
+    </dependency>
+
+    <dependency>
+      <id>maven:maven-fetch</id>
+      <version>SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    
+
+    <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
+    
+    <!-- Unit test cases -->
+    <unitTest>
+		<resources><resource>
+			<directory>src/test/java</directory>
+			<includes><include>**/*</include></includes>
+			<excludes><exclude>**/*.java</exclude></excludes>
+		</resource></resources>
+		<includes>
+			<include>**/*Test.java</include>
+		</includes>
+	</unitTest>
+              
+    <resources>
+      <resource>    	
+				<directory>src/main/java</directory>
+				<includes><include>**/*</include></includes>
+				<excludes><exclude>**/*.java</exclude></excludes>
+	  </resource>
+      <resource>    	
+				<directory>src/main/resources</directory>
+				<includes><include>velocity/**/*</include></includes>
+	  </resource>
+    </resources>
+   
+  </build>
+  
+  
+</project>
+
