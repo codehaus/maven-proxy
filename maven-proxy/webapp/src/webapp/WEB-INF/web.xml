@@ -3,18 +3,12 @@
         "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
         "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
-    <display-name>maven-proxy</display-name>
+    <display-name>maven-proxy-webapp</display-name>
     <description>
-		Maven Repository Proxy                
+		Maven Repository Proxy Webapp             
     </description>
 	
-	<listener>
-		<listener-class>
- 			org.codehaus.plexus.servlet.PlexusServletContextListener
-	    </listener-class>
-	</listener>
-	
-    <servlet>
+	<servlet>
             <servlet-name>RepositoryServlet</servlet-name>
             <servlet-class>org.apache.maven.proxy.RepositoryServlet</servlet-class>
     </servlet>
@@ -24,9 +18,4 @@
       <url-pattern>/*</url-pattern>
     </servlet-mapping>
     
-    <servlet-mapping>
-      <servlet-name>RepositoryServlet</servlet-name>
-      <url-pattern>/a</url-pattern>
-    </servlet-mapping>
-
 </web-app>
