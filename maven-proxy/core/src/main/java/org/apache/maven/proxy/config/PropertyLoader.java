@@ -11,8 +11,10 @@ import java.util.StringTokenizer;
  */
 public class PropertyLoader
 {
-    private static final String REPO_LOCAL_STORE = "repo.local.store";
-    private static final String PORT = "port";
+    public static final String REPO_LOCAL_STORE = "repo.local.store";
+    public static final String PORT = "port";
+    public static final int DEFAULT_PORT = 4321;
+    public static final String BROWSABLE = "browsable";
 
     public RetrievalComponentConfiguration load(Properties props) throws IOException, ValidationException
     {
@@ -22,7 +24,7 @@ public class PropertyLoader
         
         if (props.getProperty(PORT) == null)
         {
-            rcc.setPort(8080);
+            rcc.setPort(DEFAULT_PORT);
         }
         else
         {
@@ -35,6 +37,8 @@ public class PropertyLoader
                 throw new ValidationException("Property " + PORT + " must be a integer");
             }
         }
+        
+        rcc.setBrowsable(Boolean.valueOf(props.getProperty(BROWSABLE)).booleanValue());
 
         {
             String propertyList = props.getProperty("proxy.list");
