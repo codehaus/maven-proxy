@@ -18,6 +18,8 @@ package org.apache.maven.proxy.request;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.maven.proxy.DownloadEngine;
+
 /**
  * @author Ben Walding
  */
@@ -32,7 +34,7 @@ public class HttpProxyRequest extends BaseProxyRequest
 
     public long getLastModified()
     {
-        return httpRequest.getDateHeader( "Last-Modified" );
+        return DownloadEngine.round( httpRequest.getDateHeader( "Last-Modified" ) );
     }
 
     public String getPath()

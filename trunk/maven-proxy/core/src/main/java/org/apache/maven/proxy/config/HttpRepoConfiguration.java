@@ -173,13 +173,13 @@ public class HttpRepoConfiguration extends RepoConfiguration
             throw new FileNotFoundException( "Error " + fullUrl );
         }
 
-        DownloadEngine.download( out, method.getResponseBodyAsStream() );
+        DownloadEngine.download( out, method.getResponseBodyAsStream(), getLastModified( method ) );
 
         return new RetrievalDetails( out );
 
     }
 
-    private static long getLastModified( HttpMethod method ) throws DateParseException
+    private static long getLastModified( HttpMethod method )
     {
         Header lastModifiedHeader = method.getResponseHeader( "Last-Modified" );
         if ( lastModifiedHeader == null )
@@ -187,7 +187,15 @@ public class HttpRepoConfiguration extends RepoConfiguration
             return -1;
         }
         String lastModifiedString = lastModifiedHeader.getValue();
-        return DateParser.parseDate( lastModifiedString ).getTime();
-    }
 
+        try
+        {
+            return DateParser.parseDate( lastModifiedString ).getTime();
+        }
+        catch ( DateParseException e )
+        {
+            LOGGER.warn( "Unable to parse Last-Modified header : " + lastModifiedString );
+            return System.currentTimeMillis();
+        }
+    }
 }

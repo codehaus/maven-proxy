@@ -30,8 +30,6 @@ import org.codehaus.plexus.util.StringInputStream;
 public class MockRepoConfiguration extends RepoConfiguration
 {
     /** log4j logger */
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger
-                    .getLogger( MockRepoConfiguration.class );
     public static final String MOCK_DATA_100 = "abcdefghij1234567890klmnopqrst1112131415abcdefghij1234567890klmnopqrst1112131415abcdefghij1234567890";
 
     private long hits = 0L;
@@ -57,14 +55,7 @@ public class MockRepoConfiguration extends RepoConfiguration
 
         if ( url.equals( "/a/a-SNAPSHOT.jar" ) || url.equals( "/b/b-1.1.jar" ) )
         {
-            DownloadEngine.download( out, new StringInputStream( MOCK_DATA_100 ) );
-            LOGGER.info( "lastmodbefore:" + out.lastModified() );
-            if ( !out.setLastModified( 1010L ) )
-            {
-                //If we can't set the last modified time, then none of our not modified checking will work.
-                LOGGER.error( "Failure setting the last modified time on " + out );
-            }
-            LOGGER.info( "lastmodafter:" + out.lastModified() );
+            DownloadEngine.download( out, new StringInputStream( MOCK_DATA_100 ), 1005000L );
             return new RetrievalDetails( out );
         }
 
@@ -79,7 +70,7 @@ public class MockRepoConfiguration extends RepoConfiguration
         {
             ProxyArtifact snapshot = new ProxyArtifact( this, url );
             snapshot.setSize( 100 );
-            snapshot.setLastModified( 1010L );
+            snapshot.setLastModified( 1005000L );
             return snapshot;
         }
 
@@ -87,7 +78,7 @@ public class MockRepoConfiguration extends RepoConfiguration
         {
             ProxyArtifact snapshot = new ProxyArtifact( this, url );
             snapshot.setSize( 100 );
-            snapshot.setLastModified( 1010L );
+            snapshot.setLastModified( 1005000L );
             return snapshot;
         }
 

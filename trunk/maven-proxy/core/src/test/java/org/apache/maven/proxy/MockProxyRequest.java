@@ -36,7 +36,7 @@ public class MockProxyRequest extends BaseProxyRequest
 
     public long getLastModified()
     {
-        return lastModified;
+        return DownloadEngine.round(lastModified);
     }
 
     public String getPath()

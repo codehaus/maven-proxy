@@ -19,12 +19,10 @@ package org.apache.maven.proxy.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-import org.apache.maven.proxy.IOUtility;
+import org.apache.maven.proxy.DownloadEngine;
 import org.apache.maven.proxy.RetrievalDetails;
 import org.apache.maven.proxy.components.ProxyArtifact;
 
@@ -70,11 +68,7 @@ public class FileRepoConfiguration extends RepoConfiguration
             if ( getCopy() )
             {
                 InputStream is = new FileInputStream( file );
-                OutputStream os = new FileOutputStream( out );
-                IOUtility.transferStream( is, os );
-                //out.setLastModified( file.lastModified() );
-                IOUtility.close( is );
-                IOUtility.close( os );
+                DownloadEngine.download( out, is, file.lastModified() );
             }
             return new RetrievalDetails( out );
         }

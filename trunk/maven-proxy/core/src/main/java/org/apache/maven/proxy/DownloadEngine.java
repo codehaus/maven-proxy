@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletResponse;
@@ -289,7 +290,7 @@ public class DownloadEngine
      * @param target
      * @param is
      */
-    public static void download( File target, InputStream is )
+    public static void download( File target, InputStream is, long lastModified )
     {
         File dir = target.getParentFile();
         dir.mkdirs();
@@ -305,6 +306,17 @@ public class DownloadEngine
             IOUtility.close( is );
             target.delete();
             tmpTarget.renameTo( target );
+
+            if ( !target.setLastModified( lastModified ) )
+            {
+                LOGGER.warn( target + ".setLastModified(" + lastModified + ") failed" );
+            }
+
+            if ( target.lastModified() != lastModified )
+            {
+                LOGGER.warn( target + ".setLastModified(" + lastModified + ") didn't stick - now "
+                                + target.lastModified() );
+            }
         }
         catch ( Exception e )
         {
@@ -320,6 +332,27 @@ public class DownloadEngine
     {
         snapshotCache.stop();
         snapshotCache.start();
+    }
+
+    /**
+     * Rounds a long value to the nearest 1000
+     * It appears that Unix style systems don't store last modified times down to milliseconds. As such
+     * we're going to have to strip off the final
+     * This is possibly the most anal way of doing it, but I can't be bothered about thinking about the implications.
+     */
+    private static final BigDecimal DIVISOR = new BigDecimal( 1000 );
+
+    public static long round( long input )
+    {
+        if ( input % DIVISOR.longValue() != 0 && input != -1 )
+        {
+            LOGGER.info( "Rounding a last modified value..." );
+            BigDecimal bd = new BigDecimal( input );
+            BigDecimal rounded = bd.divide( DIVISOR, BigDecimal.ROUND_HALF_EVEN );
+            return rounded.multiply( DIVISOR ).longValueExact();
+        }
+
+        return input;
     }
 
 }
