@@ -85,11 +85,21 @@ public class RepositoryServlet extends HttpServlet
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(RepositoryServlet.class);
 
     private RetrievalComponentConfiguration rcc = null;
-    private File baseDir;
+    private File localStoreDir;
+
+    /* (non-Javadoc)
+     * @see javax.servlet.Servlet#destroy()
+     */
+    public void destroy()
+    {
+        rcc = null;
+        localStoreDir = null;
+        super.destroy();
+    }
 
     protected long getLastModified(HttpServletRequest request)
     {
-        LOGGER.info("Checking getLastModified(): " + request.getPathInfo());
+        LOGGER.debug("Checking getLastModified(): " + request.getPathInfo());
         final File f = getFileForRequest(request);
 
         if (f.exists() && f.isFile())
@@ -106,19 +116,17 @@ public class RepositoryServlet extends HttpServlet
     {
         rcc = (RetrievalComponentConfiguration) getServletContext().getAttribute("config");
 
-        
-
-        baseDir = new File(rcc.getLocalStore());
-        if (!baseDir.exists())
+        localStoreDir = new File(rcc.getLocalStore());
+        if (!localStoreDir.exists())
         {
-            LOGGER.info("Local Repository (" + baseDir.getAbsolutePath() + ") does not exist");
+            LOGGER.info("Local Repository (" + localStoreDir.getAbsolutePath() + ") does not exist");
         }
 
     }
 
     public File getFileForRequest(HttpServletRequest request)
     {
-        return new File(baseDir, request.getPathInfo());
+        return new File(localStoreDir, request.getPathInfo());
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -126,11 +134,20 @@ public class RepositoryServlet extends HttpServlet
         final String pathInfo = request.getPathInfo();
         LOGGER.info("Received request: " + pathInfo);
 
+        if (pathInfo.equalsIgnoreCase("/favicon.ico"))
+        {
+            handleImageRequest("favicon.ico", response);
+            return;
+        }
+
         if (pathInfo.endsWith("/"))
         {
-            if (rcc.isBrowsable())  {
+            if (rcc.isBrowsable())
+            {
                 handleBrowseRequest(request, response);
-            } else  {
+            }
+            else
+            {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN);
             }
             return;
@@ -141,6 +158,21 @@ public class RepositoryServlet extends HttpServlet
             return;
         }
     }
+
+    /**
+     * @param string
+     * @param response
+     */
+    private void handleImageRequest(String string, HttpServletResponse response) throws IOException
+    {
+        response.setContentType("x-ico");
+        OutputStream os = response.getOutputStream();
+        InputStream is = getClass().getResourceAsStream("favicon.ico");
+        IOUtility.transferStream(is, os);
+        IOUtility.close(is);
+    }
+
+    
 
     private void handleDownloadRequest(HttpServletRequest request, HttpServletResponse response)
         throws FileNotFoundException, IOException
@@ -156,7 +188,7 @@ public class RepositoryServlet extends HttpServlet
 
                 try
                 {
-                    File f = new File(baseDir, request.getPathInfo());
+                    File f = new File(localStoreDir, request.getPathInfo());
                     f.getParentFile().mkdirs();
                     if (f.exists())
                     {
@@ -169,11 +201,9 @@ public class RepositoryServlet extends HttpServlet
 
                     InputStream is = new FileInputStream(f);
 
-                    //TODO could tailor the mime type
                     response.setContentType("application/octet-stream");
                     OutputStream os = response.getOutputStream();
                     IOUtility.transferStream(is, os);
-                    //IOUtility.close(os);
                     IOUtility.close(is);
                     done = true;
                     break;
@@ -186,15 +216,9 @@ public class RepositoryServlet extends HttpServlet
 
             if (!done)
             {
-                LOGGER.warn("Could not find " + request.getPathInfo());
+                LOGGER.warn("Could not find upstream resource :" + request.getPathInfo());
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find " + request.getPathInfo());
             }
-        }
-        catch (ResourceNotFoundFetchException e)
-        {
-            //This is not a huge error. Can this even occur as Tryvgis put the catch inside?
-            LOGGER.info("Couldn't find upstream resource : " + e.getMessage());
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getLocalizedMessage());
         }
         catch (FetchException e)
         {
@@ -218,26 +242,51 @@ public class RepositoryServlet extends HttpServlet
         pw.println("  <title>maven-proxy</title>");
         pw.println("  <style type='text/css'>");
         pw.println("    * { font-family: tahoma,verdana,arial; }");
-        pw.println("    div.dir { left-margin: 1cm; }");
+        pw.println("    tr.dir { left-margin: 1cm; }");
         pw.println("  </style>");
         pw.println("</head>");
         pw.println("<body>");
         pw.println("<div>Browsing " + pathInfo + "</div>");
-        File dir = new File(baseDir, pathInfo);
+        File dir = new File(localStoreDir, pathInfo);
         File[] files = dir.listFiles();
         if (files == null)
         {
             files = new File[0];
         }
+
+        pw.println("<table>");
+        pw.println("<colgroup>");
+        pw.println("  <col width='3*'>");
+        pw.println("  <col width='*'>");
+        pw.println("</colgroup>");
+        pw.println("<tr class='dir'><td><a href='..'>..</a></td><td></td></tr>");
         for (int i = 0; i < files.length; i++)
         {
             File theFile = files[i];
-            if (theFile.isDirectory())  {
-                pw.println("<div class='dir'><a href='" + pathInfo + theFile.getName() + "/'>" + theFile.getName() + "</a></div>");
-            } else  {
-                pw.println("<div class='file'><a href='" + pathInfo + theFile.getName() + "'>" + theFile.getName() + "</a></div>");
+            if (theFile.isDirectory())
+            {
+                pw.println(
+                    "<tr class='dir'><td><a href='"
+                        + pathInfo
+                        + theFile.getName()
+                        + "/'>"
+                        + theFile.getName()
+                        + "</a></td><td></td></tr>");
+            }
+            else
+            {
+                pw.println(
+                    "<tr class='file'><td><a href='"
+                        + pathInfo
+                        + theFile.getName()
+                        + "'>"
+                        + theFile.getName()
+                        + "</a></td><td>"
+                        + theFile.length()
+                        + "</td></tr>");
             }
         }
+        pw.println("</table>");
         pw.println("</body>");
         pw.println("</html>");
         return;
