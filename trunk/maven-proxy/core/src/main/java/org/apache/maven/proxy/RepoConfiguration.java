@@ -1,6 +1,8 @@
 package org.apache.maven.proxy;
 
 /**
+ * Immutable.
+ * 
  * @author  Ben Walding
  * @version $Id$
  */
