@@ -50,6 +50,10 @@ public class RepositoryServlet extends HttpServlet
     public void init() throws ServletException
     {
         Properties props = (Properties) getServletContext().getAttribute("properties");
+        String remote;
+        int i = 1;
+        boolean done = false;
+
         baseDir = new File(props.getProperty(ProxyProperties.REPOSITORY_LOCAL));
 
         if (!baseDir.exists())
@@ -57,23 +61,22 @@ public class RepositoryServlet extends HttpServlet
             LOGGER.info("Local Repository (" + baseDir.getAbsolutePath() + ") does not exist");
         }
 
+        while(!done)
         {
             DefaultRetrievalComponent rc = new DefaultRetrievalComponent();
-            rc.setBaseUrl(props.getProperty(ProxyProperties.REPOSITORY_REMOTE));
+
+            remote = props.getProperty(ProxyProperties.REPOSITORY_REMOTE + "." + i);
+            if(remote == null) {
+                done = true;
+                break;
+            }
+
+            LOGGER.info("Adding " + remote);
+            rc.setBaseUrl(remote);
             configureProxy(rc, props);
             retrievers.add(rc);
+            i++;
         }
-
-        //I want you motivated to do the configuration reader!
-        //{
-        //    DefaultRetrievalComponent rc = new DefaultRetrievalComponent();
-        //    rc.setBaseUrl("http://dist.codehaus.org/");
-        //            rc.setProxyHost(props.getProperty(ProxyProperties.PARENT_PROXY_HOST));
-        //            rc.setProxyPort(Integer.parseInt(props.getProperty(ProxyProperties.PARENT_PROXY_PORT)));
-        //            rc.setProxyUsername(props.getProperty(ProxyProperties.PARENT_PROXY_USERNAME));
-        //            rc.setProxyPassword(props.getProperty(ProxyProperties.PARENT_PROXY_PASSWORD));
-        //    retrievers.add(rc);
-        //}
     }
 
     public File getFileForRequest(HttpServletRequest request)
