@@ -83,8 +83,8 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "configuration.getUrl()", "file:///./target/repo", configuration.getUrl() );
         assertEquals( "configuration.getDescription()", "Global Repository", configuration.getDescription() );
         assertEquals( "configuration.getHardFail()", true, configuration.getHardFail() );
-        assertEquals( "configuration.getCacheFailures()", true, configuration.getCacheFailures() );
-        assertEquals( "configuration.getCachePeriod()", 3600, configuration.getCachePeriod() );
+        assertEquals( "configuration.getCacheFailures()", false, configuration.getCacheFailures() );
+        assertEquals( "configuration.getCachePeriod()", 0, configuration.getCachePeriod() );
     }
 
     private void verifyRepoLocal( FileRepoConfiguration configuration )
@@ -94,6 +94,8 @@ public class PropertyLoaderTest extends TestCase
         assertEquals( "configuration.getDescription()", "Super Secret Custom Repository", configuration
                         .getDescription() );
         assertEquals( "configuration.getHardFail()", true, configuration.getHardFail() );
+        assertEquals( "configuration.getCachePeriod()", 0, configuration.getCachePeriod() );
+        assertEquals( "configuration.getCacheFailures()", false, configuration.getCacheFailures() );
     }
 
     private void verifyProxyOne( ProxyConfiguration pcOne )
