@@ -57,42 +57,18 @@ package org.apache.maven.proxy.config;
  */
 
 /**
- * Immutable.
  * 
  * @author  Ben Walding
  * @version $Id$
  */
-public class RepoConfiguration
-{
-    private final String key;
-    private final String url;
-    
-    public RepoConfiguration(String key, String url)
-    {
-        this.key = key;
-        this.url = url;
-    }
+public class FileRepoConfiguration extends RepoConfiguration {
 
-    
-    
-
-    /**
-     * @return
-     */
-    public String getUrl()
-    {
-        return url;
-    }
-
-    
-
-    /**
-     * @return
-     */
-    public String getKey()
-    {
-        // TODO Auto-generated method stub
-        return key;
-    }
+	/**
+	 * @param key
+	 * @param url
+	 */
+	public FileRepoConfiguration(String key, String url) {
+		super(key, url);
+	}
 
 }

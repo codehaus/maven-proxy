@@ -1,4 +1,4 @@
-package org.apache.maven.proxy.config;
+package org.apache.maven.proxy;
 
 /* ====================================================================
  * The Apache Software License, Version 1.1
@@ -56,43 +56,18 @@ package org.apache.maven.proxy.config;
  * ====================================================================
  */
 
+
+import java.io.File;
+import java.util.Comparator;
+
 /**
- * Immutable.
- * 
  * @author  Ben Walding
  * @version $Id$
  */
-public class RepoConfiguration
-{
-    private final String key;
-    private final String url;
-    
-    public RepoConfiguration(String key, String url)
-    {
-        this.key = key;
-        this.url = url;
-    }
-
-    
-    
-
-    /**
-     * @return
-     */
-    public String getUrl()
-    {
-        return url;
-    }
-
-    
-
-    /**
-     * @return
-     */
-    public String getKey()
-    {
-        // TODO Auto-generated method stub
-        return key;
-    }
-
+public class FileComparator implements Comparator {
+	public int compare(Object o1, Object o2) {
+		File f1 = (File) o1;
+        File f2 = (File) o2;
+        return f1.compareTo(f2);
+	}
 }
