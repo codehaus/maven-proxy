@@ -3,7 +3,7 @@
   xmlns:ant="jelly:ant">
 
   <goal name="build:snapshot">
-    <attainGoal name="uberjar"/>
+    <attainGoal name="javaapp:jar"/>
     <attainGoal name="build:snapshot:dist"/>
   </goal>
   
@@ -15,7 +15,7 @@
   <goal name="build:snapshot:dist">
     <zip file="target/maven-proxy-standalone-SNAPSHOT.zip">
       <fileset dir="target">
-        <include name="maven-proxy-standalone-*uber.jar"/>
+        <include name="maven-proxy-standalone-*-app.jar"/>
       </fileset>
     </zip>
     
