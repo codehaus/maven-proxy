@@ -13,8 +13,8 @@ public class ConfigurationTest extends TestCase
     {
         //String concat done so CVS doesn't change my test case all the time
         {
-            String input = "$" + "Name: KOMODO-TEMP " + "$";
-            assertEquals( "KOMODO-TEMP", Standalone.extractName( input ) );
+            String input = "$" + "Name: MAVENPROXY-TEMP " + "$";
+            assertEquals( "MAVENPROXY-TEMP", Standalone.extractName( input ) );
         }
 
         {
