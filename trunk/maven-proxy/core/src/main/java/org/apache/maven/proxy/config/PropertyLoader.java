@@ -31,26 +31,37 @@ import java.util.StringTokenizer;
  */
 public class PropertyLoader
 {
+
     public static final String REPO_LOCAL_STORE = "repo.local.store";
 
     public static final String REPO_CUSTOM_STORE = "repo.custom.store";
 
     public static final String PORT = "port";
+
     public static final String SNAPSHOT_UPDATE = "snapshot.update";
+
     public static final String SNAPSHOT_UPDATE_INTERVAL = "snapshot.update.interval";
+
     public static final String SNAPSHOT_CACHE_FAILURES = "snapshot.cache.failures";
 
     public static final int DEFAULT_PORT = 4321;
+
     public static final String LAST_MODIFIED_DATE_FORMAT = "lastModifiedDateFormat";
+
     public static final String DEFAULT_LAST_MODIFIED_DATE_FORMAT = null;
 
     public static final String BROWSABLE = "browsable";
+
     public static final String SEARCHABLE = "searchable";
 
     public static final String STYLESHEET = "stylesheet";
+
     public static final String BGCOLOR = "css.bgColor";
+
     public static final String BGCOLORHIGHLIGHT = "css.bgColorHighlight";
+
     public static final String ROWCOLOR = "css.rowColor";
+
     public static final String ROWCOLORHIGHLIGHT = "css.rowColorHighlight";
 
     public static final String PREFIX = "prefix";
@@ -134,7 +145,7 @@ public class PropertyLoader
                 String password = repoProps.getProperty( "password" );
                 String description = repoProps.getProperty( "description" );
                 String proxyKey = repoProps.getProperty( "proxy" );
-                
+
                 Boolean cacheFailures = Boolean.valueOf( repoProps.getProperty( "cache.failures", "false" ) );
                 Long cachePeriod = Long.valueOf( repoProps.getProperty( "cache.period", "0" ) );
                 Boolean hardFail = Boolean.valueOf( repoProps.getProperty( "hardfail", "true" ) );
@@ -155,13 +166,14 @@ public class PropertyLoader
                 if ( url.startsWith( "http://" ) )
                 {
                     rc = new HttpRepoConfiguration( key, url, description, username, password, hardFail.booleanValue(),
-                                    proxy, cacheFailures.booleanValue(), cachePeriod.longValue() );
+                            proxy, cacheFailures.booleanValue(), cachePeriod.longValue() );
                 }
 
                 if ( url.startsWith( "file:///" ) )
                 {
                     boolean copy = "true".equalsIgnoreCase( repoProps.getProperty( "copy" ) );
-                    rc = new FileRepoConfiguration( key, url, description, copy, hardFail.booleanValue(), cacheFailures.booleanValue(), cachePeriod.longValue() );
+                    rc = new FileRepoConfiguration( key, url, description, copy, hardFail.booleanValue(), cacheFailures
+                            .booleanValue(), cachePeriod.longValue() );
                 }
 
                 if ( rc == null )
@@ -173,8 +185,51 @@ public class PropertyLoader
             }
         }
         validateDirectories( rcc );
+        validateLocalRepo( rcc );
+        validateRemoteRepo( rcc );
         return rcc;
 
+    }
+
+    /**
+     * Checks to make sure a specific value is set
+     * @throws ValidationException if value is null
+     */
+    private String checkSet( String value, String propertyName ) throws ValidationException
+    {
+        if ( value == null )
+        {
+            throw new ValidationException( "Missing property '" + propertyName + "'" );
+        }
+
+        return value;
+    }
+
+    private void validateLocalRepo( RetrievalComponentConfiguration rcc ) throws ValidationException
+    {
+        //Verify local repository set
+        String tmp = checkSet( rcc.getLocalStore(), PropertyLoader.REPO_LOCAL_STORE );
+
+        File file = new File( tmp );
+        if ( !file.exists() )
+        {
+            throw new ValidationException( "The local repository doesn't exist: " + file.getAbsolutePath() );
+        }
+
+        if ( !file.isDirectory() )
+        {
+            throw new ValidationException( "The local repository must be a directory: " + file.getAbsolutePath() );
+        }
+    }
+
+    private void validateRemoteRepo( RetrievalComponentConfiguration rcc ) throws ValidationException
+    {
+        //Verify remote repository set
+        //only warn if missing
+        if ( rcc.getRepos().size() < 1 )
+        {
+            throw new ValidationException( "At least one remote repository must be configured." );
+        }
     }
 
     private Properties getSubset( Properties props, String prefix )
@@ -183,7 +238,7 @@ public class PropertyLoader
         Properties result = new Properties();
         while ( keys.hasMoreElements() )
         {
-            String key = (String) keys.nextElement();
+            String key = ( String ) keys.nextElement();
             String value = props.getProperty( key );
             if ( key.startsWith( prefix ) )
             {
@@ -234,10 +289,10 @@ public class PropertyLoader
         List repos = rcc.getRepos();
         for ( Iterator iter = repos.iterator(); iter.hasNext(); )
         {
-            RepoConfiguration repo = (RepoConfiguration) iter.next();
+            RepoConfiguration repo = ( RepoConfiguration ) iter.next();
             if ( repo instanceof FileRepoConfiguration )
             {
-                FileRepoConfiguration fileRepo = (FileRepoConfiguration) repo;
+                FileRepoConfiguration fileRepo = ( FileRepoConfiguration ) repo;
                 File f2 = new File( fileRepo.getBasePath() );
                 if ( !f2.exists() )
                 {
