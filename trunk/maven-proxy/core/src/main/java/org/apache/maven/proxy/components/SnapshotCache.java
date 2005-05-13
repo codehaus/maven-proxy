@@ -1,6 +1,5 @@
 package org.apache.maven.proxy.components;
 
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 
 /**
  * @author Ben Walding

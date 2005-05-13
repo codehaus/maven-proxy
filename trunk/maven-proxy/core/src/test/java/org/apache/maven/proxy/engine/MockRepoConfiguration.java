@@ -16,15 +16,13 @@ package org.apache.maven.proxy.engine;
  * limitations under the License.
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.maven.proxy.components.ProxyArtifact;
 import org.apache.maven.proxy.config.RepoConfiguration;
-import org.apache.maven.proxy.engine.DownloadEngine;
-import org.apache.maven.proxy.engine.RetrievalDetails;
-import org.codehaus.plexus.util.StringInputStream;
 
 /**
  * @author Ben Walding
@@ -57,13 +55,13 @@ public class MockRepoConfiguration extends RepoConfiguration
 
         if ( url.equals( "/a/a-SNAPSHOT.jar" ) || url.equals( "/b/b-1.1.jar" ) )
         {
-            DownloadEngine.download( out, new StringInputStream( MOCK_DATA_100 ), 1005000L );
+            DownloadEngine.download( out, new ByteArrayInputStream( MOCK_DATA_100.getBytes() ), 1005000L );
             return new RetrievalDetails( out );
         }
 
         if ( url.equals( "/b/b-1.1.jar.md5" ) )
         {
-            DownloadEngine.download( out, new StringInputStream( MOCK_DATA_33 ), 1006000L );
+            DownloadEngine.download( out, new ByteArrayInputStream( MOCK_DATA_33.getBytes() ), 1006000L );
             return new RetrievalDetails( out );
         }
 
