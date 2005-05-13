@@ -1,5 +1,6 @@
+##Can't have spaces before header
 #macro(parseHeader)
-	#parse("header.vtl")
+#parse("header.vtl")
 #end
 
 #macro(parseFooter)

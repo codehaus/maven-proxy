@@ -1,4 +1,7 @@
-<html>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <title>$pageTitle</title>
     #if ($stylesheet)
@@ -30,10 +33,10 @@
 </table>
 
 <div class="top-level-menu">
-	<a href="$retrace/servlets/Config" #if ($topLevel == "CONFIG")class="selected"#end accessKey="c"><u>C</u>ONFIG</a>
+	<a href="$retrace/servlets/Config" #if ($topLevel == "CONFIG")class="selected"#end accesskey="c"><span class="u">C</span>ONFIG</a>
 	#if ($rcc.Searchable)
-      <a href="$retrace/servlets/Search" #if ($topLevel == "SEARCH")class="selected"#end accessKey="s"><u>S</u>EARCH</a>
+      <a href="$retrace/servlets/Search" #if ($topLevel == "SEARCH")class="selected"#end accesskey="s"><span class="u">S</span>EARCH</a>
 	#end
-	<a href="$retrace/repository" #if ($topLevel == "REPOSITORY")class="selected"#end accessKey="r"><u>R</u>EPOSITORY</a>
-	<a href="$retrace/servlets/Admin" #if ($topLevel == "ADMIN")class="selected"#end accessKey="a"><u>A</u>DMIN</a>
+	<a href="$retrace/repository" #if ($topLevel == "REPOSITORY")class="selected"#end accesskey="r"><span class="u">R</span>EPOSITORY</a>
+	<a href="$retrace/servlets/Admin" #if ($topLevel == "ADMIN")class="selected"#end accesskey="a"><span class="u">A</span>DMIN</a>
 </div>

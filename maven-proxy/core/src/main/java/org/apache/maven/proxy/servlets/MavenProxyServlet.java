@@ -20,6 +20,7 @@ public abstract class MavenProxyServlet extends VelocityServlet
 
     public void init() throws ServletException
     {
+        super.init();
         rcc = (RetrievalComponentConfiguration) getServletContext().getAttribute( "config" );
     }
 
