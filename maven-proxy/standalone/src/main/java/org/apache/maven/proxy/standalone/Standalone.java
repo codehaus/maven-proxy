@@ -50,6 +50,7 @@ import org.mortbay.util.InetAddrPort;
  */
 public class Standalone
 {
+
     public static final String CVS_NAME = "$Name$";
 
     public static String getTag()
@@ -108,7 +109,10 @@ public class Standalone
         }
         finally
         {
-            is.close();
+            if ( is != null )
+            {
+                is.close();
+            }
         }
 
         final RetrievalComponentConfiguration rcc;
@@ -134,7 +138,7 @@ public class Standalone
         System.out.println( "Saving repository at " + rcc.getLocalStore() );
         for ( Iterator iter = rcc.getRepos().iterator(); iter.hasNext(); )
         {
-            RepoConfiguration repo = (RepoConfiguration) iter.next();
+            RepoConfiguration repo = ( RepoConfiguration ) iter.next();
             System.out.println( "Scanning repository: " + repo.getUrl() );
         }
         System.out.println( "Starting..." );
@@ -252,7 +256,9 @@ public class Standalone
 
         try
         {
-            rcc = ( new PropertyLoader() ).load( new FileInputStream( file ) );
+            PropertyLoader propertyLoader = new PropertyLoader();
+            rcc = propertyLoader.load( new FileInputStream( file ) );
+            return rcc;
         }
         catch ( FileNotFoundException ex )
         {
@@ -264,42 +270,6 @@ public class Standalone
             throw new ValidationException( ex );
         }
 
-        {
-            //Verify local repository set
-            String tmp = checkSet( rcc.getLocalStore(), PropertyLoader.REPO_LOCAL_STORE );
-
-            file = new File( tmp );
-            if ( !file.exists() )
-            {
-                throw new ValidationException( "The local repository doesn't exist: " + file.getAbsolutePath() );
-            }
-
-            if ( !file.isDirectory() )
-            {
-                throw new ValidationException( "The local repository must be a directory: " + file.getAbsolutePath() );
-            }
-        }
-
-        {
-            //Verify remote repository set
-            //only warn if missing
-            if ( rcc.getRepos().size() < 1 )
-            {
-                throw new ValidationException( "At least one remote repository must be configured." );
-            }
-        }
-
-        // all ok
-        return rcc;
     }
 
-    private String checkSet( String value, String propertyName ) throws ValidationException
-    {
-        if ( value == null )
-        {
-            throw new ValidationException( "Missing property '" + propertyName + "'" );
-        }
-
-        return value;
-    }
 }
