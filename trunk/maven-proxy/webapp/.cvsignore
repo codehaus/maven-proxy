@@ -1,5 +1,6 @@
+target
 .classpath
 .project
 .clover
-target
-maven.log
+*.log
+*.log.?
