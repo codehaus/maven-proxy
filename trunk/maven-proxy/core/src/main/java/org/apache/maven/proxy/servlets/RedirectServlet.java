@@ -16,6 +16,6 @@ public class RedirectServlet extends HttpServlet
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException,
                     IOException
     {
-        response.sendRedirect( "/servlets/Config" );
+        response.sendRedirect( request.getContextPath() + "/servlets/Config" );
     }
 }
