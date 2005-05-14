@@ -54,6 +54,18 @@
       <Array type="java.lang.String"/>
     </Set>
   </Call>
+  
+  <!-- We also mount it under test, as that is what most end-users will want to do and we need to test a non-root installation -->
+  <Call name="addWebApplication">
+    <Arg>/test</Arg>
+    <Arg>src/webapp</Arg>
+
+    <Set name="extractWAR">false</Set> 
+
+    <Set name="virtualHosts">
+      <Array type="java.lang.String"/>
+    </Set>
+  </Call>
 
   <!-- =============================================================== -->
   <!-- Configure the Other Server Options                              -->
