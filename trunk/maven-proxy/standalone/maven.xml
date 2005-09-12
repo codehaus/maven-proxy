@@ -20,7 +20,7 @@
     </zip>
     
     <copy file="target/maven-proxy-standalone-SNAPSHOT.zip"
-          todir="/dist/maven-proxy/distributions/"/>
+          todir="${mavenproxy.dist.dir}"/>
   </goal>
   
   <goal name="run" prereqs="jar:jar">
