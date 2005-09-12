@@ -13,7 +13,7 @@
     </zip>
     
     <copy file="target/maven-proxy-webapp-SNAPSHOT.zip"
-          todir="/dist/maven-proxy/distributions/"/>
+          todir="${mavenproxy.dist.dir}"/>
   </goal>
   
   
