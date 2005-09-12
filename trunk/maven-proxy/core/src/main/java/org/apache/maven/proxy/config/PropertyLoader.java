@@ -40,8 +40,6 @@ public class PropertyLoader
 
     public static final String SNAPSHOT_UPDATE = "snapshot.update";
 
-    public static final String SNAPSHOT_UPDATE_INTERVAL = "snapshot.update.interval";
-
     public static final String SNAPSHOT_CACHE_FAILURES = "snapshot.cache.failures";
 
     public static final int DEFAULT_PORT = 4321;
