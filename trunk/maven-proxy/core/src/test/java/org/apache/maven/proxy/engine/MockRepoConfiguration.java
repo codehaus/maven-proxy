@@ -2,13 +2,13 @@ package org.apache.maven.proxy.engine;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,7 +53,7 @@ public class MockRepoConfiguration extends RepoConfiguration
     {
         incrementHits();
 
-        if ( url.equals( "/a/a-SNAPSHOT.jar" ) || url.equals( "/b/b-1.1.jar" ) )
+        if ( url.equals( "/a/a-SNAPSHOT.jar" ) || url.equals( "/b/b-1.1.jar" ) || url.equals("/b/maven-metadata.xml") || url.equals( "/b/b-1.1.pom" ) )
         {
             DownloadEngine.download( out, new ByteArrayInputStream( MOCK_DATA_100.getBytes() ), 1005000L );
             return new RetrievalDetails( out );
@@ -93,6 +93,22 @@ public class MockRepoConfiguration extends RepoConfiguration
             ProxyArtifact snapshot = new ProxyArtifact( this, url );
             snapshot.setSize( 33 );
             snapshot.setLastModified( 1006000L );
+            return snapshot;
+        }
+
+        if ( url.equals( "/b/maven-metadata.xml" ) )
+        {
+            ProxyArtifact snapshot = new ProxyArtifact( this, url );
+            snapshot.setSize( 100 );
+            snapshot.setLastModified( 1005000L );
+            return snapshot;
+        }
+
+        if ( url.equals( "/b/b-1.1.pom" ) )
+        {
+            ProxyArtifact snapshot = new ProxyArtifact( this, url );
+            snapshot.setSize( 100 );
+            snapshot.setLastModified( 1005000L );
             return snapshot;
         }
 

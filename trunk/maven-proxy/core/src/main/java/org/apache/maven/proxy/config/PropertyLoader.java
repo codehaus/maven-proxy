@@ -2,13 +2,13 @@ package org.apache.maven.proxy.config;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,6 +41,10 @@ public class PropertyLoader
     public static final String SNAPSHOT_UPDATE = "snapshot.update";
 
     public static final String SNAPSHOT_CACHE_FAILURES = "snapshot.cache.failures";
+
+    public static final String METADATA_UPDATE = "metadata.update";
+
+    public static final String POM_UPDATE = "pom.update";
 
     public static final int DEFAULT_PORT = 4321;
 
@@ -92,6 +96,8 @@ public class PropertyLoader
         }
 
         rcc.setSnapshotUpdate( Boolean.valueOf( getMandatoryProperty( props, SNAPSHOT_UPDATE ) ).booleanValue() );
+        rcc.setMetaDataUpdate( Boolean.valueOf( getOptionalProperty( props, METADATA_UPDATE , "true") ).booleanValue() );
+        rcc.setPOMUpdate( Boolean.valueOf( getOptionalProperty( props, POM_UPDATE , "false") ).booleanValue() );
 
         rcc.setBrowsable( Boolean.valueOf( getMandatoryProperty( props, BROWSABLE ) ).booleanValue() );
         rcc.setSearchable( Boolean.valueOf( getOptionalProperty( props, SEARCHABLE, "true" ) ).booleanValue() );
