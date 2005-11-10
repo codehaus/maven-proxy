@@ -22,7 +22,7 @@
     
     <dependency>
       <id>servletapi</id>
-      <version>2.4-20040521</version>
+      <version>2.4</version>
       <properties>
         <war.bundle>false</war.bundle>
       </properties>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>commons-httpclient</groupId>
 	  <artifactId>commons-httpclient</artifactId>
-      <version>2.0.1</version>
+      <version>2.0.2</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>      
