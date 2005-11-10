@@ -2,13 +2,13 @@ package org.apache.maven.proxy.config;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,6 +46,8 @@ public class RetrievalComponentConfiguration
     private int port;
     private String prefix;
     private boolean snapshotUpdate;
+    private boolean metaDataUpdate;
+    private boolean pomUpdate;
     private String lastModifiedDateFormat;
 
     public String getPrefix()
@@ -152,6 +154,26 @@ public class RetrievalComponentConfiguration
     public boolean getSnapshotUpdate()
     {
         return snapshotUpdate;
+    }
+
+    public void setMetaDataUpdate( boolean metaDataUpdate )
+    {
+        this.metaDataUpdate = metaDataUpdate;
+    }
+
+    public boolean getMetaDataUpdate()
+    {
+        return metaDataUpdate;
+    }
+
+    public void setPOMUpdate( boolean pomUpdate )
+    {
+        this.pomUpdate = pomUpdate;
+    }
+
+    public boolean getPOMUpdate()
+    {
+        return pomUpdate;
     }
 
     public String getLastModifiedDateFormat()

@@ -2,13 +2,13 @@ package org.apache.maven.proxy.engine;
 
 /*
  * Copyright 2003-2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,11 +27,11 @@ import org.apache.maven.proxy.config.GlobalRepoConfiguration;
 import org.apache.maven.proxy.config.RetrievalComponentConfiguration;
 
 /**
- * This is the core test of how the proxy works with snapshots, partial downloads etc.  
- * 
+ * This is the core test of how the proxy works with snapshots, partial downloads etc.
+ *
  * I tried implementing without abstracting it all apart for testing, but it's just too fragile.
- * 
- * 
+ *
+ *
  * @author Ben Walding
  */
 public class DownloadEngineTest extends TestCase
@@ -45,6 +45,8 @@ public class DownloadEngineTest extends TestCase
         rcc.addRepo( new GlobalRepoConfiguration( "target/repo" ) );
         rcc.addRepo( new MockRepoConfiguration( "MockA", "target/mock-a", "MockA", true, true, false, 1000 ) );
         rcc.setSnapshotUpdate( true );
+        rcc.setMetaDataUpdate( true );
+        rcc.setPOMUpdate( true );
         return rcc;
     }
 
@@ -189,7 +191,7 @@ public class DownloadEngineTest extends TestCase
     /**
      * With non snapshot artifacts, the server simply tries to satisfy the download request -
      * it doesn't take into account the last modified values etc.
-     * 
+     *
      * It will respect a head only download request
      */
     public void testArtifactGet() throws IOException
@@ -209,7 +211,7 @@ public class DownloadEngineTest extends TestCase
     /**
      * With non snapshot artifacts, the server simply tries to satisfy the download request -
      * it doesn't take into account the last modified values etc.
-     * 
+     *
      * Having the latest version of a static artifact doesn't really make much sense, but we support it anyway.
      */
     public void testArtifactGetAlreadyHaveLatest() throws IOException
@@ -228,7 +230,7 @@ public class DownloadEngineTest extends TestCase
     /**
      * With non snapshot artifacts, the server simply tries to satisfy the download request -
      * it doesn't take into account the last modified values etc.
-     * 
+     *
      * It will respect a head only download request
      */
     public void testArtifactHeadOnly() throws IOException
@@ -248,7 +250,7 @@ public class DownloadEngineTest extends TestCase
     /**
      * With non snapshot artifacts, the server simply tries to satisfy the download request -
      * it doesn't take into account the last modified values etc.
-     * 
+     *
      * It will respect a head only download request
      */
     public void testNonArtifactHeadOnly() throws IOException
@@ -431,7 +433,7 @@ public class DownloadEngineTest extends TestCase
 
     /**
      * TODO: Do we want to know if the upstream repos are flaking out?
-     * Perhaps an option per repo - hardfail? 
+     * Perhaps an option per repo - hardfail?
      */
     public void testUnreliableRepository() throws IOException
     {
@@ -509,6 +511,74 @@ public class DownloadEngineTest extends TestCase
         pResponse = new MockProxyResponse();
         engine.process( pRequest, pResponse );
         assertEquals( 1, mockRepo.getHits() );
+    }
+
+    /**
+     * The client has requested a maven-metadata.xml download and has provided a Last-Modified entry.
+     */
+    public void testOlderMetaData() throws IOException
+    {
+        MockProxyRequest pRequest = new MockProxyRequest( "/b/maven-metadata.xml", 1006000L, true, -1 );
+        MockProxyResponse pResponse = new MockProxyResponse();
+        DownloadEngine engine = new DownloadEngine( createRCC_A() );
+        engine.process( pRequest, pResponse );
+
+        assertEquals( 1005000L, pResponse.getLastModified() );
+        assertEquals( "application/octet-stream", pResponse.getContentType() );
+        assertEquals( 100, pResponse.getContentLength() );
+        assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
+        assertNull( pResponse.getContent() );
+    }
+
+    /**
+     * The client has requested a maven-metadata.xml download and has provided a Last-Modified entry.
+     */
+    public void testNewerMetaData() throws IOException
+    {
+        MockProxyRequest pRequest = new MockProxyRequest( "/b/maven-metadata.xml", 1002000L, true, -1 );
+        MockProxyResponse pResponse = new MockProxyResponse();
+        DownloadEngine engine = new DownloadEngine( createRCC_A() );
+        engine.process( pRequest, pResponse );
+
+        assertEquals( 1005000L, pResponse.getLastModified() );
+        assertEquals( "application/octet-stream", pResponse.getContentType() );
+        assertEquals( 100, pResponse.getContentLength() );
+        assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
+        assertNull( pResponse.getContent() );
+    }
+
+    /**
+     * The client has requested a maven-metadata.xml download and has provided a Last-Modified entry.
+     */
+    public void testOlderPOM() throws IOException
+    {
+        MockProxyRequest pRequest = new MockProxyRequest( "/b/b-1.1.pom", 1006000L, true, -1 );
+        MockProxyResponse pResponse = new MockProxyResponse();
+        DownloadEngine engine = new DownloadEngine( createRCC_A() );
+        engine.process( pRequest, pResponse );
+
+        assertEquals( 1005000L, pResponse.getLastModified() );
+        assertEquals( "application/octet-stream", pResponse.getContentType() );
+        assertEquals( 100, pResponse.getContentLength() );
+        assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
+        assertNull( pResponse.getContent() );
+    }
+
+    /**
+     * The client has requested a maven-metadata.xml download and has provided a Last-Modified entry.
+     */
+    public void testNewerPOM() throws IOException
+    {
+        MockProxyRequest pRequest = new MockProxyRequest( "/b/b-1.1.pom", 1002000L, true, -1 );
+        MockProxyResponse pResponse = new MockProxyResponse();
+        DownloadEngine engine = new DownloadEngine( createRCC_A() );
+        engine.process( pRequest, pResponse );
+
+        assertEquals( 1005000L, pResponse.getLastModified() );
+        assertEquals( "application/octet-stream", pResponse.getContentType() );
+        assertEquals( 100, pResponse.getContentLength() );
+        assertEquals( HttpServletResponse.SC_OK, pResponse.getStatusCode() );
+        assertNull( pResponse.getContent() );
     }
 
 }

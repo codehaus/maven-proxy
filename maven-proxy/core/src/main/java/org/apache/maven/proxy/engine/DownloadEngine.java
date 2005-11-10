@@ -44,7 +44,9 @@ public class DownloadEngine
         try
         {
             //If we try to update snapshots, and this is a snapshot
-            if ( rcc.getSnapshotUpdate() && request.isSnapshot() )
+            if ( ( rcc.getSnapshotUpdate() && request.isSnapshot() )
+                    || ( rcc.getMetaDataUpdate() && request.isMetaData() )
+                    || ( rcc.getPOMUpdate() && request.isPOM() ) )
             {
                 processSnapshot( request, response );
                 return;
@@ -275,7 +277,7 @@ public class DownloadEngine
 
     /**
      * Downloads a stream to a file, using a temporary file to ensure any problems are not written to target file
-     * 
+     *
      * I'm sure this code is required...
      * @param target
      * @param is
