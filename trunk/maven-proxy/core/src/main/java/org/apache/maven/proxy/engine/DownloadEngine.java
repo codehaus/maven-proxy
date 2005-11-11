@@ -335,7 +335,7 @@ public class DownloadEngine
      * we're going to have to strip off the final
      * This is possibly the most anal way of doing it, but I can't be bothered about thinking about the implications.
      */
-    private static final BigDecimal DIVISOR = new BigDecimal( 1000 );
+    private static final BigDecimal DIVISOR = new BigDecimal( "1000" );
 
     public static long round( long input )
     {
