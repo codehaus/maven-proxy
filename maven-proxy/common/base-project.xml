@@ -30,36 +30,32 @@
 
 
   <build>
-    <sourceDirectory>src/main/java</sourceDirectory>
-    <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
-    
-    <!-- Unit test cases -->
+    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
     <unitTest>
-		<resources><resource>
-			<directory>src/test/java</directory>
-			<includes><include>**/*</include></includes>
-			<excludes><exclude>**/*.java</exclude></excludes>
-		</resource></resources>
-		<includes>
-			<include>**/*Test.java</include>
-		</includes>
-	</unitTest>
-              
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/src/test/resources</directory>
+          <includes>
+            <include>**/**</include>
+          </includes>
+          <filtering>false</filtering>
+        </resource>
+      </resources>
+    </unitTest>
     <resources>
       <resource>
-				<directory>src/main/java</directory>
-				<includes><include>**/*</include></includes>
-				<excludes><exclude>**/*.java</exclude></excludes>
-				<excludes><exclude>**/*.class</exclude></excludes>
-	  </resource>
-      <resource>
-				<directory>src/main/resources</directory>
-				<includes><include>**/*</include></includes>
-	  </resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <includes>
+          <include>**/**</include>
+        </includes>
+        <filtering>false</filtering>
+      </resource>
     </resources>
-   
   </build>
-  
   
 </project>
 
