@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>$pageTitle</title>
+    #if ($stylesheet)
+      <link type="text/css" rel="stylesheet" href="${stylesheet}"/>       
+    #else
+      <link type="text/css" rel="stylesheet" href="$retrace/servlets/Style"/>       
+    #end
+    <link rel="shortcut icon" href="$retrace/images/favicon.png"/>    
+  </head>
+  <body>
+  <table class="page-header">
+  <tr>
+    <th class="page-header-left">
+      ##<img src="$retrace/images/invigilator-small.png"/>
+      maven-proxy
+    </th>
+    <th class="page-header-middle"></th>
+    <th class="page-header-right">
+      #*
+      <img src="$retrace/images/print.gif" title="View a printable version of the current page" onClick="javascript:alert('Not implemented yet.');"/>
+      #if (!$help-wiki)
+        #set ($help-wiki = "index")
+      #end
+      <a href="Wiki?page=$help-wiki"><img style="border: 0" src="$retrace/images/question.gif" title="Get online help about configuring and using Invigilator" /></a>
+      *#
+      $version
+    </th>
+  </tr>
+</table>
+
+<div class="top-level-menu">
+	<a href="$retrace/servlets/Config" #if ($topLevel == "CONFIG")class="selected"#end accesskey="c"><span class="u">C</span>ONFIG</a>
+	#if ($rcc.Searchable)
+      <a href="$retrace/servlets/Search" #if ($topLevel == "SEARCH")class="selected"#end accesskey="s"><span class="u">S</span>EARCH</a>
+	#end
+	<a href="$retrace/repository" #if ($topLevel == "REPOSITORY")class="selected"#end accesskey="r"><span class="u">R</span>EPOSITORY</a>
+	<a href="$retrace/servlets/Admin" #if ($topLevel == "ADMIN")class="selected"#end accesskey="a"><span class="u">A</span>DMIN</a>
+</div>

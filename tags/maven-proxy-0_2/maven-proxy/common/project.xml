@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<project>
+  <extend>../common/base-project.xml</extend>
+  <pomVersion>3</pomVersion>
+  <id>maven-proxy-common</id>
+  <groupId>maven</groupId>
+  <name>Maven Repository Proxy - Common</name>
+  <siteAddress>projects.walding.com</siteAddress>
+  <siteDirectory>/home/projects/maven-proxy/public_html/</siteDirectory>
+  <package>org.apache.maven.proxy</package>
+  <description>Simulates a remote repository that has upstream providers.
+   You download from it, it downloads from parent.  Avoids full mirroring.
+  </description>
+  
+
+  <dependencies>
+    
+  </dependencies>
+
+    
+</project>
+

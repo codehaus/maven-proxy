@@ -1,0 +1,39 @@
+<project default="jar:install"
+  xmlns:j="jelly:core"
+  xmlns:ant="jelly:ant">
+
+  <goal name="build:snapshot">
+    <attainGoal name="javaapp:jar"/>
+    <attainGoal name="build:snapshot:dist"/>
+  </goal>
+  
+  <preGoal name="test:test-resources">
+    <mkdir dir="target/repo"/>
+    <mkdir dir="target/repo-local"/>
+  </preGoal>
+    
+  <goal name="build:snapshot:dist">
+    <zip file="target/maven-proxy-standalone-0.2.zip">
+      <fileset dir="target">
+        <include name="maven-proxy-standalone-*-app.jar"/>
+      </fileset>
+    </zip>
+    
+    <copy file="target/maven-proxy-standalone-0.2.zip"
+          todir="${mavenproxy.dist.dir}"/>
+  </goal>
+  
+  <goal name="run" prereqs="jar:jar">
+    <mkdir dir="target/repo"/>
+  	<java
+      classname="org.apache.maven.proxy.standalone.Standalone"
+      fork="true">
+        <arg value="src/test/test.properties"/>
+        <classpath>
+          <path refid="maven-classpath"/>
+          <path refid="maven.dependency.classpath"/>
+          <pathelement path="target/classes"/>
+        </classpath>
+    </java>
+  </goal>
+</project>

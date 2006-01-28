@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <id>maven:nil-by-mouth</id>
+  <name>Maven Repository Proxy</name>
+  <currentVersion>0.2</currentVersion>
+  <organization>
+    <name>Walding Consulting Services</name>
+    <url></url>
+    <logo></logo>
+  </organization>
+  <inceptionYear>2003</inceptionYear>
+  <siteAddress>projects.walding.com</siteAddress>
+  <siteDirectory>/home/projects/maven-proxy/public_html/${pom.artifactId}</siteDirectory>
+  
+  <package>org.apache.maven.proxy</package>
+  
+  <description>Simulates a remote repository that has upstream providers.
+   You download from it, it downloads from parent.  Avoids full mirroring.
+  </description>
+  
+  <repository>
+    <connection>
+      scm:cvs:pserver:anoncvs@cvs.codehaus.org:/scm/maven-proxy:${pom.artifactId}
+    </connection>
+    <url>
+      http://cvs.maven-proxy.codehaus.org/maven-proxy/
+    </url>
+  </repository>
+
+
+  <build>
+    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/src/test/resources</directory>
+          <includes>
+            <include>**/**</include>
+          </includes>
+          <filtering>false</filtering>
+        </resource>
+      </resources>
+    </unitTest>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <includes>
+          <include>**/**</include>
+        </includes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
+  </build>
+  
+</project>
+

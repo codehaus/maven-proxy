@@ -1,0 +1,10 @@
+<project default="java:jar">
+	<goal name="make-repos">
+		<jar jarfile="${basedir}/src/test-resources/test-a/a.jar">
+			<includes dir="${basedir}">
+				<include name="project.xml"/>
+			</includes>
+		</jar>
+	</goal>
+  
+</project>

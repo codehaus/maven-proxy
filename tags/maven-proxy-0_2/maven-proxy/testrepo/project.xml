@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<project>
+  <extend>../common/base-project.xml</extend>
+  <pomVersion>3</pomVersion>
+  <id>maven-proxy-testrepo</id>
+  <groupId>maven</groupId>
+  <name>Maven Repository Proxy - Test Report</name>
+  <package>org.apache.maven.proxy.testrepo</package>
+  <description>
+  	Simulates a test maven repository, can be used for a variety of things
+  </description>
+ 
+  <dependencies>
+    <dependency>
+      <id>servletapi</id>
+      <version>2.3</version>
+    </dependency>
+    
+    <dependency>
+      <id>jetty</id>
+      <version>4.2.9</version>
+    </dependency>
+    
+  	<dependency>
+      <id>log4j</id>
+      <version>1.2.8</version>
+    </dependency>
+  </dependencies>
+</project>
+

@@ -1,0 +1,103 @@
+#set ($pageTitle = "maven-proxy")
+#parseHeader()
+
+<h1>Local Repository</h1>
+<div class="h1">
+<table>
+  <tr class="${ab.Next}">
+    <th>Local Store</th><td>$rcc.LocalStore</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Server Name</th><td>$!rcc.ServerName</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Port</th><td>$rcc.Port</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Prefix</th><td>$rcc.Prefix</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Browsable</th><td>$rcc.Browsable</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Searchable</th><td>$rcc.Searchable</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Last Modified Date Format</th><td>$!rcc.LastModifiedDataFormat</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Snapshot Update</th><td>$rcc.SnapshotUpdate</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Stylesheet</th><td>$!rcc.Stylesheet</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>BgColor</th><td>$!rcc.BgColor</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>BgColorHighlight</th><td>$!rcc.BgColorHighlight</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>RowColor</th><td>$!rcc.RowColor</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>RowColorHighlight</th><td>$!rcc.RowColorHighlight</td>
+  </tr>
+</table>
+</div>
+
+<h1>Repositories</h1>
+<div class="h1">
+
+#foreach ($repo in $rcc.Repos)
+<h2>$repo.Key</h2>
+<table>
+  <tr class="${ab.Next}">
+    <th>Description</th><td>$repo.Description</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>URL</th><td>$repo.Url</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Copy</th><td>$repo.Copy</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Hard Fail</th><td>$repo.HardFail</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Cache Period</th><td>#if ($repo.CachePeriod.toString() == "0")0 (disabled)#else $repo.CachePeriod seconds#end</td>
+  </tr>
+  <tr class="${ab.Next}">
+    <th>Cache Failures</th><td>$repo.CacheFailures</td>
+  </tr>
+  #if ($repo.Proxy)
+  <tr class="${ab.Next}">
+    <th>Proxy</th><td>$repo.Proxy.Key</td>
+  </tr>
+  #end
+  #if ($repo.BasePath)
+  <tr class="${ab.Next}">
+    <th>Base Path</th><td>$repo.BasePath</td>
+  </tr>
+  #end
+    
+</table>
+#end
+</div>
+<h1>Proxies</h1>
+<div class="h1">
+
+<table>
+  <thead>
+  <tr class="${ab.Next}">
+    <th>Key</th><th>Location</th>
+  </tr>
+  </thead>
+#foreach ($proxy in $rcc.Proxies)
+  <tr class="${ab.Next}">
+    <td>$proxy.Key</td><td>#if ($proxy.Username)$proxy.Username@#end$proxy.Host:$proxy.Port</td>
+  </tr>
+#end
+</table>
+</div>
+#parseFooter()

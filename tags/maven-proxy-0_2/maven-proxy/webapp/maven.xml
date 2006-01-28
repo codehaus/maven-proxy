@@ -1,0 +1,20 @@
+<project default="build:snapshot">
+
+  <goal name="build:snapshot">
+    <attainGoal name="war:war"/>
+    <attainGoal name="build:snapshot:dist"/>
+  </goal>
+  
+  <goal name="build:snapshot:dist">
+    <zip file="target/maven-proxy-webapp-0.2.zip">
+      <fileset dir="target">
+        <include name="maven-proxy-webapp.war"/>
+      </fileset>
+    </zip>
+    
+    <copy file="target/maven-proxy-webapp-0.2.zip"
+          todir="${mavenproxy.dist.dir}"/>
+  </goal>
+  
+  
+</project>

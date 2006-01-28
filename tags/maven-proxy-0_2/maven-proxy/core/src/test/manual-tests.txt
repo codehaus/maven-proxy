@@ -1,0 +1,15 @@
+#!/bin/sh
+
+
+# Here are some manual tests that can be handy to run to test a live maven-proxy.  They exercise several areas
+# that are not exercised during normal unit-tests.
+#HOSTPORT=era.health.qld.gov.au:4321
+HOSTPORT=localhost:9999
+PREFIX=/
+REPOSITORY=repository
+
+rm -f plexus-0.14-SNAPSHOT.jar
+#This should download a shiny fresh jar
+wget -N http://$HOSTPORT$PREFIX/$REPOSITORY/plexus/jars/plexus-0.14-SNAPSHOT.jar
+#Should do nothing
+wget -N http://$HOSTPORT$PREFIX/$REPOSITORY/plexus/jars/plexus-0.14-SNAPSHOT.jar

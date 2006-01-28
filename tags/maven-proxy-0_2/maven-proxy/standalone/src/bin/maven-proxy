@@ -1,0 +1,26 @@
+#!/bin/sh
+
+INVIGILATOR_HOME=`dirname $0`
+
+if [ ! -f $INVIGILATOR_HOME/bin/invigilator ] ; then
+  cd ..
+  if [ ! -f $INVIGILATOR_HOME/bin/invigilator ] ; then
+    exit -1
+  fi
+fi
+INVIGILATOR_HOME=$PWD
+cd $INVIGILATOR_HOME
+echo INVIGILATOR_HOME = $INVIGILATOR_HOME
+
+
+LIB=./lib
+
+CP=$LIB/invigilator-webapp-SNAPSHOT.jar
+
+for jar in `ls $LIB/*.jar`;
+do
+  CP=$CP:$jar
+done
+
+
+java -classpath $CP com.walding.invigilator.webapp.InvigilatorServer

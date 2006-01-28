@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<project>
+  <extend>../common/base-project.xml</extend>
+  <pomVersion>3</pomVersion>
+  <id>maven-proxy-standalone</id>
+  <groupId>maven</groupId>
+  <name>Maven Repository Proxy - Standalone Project</name>
+  <package>org.apache.maven.proxy.standalone</package>
+  <description>Simulates a remote repository that has upstream providers.
+   You download from it, it downloads from parent.  Avoids full mirroring.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>maven-proxy-core</artifactId>
+      <version>0.2</version>
+      <properties>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
+    </dependency>
+    
+    <dependency>
+      <id>servletapi</id>
+      <version>2.4</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>jetty</groupId>
+      <artifactId>org.mortbay.jetty</artifactId>
+      <version>5.1.4</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+
+    <dependency>
+      <id>log4j</id>
+      <version>1.2.8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.4</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.1</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>2.0.2</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>maven-plugins</groupId>
+      <artifactId>maven-javaapp-plugin</artifactId>
+      <version>1.3.1</version>
+      <type>plugin</type>
+    </dependency>
+    
+  </dependencies>
+
+  
+</project>
+

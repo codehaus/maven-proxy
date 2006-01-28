@@ -1,0 +1,40 @@
+##Can't have spaces before header
+#macro(parseHeader)
+#parse("header.vtl")
+#end
+
+#macro(parseFooter)
+	#parse("footer.vtl")
+#end
+
+#macro (createRow $imgSrc $length $lastModifiedDate $link $linkTitle $repoDescription)
+  #set ($lastModifiedString = "")
+
+  #if ( $lastModifiedDate.Class.Name == "java.util.Date")
+    #set ($lastModifiedString = $dateFormat.format( $lastModifiedDate ))
+  #end
+  
+  #set ($lengthString = "")
+  #if ($length.toString() != "-1")
+    #set ($lengthString = $length)
+  #end
+  
+        <tr class="${ab.Next}">
+          <td>
+            <a href="$link"><img src="$imgSrc" alt=""/></a>
+          </td>
+          <td style='text-align:right'>$lengthString</td>
+          <td>$lastModifiedString</td>
+          <td><a href="$link">$linkTitle</a></td>
+          <td>$repoDescription</td>
+          <td></td>
+        </tr>
+#end
+
+#macro (createRow2 $imgSrc $fileElement $repoDescription)
+  #if ($fileElement.isDirectory())
+    #createRow( $imgSrc $fileElement.length() $fileElement.lastModifiedDate() "${fileElement.Name}/" "${fileElement.Name}/" $repoDescription )
+  #else
+    #createRow( $imgSrc $fileElement.length() $fileElement.lastModifiedDate() "${fileElement.Name}" "${fileElement.Name}" $repoDescription )
+  #end
+#end

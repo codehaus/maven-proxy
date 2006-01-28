@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<project default="notapplicable">
+  <extend>../common/base-project.xml</extend>
+  <pomVersion>3</pomVersion>
+  <id>maven-proxy-core</id>
+  <groupId>maven</groupId>
+  <name>Maven Repository Proxy - Core</name>
+  <siteAddress>projects.walding.com</siteAddress>
+  <siteDirectory>/var/www/projects.walding.com/html/overlord</siteDirectory>
+  <package>org.apache.maven.proxy</package>
+  <description>Simulates a remote repository that has upstream providers.
+   You download from it, it downloads from parent.  Avoids full mirroring.
+  </description>
+  <logo>/images/overlord.png</logo>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+    </dependency>
+
+    <dependency>
+      <id>log4j</id>
+      <version>1.2.8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>2.0.2</version>
+    </dependency>
+
+  </dependencies>
+
+
+</project>
+
