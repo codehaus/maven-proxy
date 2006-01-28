@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <id>maven:nil-by-mouth</id>
   <name>Maven Repository Proxy</name>
-  <currentVersion>SNAPSHOT</currentVersion>
+  <currentVersion>0.2</currentVersion>
   <organization>
     <name>Walding Consulting Services</name>
     <url></url>

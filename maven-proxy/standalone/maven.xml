@@ -13,13 +13,13 @@
   </preGoal>
     
   <goal name="build:snapshot:dist">
-    <zip file="target/maven-proxy-standalone-SNAPSHOT.zip">
+    <zip file="target/maven-proxy-standalone-0.2.zip">
       <fileset dir="target">
         <include name="maven-proxy-standalone-*-app.jar"/>
       </fileset>
     </zip>
     
-    <copy file="target/maven-proxy-standalone-SNAPSHOT.zip"
+    <copy file="target/maven-proxy-standalone-0.2.zip"
           todir="${mavenproxy.dist.dir}"/>
   </goal>
   
