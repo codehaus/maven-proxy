@@ -6,7 +6,7 @@
   </preGoal>
   
   <goal name="build:snapshot">
-    <attainGoal name="jar:install-snapshot"/>
+    <attainGoal name="jar:install"/>
   </goal> 
   
 </project>
