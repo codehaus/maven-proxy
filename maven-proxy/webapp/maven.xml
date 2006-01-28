@@ -6,13 +6,13 @@
   </goal>
   
   <goal name="build:snapshot:dist">
-    <zip file="target/maven-proxy-webapp-0.2.zip">
+    <zip file="target/maven-proxy-webapp-0.3-SNAPSHOT.zip">
       <fileset dir="target">
         <include name="maven-proxy-webapp.war"/>
       </fileset>
     </zip>
     
-    <copy file="target/maven-proxy-webapp-0.2.zip"
+    <copy file="target/maven-proxy-webapp-0.3-SNAPSHOT.zip"
           todir="${mavenproxy.dist.dir}"/>
   </goal>
   
