@@ -89,7 +89,7 @@ public class DownloadEngine
                 final File targetFile;
                 if ( repo.getCopy() )
                 {
-                    LOGGER.info( "Copying " + request.getPath() + " from " + globalRepo + " to " + repo );
+                    LOGGER.info( "Copying " + request.getPath() + " from " + repo + " to " + globalRepo );
                     targetFile = globalRepo.getLocalFile( request.getPath() );
                     repo.retrieveArtifact( targetFile, request.getPath() );
                 }
